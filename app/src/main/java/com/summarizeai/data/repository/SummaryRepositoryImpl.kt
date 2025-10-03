@@ -1,7 +1,9 @@
 package com.summarizeai.data.repository
 
 import com.summarizeai.data.local.datasource.SummaryLocalDataSource
-import com.summarizeai.data.local.mapper.SummaryMapper
+import com.summarizeai.data.local.mapper.SummaryMapper.toSummaryData
+import com.summarizeai.data.local.mapper.SummaryMapper.toSummaryDataList
+import com.summarizeai.data.local.mapper.SummaryMapper.toSummaryEntity
 import com.summarizeai.data.model.ApiResult
 import com.summarizeai.data.model.SummaryData
 import com.summarizeai.data.remote.api.SummarizerApi
