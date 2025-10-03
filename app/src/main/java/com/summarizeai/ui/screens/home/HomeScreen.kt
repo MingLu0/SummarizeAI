@@ -1,15 +1,24 @@
 package com.summarizeai.ui.screens.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.summarizeai.ui.theme.*
-import androidx.compose.material3.ExperimentalMaterial3Api
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -17,6 +26,9 @@ fun HomeScreen(
     onNavigateToLoading: () -> Unit,
     onNavigateToOutput: () -> Unit
 ) {
+    var textInput by remember { mutableStateOf("") }
+    var isTextEmpty by remember { mutableStateOf(true) }
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -40,41 +52,122 @@ fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(Spacing.xl),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = Spacing.xl)
+                .padding(top = Spacing.xl),
+            verticalArrangement = Arrangement.spacedBy(Spacing.lg)
         ) {
-            Text(
-                text = "Home Screen",
-                style = MaterialTheme.typography.headlineMedium,
-                color = Gray900
-            )
+            // Text Input Area
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .shadow(
+                        elevation = Elevation.sm,
+                        shape = RoundedCornerShape(CornerRadius.lg),
+                        ambientColor = ShadowColor,
+                        spotColor = ShadowColor
+                    ),
+                colors = CardDefaults.cardColors(containerColor = White),
+                shape = RoundedCornerShape(CornerRadius.lg)
+            ) {
+                BasicTextField(
+                    value = textInput,
+                    onValueChange = { 
+                        textInput = it
+                        isTextEmpty = it.isBlank()
+                    },
+                    textStyle = TextStyle(
+                        color = Gray900,
+                        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                        lineHeight = MaterialTheme.typography.bodyLarge.lineHeight
+                    ),
+                    cursorBrush = SolidColor(Cyan600),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(Spacing.xl)
+                ) { innerTextField ->
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.TopStart
+                    ) {
+                        if (isTextEmpty) {
+                            Text(
+                                text = "Paste or upload your text here...",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Gray400
+                            )
+                        }
+                        innerTextField()
+                    }
+                }
+            }
+            
+            // Upload Button
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = CardDefaults.cardColors(containerColor = White),
+                shape = RoundedCornerShape(CornerRadius.lg)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .border(
+                            width = 2.dp,
+                            color = Gray300,
+                            shape = RoundedCornerShape(CornerRadius.lg)
+                        )
+                        .padding(horizontal = Spacing.lg),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Upload,
+                        contentDescription = "Upload",
+                        tint = Gray700,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(Spacing.sm))
+                    Text(
+                        text = "Upload PDF or DOC",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Gray700
+                    )
+                }
+            }
+            
+            // Summarize Button
+            Button(
+                onClick = {
+                    if (textInput.isNotBlank()) {
+                        onNavigateToLoading()
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .shadow(
+                        elevation = Elevation.lg,
+                        shape = RoundedCornerShape(CornerRadius.xxl),
+                        ambientColor = AccentShadow,
+                        spotColor = AccentShadow
+                    ),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Cyan600
+                ),
+                shape = RoundedCornerShape(CornerRadius.xxl),
+                enabled = textInput.isNotBlank()
+            ) {
+                Text(
+                    text = "Summarize",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = White,
+                    fontWeight = FontWeight.Medium
+                )
+            }
             
             Spacer(modifier = Modifier.height(Spacing.xl))
-            
-            Text(
-                text = "This will be the main input screen with text area and upload functionality",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Gray600
-            )
-            
-            Spacer(modifier = Modifier.height(Spacing.xxl))
-            
-            Button(
-                onClick = onNavigateToLoading,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Go to Loading Screen")
-            }
-            
-            Spacer(modifier = Modifier.height(Spacing.md))
-            
-            Button(
-                onClick = onNavigateToOutput,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Go to Output Screen")
-            }
         }
     }
 }
