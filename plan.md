@@ -9,6 +9,7 @@ Building a native Android app using Jetpack Compose for text summarization with 
 - **Testing**: Unit tests for business logic, E2E tests for user journeys
 - **Version Control**: Descriptive Git commits for each feature
 - **Material 3**: Modern Android design system
+- **Build Quality**: App MUST build successfully before any commits (see BUILD_RULES.md)
 
 ---
 
@@ -175,7 +176,7 @@ Building a native Android app using Jetpack Compose for text summarization with 
 **Goal**: Connect app to local AI summarization service
 
 #### Tasks:
-- [ ] Setup Room database for local storage
+- ✅ Setup Room database for local storage
 - ✅ Create data models for summaries
 - ✅ Implement repository pattern for data access
 - ✅ Setup Retrofit with local API service (http://127.0.0.1:8000/)
