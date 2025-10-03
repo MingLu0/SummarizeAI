@@ -150,9 +150,9 @@ fun HomeScreen(
             // Summarize Button
             Button(
                 onClick = {
-                    viewModel.summarizeText()
                     if (uiState.textInput.isNotBlank()) {
                         onNavigateToLoading()
+                        viewModel.summarizeText()
                     }
                 },
                 modifier = Modifier

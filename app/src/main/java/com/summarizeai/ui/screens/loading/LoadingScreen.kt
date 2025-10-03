@@ -40,6 +40,14 @@ fun LoadingScreen(
             onNavigateBack()
         }
     }
+    
+    // Add timeout mechanism to prevent infinite loading
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(60000) // 60 seconds timeout
+        if (uiState.isLoading) {
+            onNavigateBack()
+        }
+    }
     // Animation for dots
     val infiniteTransition = rememberInfiniteTransition(label = "loading")
     
