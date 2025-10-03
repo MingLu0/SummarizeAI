@@ -1,0 +1,7 @@
+# This file should be renamed to local.properties
+# Android SDK location
+sdk.dir=/Users/ming/Library/Android/sdk
+# Or on Windows:
+# sdk.dir=C\:\\Users\\YourUsername\\AppData\\Local\\Android\\Sdk
+# Or on Linux:
+# sdk.dir=/home/YourUsername/Android/Sdk

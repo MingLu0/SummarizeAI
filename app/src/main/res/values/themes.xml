@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.SummarizeAI" parent="Theme.Material3.DayNight">
+        <!-- Customize your light theme here. -->
+        <item name="colorPrimary">@color/cyan_600</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/cyan_50</item>
+        <item name="colorOnPrimaryContainer">@color/cyan_700</item>
+        <item name="colorSecondary">@color/blue_600</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/blue_50</item>
+        <item name="colorOnSecondaryContainer">@color/blue_700</item>
+        <item name="android:colorBackground">@color/gray_50</item>
+        <item name="colorOnBackground">@color/gray_900</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/gray_900</item>
+    </style>
+
+    <style name="Theme.SummarizeAI" parent="Base.Theme.SummarizeAI" />
+</resources>

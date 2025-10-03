@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Summarize AI</string>
+    
+    <!-- Welcome Screen -->
+    <string name="welcome_title">Summarize Smarter</string>
+    <string name="welcome_subtitle">Turn long text into key insights instantly</string>
+    <string name="get_started">Get Started</string>
+    <string name="learn_more">Learn More</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_history">History</string>
+    <string name="nav_saved">Saved</string>
+    <string name="nav_settings">Settings</string>
+    
+    <!-- Home Screen -->
+    <string name="home_title">Summarize AI</string>
+    <string name="text_input_placeholder">Paste or upload your text here...</string>
+    <string name="upload_button">Upload PDF or DOC</string>
+    <string name="summarize_button">Summarize</string>
+    
+    <!-- Loading Screen -->
+    <string name="loading_title">Analyzing text...</string>
+    <string name="loading_description">Please wait while we summarize your content</string>
+    
+    <!-- Output Screen -->
+    <string name="output_title">Summary</string>
+    <string name="summary_short">Short</string>
+    <string name="summary_medium">Medium</string>
+    <string name="summary_detailed">Detailed</string>
+    <string name="copy_button">Copy</string>
+    <string name="save_button">Save</string>
+    <string name="share_button">Share</string>
+    
+    <!-- History Screen -->
+    <string name="history_title">History</string>
+    <string name="search_placeholder">Search history...</string>
+    <string name="empty_history_title">No History Yet</string>
+    <string name="empty_history_description">Your summarized texts will appear here</string>
+    
+    <!-- Saved Screen -->
+    <string name="saved_title">Saved</string>
+    <string name="empty_saved_title">No Saved Items</string>
+    <string name="empty_saved_description">Bookmark summaries to save them here</string>
+    
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="language_setting">Language</string>
+    <string name="language_description">Choose your preferred language</string>
+    <string name="summary_length_setting">Summary Length</string>
+    <string name="summary_length_description">Adjust the default summary length</string>
+    <string name="dark_mode_setting">Dark Mode</string>
+    <string name="dark_mode_description">Toggle dark theme</string>
+    <string name="about_app">Summarize AI</string>
+    <string name="app_version">Version 1.0.0</string>
+    <string name="app_tagline">Turn long text into key insights instantly</string>
+    
+    <!-- Error Messages -->
+    <string name="network_error">Network not available</string>
+    <string name="api_error">Failed to summarize text. Please try again.</string>
+    <string name="file_upload_error">Failed to upload file. Please try again.</string>
+    
+    <!-- Common -->
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="retry">Retry</string>
+</resources>
