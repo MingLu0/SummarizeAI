@@ -2,8 +2,8 @@ package com.summarizeai.data.repository
 
 import com.summarizeai.data.model.ApiResult
 import com.summarizeai.data.model.SummaryData
-import com.summarizeai.data.model.SummaryRequest
 import com.summarizeai.data.remote.api.SummarizerApi
+import com.summarizeai.data.remote.api.SummarizeRequest
 import com.summarizeai.domain.repository.SummaryRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +22,7 @@ class SummaryRepositoryImpl @Inject constructor(
     
     override suspend fun summarizeText(text: String): ApiResult<SummaryData> {
         return try {
-            val request = SummaryRequest(text = text)
+            val request = SummarizeRequest(text = text)
             val response = api.summarize(request)
             
             val summaryData = SummaryData(
