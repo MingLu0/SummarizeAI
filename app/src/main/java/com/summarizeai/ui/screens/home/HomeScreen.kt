@@ -1,7 +1,9 @@
 package com.summarizeai.ui.screens.home
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -22,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.summarizeai.presentation.viewmodel.HomeViewModel
+import com.summarizeai.utils.FilePickerUtils
 import com.summarizeai.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,6 +35,11 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    
+    val filePickerUtils = FilePickerUtils(context)
+    val filePicker = filePickerUtils.rememberFilePicker { uri ->
+        viewModel.uploadFile(uri)
+    }
     
     Column(
         modifier = Modifier
@@ -119,7 +127,8 @@ fun HomeScreen(
                             color = Gray300,
                             shape = RoundedCornerShape(CornerRadius.lg)
                         )
-                        .padding(horizontal = Spacing.lg),
+                        .padding(horizontal = Spacing.lg)
+                        .clickable { filePicker() },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {

@@ -76,7 +76,7 @@ Building a native Android app using Jetpack Compose for text summarization with 
 - ✅ Add button state management (enabled/disabled)
 - ✅ Setup ViewModel for input state management
 - ✅ Add proper keyboard handling
-- [ ] **File Upload**: Implement PDF/DOC upload with client-side text extraction
+- ✅ **File Upload**: Implement PDF/DOC upload with client-side text extraction
 - ✅ Test text input and file upload functionality
 
 **Deliverable**: Complete Home screen with text input and action buttons
