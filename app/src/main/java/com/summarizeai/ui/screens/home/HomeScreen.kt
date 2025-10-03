@@ -23,8 +23,7 @@ import com.summarizeai.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onNavigateToLoading: () -> Unit,
-    onNavigateToOutput: () -> Unit
+    onNavigateToLoading: () -> Unit
 ) {
     var textInput by remember { mutableStateOf("") }
     var isTextEmpty by remember { mutableStateOf(true) }

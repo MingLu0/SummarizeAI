@@ -18,6 +18,7 @@ import com.summarizeai.ui.theme.*
 
 @Composable
 fun LoadingScreen(
+    onNavigateToOutput: () -> Unit = {},
     onNavigateBack: () -> Unit
 ) {
     // Animation for dots
@@ -143,19 +144,35 @@ fun LoadingScreen(
                 modifier = Modifier.widthIn(max = 280.dp)
             )
             
-            // Back Button (for testing)
+            // Action Buttons (for testing)
             Spacer(modifier = Modifier.height(Spacing.xxl))
             
-            Button(
-                onClick = onNavigateBack,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Gray200
-                )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(Spacing.md)
             ) {
-                Text(
-                    text = "Go Back",
-                    color = Gray700
-                )
+                Button(
+                    onClick = onNavigateToOutput,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Cyan600
+                    )
+                ) {
+                    Text(
+                        text = "View Summary",
+                        color = White
+                    )
+                }
+                
+                Button(
+                    onClick = onNavigateBack,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Gray200
+                    )
+                ) {
+                    Text(
+                        text = "Go Back",
+                        color = Gray700
+                    )
+                }
             }
         }
     }

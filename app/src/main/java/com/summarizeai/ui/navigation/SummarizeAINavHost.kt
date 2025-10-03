@@ -1,5 +1,6 @@
 package com.summarizeai.ui.navigation
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Home
@@ -54,21 +55,24 @@ fun SummarizeAINavHost(
             MainScreenWithBottomNavigation(navController = navController)
         }
         
-        composable(Screen.Loading.route) {
-            LoadingScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-        
-        composable(Screen.Output.route) {
-            OutputScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
+            composable(Screen.Loading.route) {
+                LoadingScreen(
+                    onNavigateToOutput = {
+                        navController.navigate(Screen.Output.route)
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+            
+            composable(Screen.Output.route) {
+                OutputScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
     }
 }
 
@@ -144,9 +148,6 @@ fun MainScreenWithBottomNavigation(navController: NavHostController) {
                 HomeScreen(
                     onNavigateToLoading = {
                         navController.navigate(Screen.Loading.route)
-                    },
-                    onNavigateToOutput = {
-                        navController.navigate(Screen.Output.route)
                     }
                 )
             }
