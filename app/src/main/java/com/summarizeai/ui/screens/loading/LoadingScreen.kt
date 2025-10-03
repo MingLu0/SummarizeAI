@@ -14,13 +14,32 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.summarizeai.presentation.viewmodel.HomeViewModel
 import com.summarizeai.ui.theme.*
 
 @Composable
 fun LoadingScreen(
     onNavigateToOutput: () -> Unit = {},
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    
+    // Navigate to output screen when API call completes successfully
+    LaunchedEffect(uiState.summaryData) {
+        if (uiState.summaryData != null && !uiState.isLoading) {
+            onNavigateToOutput()
+        }
+    }
+    
+    // Navigate back if there's an error
+    LaunchedEffect(uiState.error) {
+        if (uiState.error != null && !uiState.isLoading) {
+            onNavigateBack()
+        }
+    }
     // Animation for dots
     val infiniteTransition = rememberInfiniteTransition(label = "loading")
     
@@ -144,36 +163,6 @@ fun LoadingScreen(
                 modifier = Modifier.widthIn(max = 280.dp)
             )
             
-            // Action Buttons (for testing)
-            Spacer(modifier = Modifier.height(Spacing.xxl))
-            
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(Spacing.md)
-            ) {
-                Button(
-                    onClick = onNavigateToOutput,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Cyan600
-                    )
-                ) {
-                    Text(
-                        text = "View Summary",
-                        color = White
-                    )
-                }
-                
-                Button(
-                    onClick = onNavigateBack,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Gray200
-                    )
-                ) {
-                    Text(
-                        text = "Go Back",
-                        color = Gray700
-                    )
-                }
-            }
         }
     }
 }

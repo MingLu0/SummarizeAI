@@ -31,6 +31,8 @@ import com.summarizeai.ui.screens.loading.LoadingScreen
 import com.summarizeai.ui.screens.output.OutputScreen
 import com.summarizeai.ui.theme.Cyan600
 import com.summarizeai.ui.theme.Gray400
+import com.summarizeai.ui.theme.Gray600
+import com.summarizeai.ui.theme.White
 
 @Composable
 fun SummarizeAINavHost(
@@ -116,7 +118,10 @@ fun MainScreenWithBottomNavigation(navController: NavHostController) {
     
     Scaffold(
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = White,
+                contentColor = Gray600
+            ) {
                 val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
                 
@@ -125,10 +130,16 @@ fun MainScreenWithBottomNavigation(navController: NavHostController) {
                         icon = {
                             Icon(
                                 imageVector = item.icon,
-                                contentDescription = item.label
+                                contentDescription = item.label,
+                                tint = if (currentDestination?.hierarchy?.any { it.route == item.route } == true) Cyan600 else Gray400
                             )
                         },
-                        label = { Text(item.label) },
+                        label = { 
+                            Text(
+                                text = item.label,
+                                color = if (currentDestination?.hierarchy?.any { it.route == item.route } == true) Cyan600 else Gray400
+                            ) 
+                        },
                         selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                         onClick = {
                             bottomNavController.navigate(item.route) {

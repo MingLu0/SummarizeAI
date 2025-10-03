@@ -42,6 +42,9 @@ class SummaryRepositoryImpl @Inject constructor(
             is ApiResult.Error -> {
                 ApiResult.Error(result.message)
             }
+            is ApiResult.Loading -> {
+                ApiResult.Error("Request is still loading")
+            }
         }
     }
     
@@ -54,6 +57,10 @@ class SummaryRepositoryImpl @Inject constructor(
         localDataSource.getSavedSummaries().map { entities ->
             entities.toSummaryDataList()
         }
+    
+    override suspend fun getLatestSummary(): SummaryData? {
+        return localDataSource.getLatestSummary()?.toSummaryData()
+    }
     
     override suspend fun saveSummary(summaryData: SummaryData) {
         localDataSource.updateSaveStatus(summaryData.id, true)

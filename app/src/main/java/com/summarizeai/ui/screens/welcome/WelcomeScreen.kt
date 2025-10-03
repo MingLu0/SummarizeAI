@@ -16,7 +16,8 @@ import com.summarizeai.ui.theme.*
 
 @Composable
 fun WelcomeScreen(
-    onGetStarted: () -> Unit
+    onGetStarted: () -> Unit,
+    onLearnMore: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -111,7 +112,7 @@ fun WelcomeScreen(
             
             // Learn More Button
             OutlinedButton(
-                onClick = { /* TODO: Implement learn more */ },
+                onClick = onLearnMore,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),

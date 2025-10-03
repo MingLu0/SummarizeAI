@@ -33,4 +33,6 @@ class SummaryLocalDataSource @Inject constructor(
     suspend fun deleteAllSummaries() = summaryDao.deleteAllSummaries()
     
     suspend fun getSummaryById(id: String) = summaryDao.getSummaryById(id)
+    
+    suspend fun getLatestSummary() = summaryDao.getLatestSummary()
 }

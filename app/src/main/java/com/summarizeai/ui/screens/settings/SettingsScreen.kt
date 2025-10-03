@@ -6,7 +6,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Nightlight
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -56,7 +58,7 @@ fun SettingsScreen() {
         ) {
             // Language Card
             SettingsCard(
-                icon = Icons.Default.Language,
+                icon = Icons.Default.Public,
                 iconBackground = Cyan50,
                 iconTint = Cyan600,
                 title = "Language",
@@ -89,7 +91,7 @@ fun SettingsScreen() {
             
             // Summary Length Card
             SettingsCard(
-                icon = Icons.Default.TextFields,
+                icon = Icons.Default.Description,
                 iconBackground = Blue50,
                 iconTint = Blue600,
                 title = "Summary Length",
@@ -135,7 +137,7 @@ fun SettingsScreen() {
             
             // Dark Mode Card
             SettingsCard(
-                icon = Icons.Default.DarkMode,
+                icon = Icons.Default.Nightlight,
                 iconBackground = Purple50,
                 iconTint = Purple600,
                 title = "Dark Mode",

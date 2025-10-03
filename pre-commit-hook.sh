@@ -5,8 +5,8 @@
 
 echo "🔍 Running pre-commit build verification..."
 
-# Change to project directory
-cd "$(dirname "$0")"
+# Change to project directory (go up one level from .git/hooks)
+cd "$(dirname "$0")/../.."
 
 # Run debug build
 echo "📱 Building debug APK..."

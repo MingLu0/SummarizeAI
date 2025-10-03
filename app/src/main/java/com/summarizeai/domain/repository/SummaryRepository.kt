@@ -8,6 +8,7 @@ interface SummaryRepository {
     suspend fun summarizeText(text: String): ApiResult<SummaryData>
     fun getAllSummaries(): Flow<List<SummaryData>>
     fun getSavedSummaries(): Flow<List<SummaryData>>
+    suspend fun getLatestSummary(): SummaryData?
     suspend fun saveSummary(summaryData: SummaryData)
     suspend fun deleteSummary(id: String)
     suspend fun toggleSaveStatus(id: String)

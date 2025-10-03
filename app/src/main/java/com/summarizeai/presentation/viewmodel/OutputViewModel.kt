@@ -23,6 +23,19 @@ class OutputViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(OutputUiState())
     val uiState: StateFlow<OutputUiState> = _uiState.asStateFlow()
     
+    init {
+        loadLatestSummary()
+    }
+    
+    private fun loadLatestSummary() {
+        viewModelScope.launch {
+            val latestSummary = repository.getLatestSummary()
+            if (latestSummary != null) {
+                _uiState.value = _uiState.value.copy(summaryData = latestSummary)
+            }
+        }
+    }
+    
     fun setSummaryData(summaryData: SummaryData) {
         _uiState.value = _uiState.value.copy(summaryData = summaryData)
     }
