@@ -122,15 +122,15 @@ Building a native Android app using Jetpack Compose for text summarization with 
 **Goal**: Show list of previously summarized texts
 
 #### Tasks:
-- [ ] Create history screen layout with top bar
-- [ ] Implement search functionality with search input
-- [ ] Create history item cards with proper styling
-- [ ] Add delete functionality for history items
-- [ ] Implement empty state when no history exists
-- [ ] Add proper timestamps and icons
-- [ ] Setup ViewModel for history management
-- [ ] Implement search filtering
-- [ ] Test history CRUD operations
+- ✅ Create history screen layout with top bar
+- ✅ Implement search functionality with search input
+- ✅ Create history item cards with proper styling
+- ✅ Add delete functionality for history items
+- ✅ Implement empty state when no history exists
+- ✅ Add proper timestamps and icons
+- ✅ Setup ViewModel for history management
+- ✅ Implement search filtering
+- ✅ Test history CRUD operations
 
 **Deliverable**: Complete history screen with search and delete functionality
 
