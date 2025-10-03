@@ -1,24 +1,22 @@
 package com.summarizeai.data.repository
 
+import com.summarizeai.data.local.datasource.SummaryLocalDataSource
+import com.summarizeai.data.local.mapper.SummaryMapper
 import com.summarizeai.data.model.ApiResult
 import com.summarizeai.data.model.SummaryData
 import com.summarizeai.data.remote.api.SummarizerApi
 import com.summarizeai.data.remote.api.SummarizeRequest
 import com.summarizeai.domain.repository.SummaryRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class SummaryRepositoryImpl @Inject constructor(
-    private val api: SummarizerApi
+    private val api: SummarizerApi,
+    private val localDataSource: SummaryLocalDataSource
 ) : SummaryRepository {
-    
-    private val _summaries = MutableStateFlow<List<SummaryData>>(emptyList())
     
     override suspend fun summarizeText(text: String): ApiResult<SummaryData> {
         return try {
@@ -32,10 +30,8 @@ class SummaryRepositoryImpl @Inject constructor(
                 detailedSummary = generateDetailedSummary(response.summary)
             )
             
-            // Save to local storage
-            val currentList = _summaries.value.toMutableList()
-            currentList.add(0, summaryData) // Add to beginning
-            _summaries.value = currentList
+            // Save to local database
+            localDataSource.insertSummary(summaryData.toSummaryEntity())
             
             ApiResult.Success(summaryData)
         } catch (e: Exception) {
@@ -43,50 +39,34 @@ class SummaryRepositoryImpl @Inject constructor(
         }
     }
     
-    override fun getAllSummaries(): Flow<List<SummaryData>> = _summaries.asStateFlow()
+    override fun getAllSummaries(): Flow<List<SummaryData>> = 
+        localDataSource.getAllSummaries().map { entities ->
+            entities.toSummaryDataList()
+        }
     
     override fun getSavedSummaries(): Flow<List<SummaryData>> = 
-        _summaries.asStateFlow().map { summaries ->
-            summaries.filter { it.isSaved }
+        localDataSource.getSavedSummaries().map { entities ->
+            entities.toSummaryDataList()
         }
     
     override suspend fun saveSummary(summaryData: SummaryData) {
-        val currentList = _summaries.value.toMutableList()
-        val index = currentList.indexOfFirst { it.id == summaryData.id }
-        if (index != -1) {
-            currentList[index] = summaryData.copy(isSaved = true)
-            _summaries.value = currentList
-        }
+        localDataSource.updateSaveStatus(summaryData.id, true)
     }
     
     override suspend fun deleteSummary(id: String) {
-        val currentList = _summaries.value.toMutableList()
-        currentList.removeAll { it.id == id }
-        _summaries.value = currentList
+        localDataSource.deleteSummaryById(id)
     }
     
     override suspend fun toggleSaveStatus(id: String) {
-        val currentList = _summaries.value.toMutableList()
-        val index = currentList.indexOfFirst { it.id == id }
-        if (index != -1) {
-            val summary = currentList[index]
-            currentList[index] = summary.copy(isSaved = !summary.isSaved)
-            _summaries.value = currentList
+        val entity = localDataSource.getSummaryById(id)
+        entity?.let {
+            localDataSource.updateSaveStatus(id, !it.isSaved)
         }
     }
     
     override fun searchSummaries(query: String): Flow<List<SummaryData>> = 
-        _summaries.asStateFlow().map { summaries ->
-            if (query.isBlank()) {
-                summaries
-            } else {
-                summaries.filter { summary ->
-                    summary.originalText.contains(query, ignoreCase = true) ||
-                    summary.shortSummary.contains(query, ignoreCase = true) ||
-                    summary.mediumSummary.contains(query, ignoreCase = true) ||
-                    summary.detailedSummary.contains(query, ignoreCase = true)
-                }
-            }
+        localDataSource.searchSummaries(query).map { entities ->
+            entities.toSummaryDataList()
         }
     
     private fun generateShortSummary(summary: String): String {
