@@ -35,6 +35,7 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     
     Column(
         modifier = Modifier
@@ -75,7 +76,7 @@ fun HistoryScreen(
                 
                 // Search Input
                 OutlinedTextField(
-                    value = uiState.searchQuery,
+                    value = searchQuery,
                     onValueChange = viewModel::updateSearchQuery,
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
