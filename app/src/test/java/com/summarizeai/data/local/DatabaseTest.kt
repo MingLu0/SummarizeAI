@@ -205,4 +205,38 @@ class DatabaseTest {
         // Then
         assertEquals(0, summaries.size)
     }
+    
+    @Test
+    fun getLatestSummary() = runTest {
+        // Given
+        val summary1 = SummaryEntity(
+            id = "1",
+            originalText = "Test text 1",
+            shortSummary = "Short summary 1",
+            mediumSummary = "Medium summary 1",
+            detailedSummary = "Detailed summary 1",
+            createdAt = System.currentTimeMillis(),
+            isSaved = false
+        )
+        
+        val summary2 = SummaryEntity(
+            id = "2",
+            originalText = "Test text 2",
+            shortSummary = "Short summary 2",
+            mediumSummary = "Medium summary 2",
+            detailedSummary = "Detailed summary 2",
+            createdAt = System.currentTimeMillis() + 1000,
+            isSaved = true
+        )
+        
+        // When
+        dao.insertSummary(summary1)
+        dao.insertSummary(summary2)
+        val latestSummary = dao.getLatestSummary()
+        
+        // Then
+        assertNotNull(latestSummary)
+        assertEquals(summary2.id, latestSummary!!.id)
+        assertEquals(summary2.originalText, latestSummary.originalText)
+    }
 }
