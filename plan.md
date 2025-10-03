@@ -140,14 +140,14 @@ Building a native Android app using Jetpack Compose for text summarization with 
 **Goal**: Show bookmarked/saved summaries
 
 #### Tasks:
-- [ ] Create saved screen layout (similar to history)
-- [ ] Implement saved items display
-- [ ] Add unsave functionality
-- [ ] Create empty state for no saved items
-- [ ] Implement search functionality for saved items
-- [ ] Add proper bookmark icons and states
-- [ ] Setup ViewModel for saved items management
-- [ ] Test save/unsave operations
+- ✅ Create saved screen layout (similar to history)
+- ✅ Implement saved items display
+- ✅ Add unsave functionality
+- ✅ Create empty state for no saved items
+- ✅ Implement search functionality for saved items
+- ✅ Add proper bookmark icons and states
+- ✅ Setup ViewModel for saved items management
+- ✅ Test save/unsave operations
 
 **Deliverable**: Complete saved screen with bookmark management
 
