@@ -19,22 +19,21 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.summarizeai.presentation.viewmodel.OutputViewModel
 import com.summarizeai.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutputScreen(
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    viewModel: OutputViewModel = hiltViewModel()
 ) {
-    var selectedTab by remember { mutableStateOf(0) }
-    var isSaved by remember { mutableStateOf(false) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     
     val tabs = listOf("Short", "Medium", "Detailed")
-    val summaries = listOf(
-        "This is a short summary of the text that provides key points concisely.",
-        "This is a medium-length summary that provides more detail while still being concise. It includes the main points and supporting information in a balanced way.",
-        "This is a detailed summary that provides comprehensive coverage of the original text. It includes all major points, supporting details, and context to give the reader a thorough understanding of the content."
-    )
+    val currentSummaryText = viewModel.getCurrentSummaryText()
     
     Column(
         modifier = Modifier
@@ -102,7 +101,7 @@ fun OutputScreen(
                                 .height(40.dp)
                                 .clip(RoundedCornerShape(CornerRadius.md))
                                 .background(
-                                    if (selectedTab == index) Gray900 else androidx.compose.ui.graphics.Color.Transparent
+                                    if (uiState.selectedTabIndex == index) Gray900 else androidx.compose.ui.graphics.Color.Transparent
                                 )
                                 .padding(horizontal = Spacing.md),
                             contentAlignment = Alignment.Center
@@ -110,9 +109,9 @@ fun OutputScreen(
                             Text(
                                 text = tab,
                                 style = MaterialTheme.typography.labelMedium,
-                                color = if (selectedTab == index) White else Gray600,
-                                fontWeight = if (selectedTab == index) FontWeight.Medium else FontWeight.Normal,
-                                modifier = Modifier.clickable { selectedTab = index }
+                                color = if (uiState.selectedTabIndex == index) White else Gray600,
+                                fontWeight = if (uiState.selectedTabIndex == index) FontWeight.Medium else FontWeight.Normal,
+                                modifier = Modifier.clickable { viewModel.selectTab(index) }
                             )
                         }
                     }
@@ -134,7 +133,7 @@ fun OutputScreen(
                 shape = RoundedCornerShape(CornerRadius.lg)
             ) {
                 Text(
-                    text = summaries[selectedTab],
+                    text = currentSummaryText.ifEmpty { "No summary available" },
                     style = MaterialTheme.typography.bodyLarge,
                     color = Gray700,
                     modifier = Modifier.padding(Spacing.xl),
@@ -172,7 +171,7 @@ fun OutputScreen(
                     ) {
                         // Copy Button
                         OutlinedButton(
-                            onClick = { /* TODO: Implement copy functionality */ },
+                            onClick = viewModel::copyToClipboard,
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.outlinedButtonColors(
                                 contentColor = Gray900
@@ -193,29 +192,27 @@ fun OutputScreen(
                         
                         // Save Button
                         OutlinedButton(
-                            onClick = { 
-                                isSaved = !isSaved
-                            },
+                            onClick = viewModel::toggleSaveStatus,
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = if (isSaved) Cyan600 else Gray900,
-                                containerColor = if (isSaved) Cyan50 else White
+                                contentColor = if (uiState.summaryData?.isSaved == true) Cyan600 else Gray900,
+                                containerColor = if (uiState.summaryData?.isSaved == true) Cyan50 else White
                             ),
                             border = ButtonDefaults.outlinedButtonBorder.copy(
                                 brush = Brush.linearGradient(
                                     listOf(
-                                        if (isSaved) Cyan600 else Gray200,
-                                        if (isSaved) Cyan600 else Gray200
+                                        if (uiState.summaryData?.isSaved == true) Cyan600 else Gray200,
+                                        if (uiState.summaryData?.isSaved == true) Cyan600 else Gray200
                                     )
                                 )
                             ),
                             shape = RoundedCornerShape(CornerRadius.lg)
                         ) {
                             Icon(
-                                imageVector = if (isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                                imageVector = if (uiState.summaryData?.isSaved == true) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
                                 contentDescription = "Save",
                                 modifier = Modifier.size(20.dp),
-                                tint = if (isSaved) Cyan600 else Gray600
+                                tint = if (uiState.summaryData?.isSaved == true) Cyan600 else Gray600
                             )
                             Spacer(modifier = Modifier.width(Spacing.sm))
                             Text("Save")
@@ -224,7 +221,7 @@ fun OutputScreen(
                     
                     // Share Button
                     Button(
-                        onClick = { /* TODO: Implement share functionality */ },
+                        onClick = viewModel::shareSummary,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp)

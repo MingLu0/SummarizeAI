@@ -21,21 +21,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.summarizeai.data.model.SummaryData
+import com.summarizeai.presentation.viewmodel.HistoryViewModel
 import com.summarizeai.ui.theme.*
 import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HistoryScreen() {
-    var searchText by remember { mutableStateOf("") }
-    var historyItems by remember { mutableStateOf(createSampleHistoryItems()) }
-    
-    // Filter history items based on search
-    val filteredItems = historyItems.filter { item ->
-        item.summary.contains(searchText, ignoreCase = true) ||
-        item.originalText.contains(searchText, ignoreCase = true)
-    }
+fun HistoryScreen(
+    viewModel: HistoryViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     
     Column(
         modifier = Modifier
@@ -76,8 +75,8 @@ fun HistoryScreen() {
                 
                 // Search Input
                 OutlinedTextField(
-                    value = searchText,
-                    onValueChange = { searchText = it },
+                    value = uiState.searchQuery,
+                    onValueChange = viewModel::updateSearchQuery,
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text(
@@ -112,7 +111,7 @@ fun HistoryScreen() {
                 .background(Gray50)
                 .padding(Spacing.xl)
         ) {
-            if (filteredItems.isEmpty()) {
+            if (uiState.filteredSummaries.isEmpty()) {
                 // Empty State
                 Column(
                     modifier = Modifier.align(Alignment.Center),
@@ -154,14 +153,12 @@ fun HistoryScreen() {
                     verticalArrangement = Arrangement.spacedBy(Spacing.md)
                 ) {
                     items(
-                        items = filteredItems,
+                        items = uiState.filteredSummaries,
                         key = { it.id }
                     ) { item ->
                         HistoryItemCard(
                             item = item,
-                            onDelete = { itemToDelete ->
-                                historyItems = historyItems.filter { it.id != itemToDelete.id }
-                            }
+                            onDelete = viewModel::deleteSummary
                         )
                     }
                 }
@@ -172,8 +169,8 @@ fun HistoryScreen() {
 
 @Composable
 fun HistoryItemCard(
-    item: HistoryItem,
-    onDelete: (HistoryItem) -> Unit
+    item: SummaryData,
+    onDelete: (SummaryData) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -218,7 +215,7 @@ fun HistoryItemCard(
                     .padding(vertical = Spacing.xs)
             ) {
                 Text(
-                    text = item.summary,
+                    text = item.mediumSummary,
                     style = MaterialTheme.typography.bodyMedium,
                     color = Gray800,
                     maxLines = 2,
@@ -229,7 +226,7 @@ fun HistoryItemCard(
                 Spacer(modifier = Modifier.height(Spacing.sm))
                 
                 Text(
-                    text = item.formattedTimestamp,
+                    text = formatDate(item.createdAt),
                     style = MaterialTheme.typography.bodySmall,
                     color = Gray500
                 )
@@ -255,39 +252,14 @@ fun HistoryItemCard(
     }
 }
 
-data class HistoryItem(
-    val id: String,
-    val originalText: String,
-    val summary: String,
-    val timestamp: Date,
-    val formattedTimestamp: String
-)
-
-fun createSampleHistoryItems(): List<HistoryItem> {
-    val formatter = SimpleDateFormat("MMM dd, hh:mm a", Locale.getDefault())
+private fun formatDate(date: Date): String {
     val now = Date()
+    val diffInMinutes = (now.time - date.time) / (1000 * 60)
     
-    return listOf(
-        HistoryItem(
-            id = "1",
-            originalText = "This is a sample original text that was summarized...",
-            summary = "This is a sample summary of the original text that provides key insights.",
-            timestamp = Date(now.time - 3600000), // 1 hour ago
-            formattedTimestamp = "1h ago"
-        ),
-        HistoryItem(
-            id = "2", 
-            originalText = "Another piece of text that was processed...",
-            summary = "Another summary with different content and insights.",
-            timestamp = Date(now.time - 7200000), // 2 hours ago
-            formattedTimestamp = "2h ago"
-        ),
-        HistoryItem(
-            id = "3",
-            originalText = "A third example of text that needed summarization...",
-            summary = "A third summary showing the variety of content processed.",
-            timestamp = Date(now.time - 86400000), // 1 day ago
-            formattedTimestamp = "1d ago"
-        )
-    )
+    return when {
+        diffInMinutes < 1 -> "Just now"
+        diffInMinutes < 60 -> "${diffInMinutes}m ago"
+        diffInMinutes < 1440 -> "${diffInMinutes / 60}h ago"
+        else -> "${diffInMinutes / 1440}d ago"
+    }
 }
