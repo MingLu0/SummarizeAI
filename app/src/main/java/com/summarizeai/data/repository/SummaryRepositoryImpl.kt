@@ -6,8 +6,8 @@ import com.summarizeai.data.local.mapper.SummaryMapper.toSummaryDataList
 import com.summarizeai.data.local.mapper.SummaryMapper.toSummaryEntity
 import com.summarizeai.data.model.ApiResult
 import com.summarizeai.data.model.SummaryData
-import com.summarizeai.data.remote.api.SummarizerApi
 import com.summarizeai.data.remote.api.SummarizeRequest
+import com.summarizeai.data.remote.datasource.SummaryRemoteDataSource
 import com.summarizeai.domain.repository.SummaryRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -16,28 +16,32 @@ import javax.inject.Singleton
 
 @Singleton
 class SummaryRepositoryImpl @Inject constructor(
-    private val api: SummarizerApi,
+    private val remoteDataSource: SummaryRemoteDataSource,
     private val localDataSource: SummaryLocalDataSource
 ) : SummaryRepository {
     
     override suspend fun summarizeText(text: String): ApiResult<SummaryData> {
-        return try {
-            val request = SummarizeRequest(text = text)
-            val response = api.summarize(request)
-            
-            val summaryData = SummaryData(
-                originalText = text,
-                shortSummary = generateShortSummary(response.summary),
-                mediumSummary = response.summary,
-                detailedSummary = generateDetailedSummary(response.summary)
-            )
-            
-            // Save to local database
-            localDataSource.insertSummary(summaryData.toSummaryEntity())
-            
-            ApiResult.Success(summaryData)
-        } catch (e: Exception) {
-            ApiResult.Error("Network not available")
+        val request = SummarizeRequest(text = text)
+        val result = remoteDataSource.summarizeText(request)
+        
+        return when (result) {
+            is ApiResult.Success -> {
+                val response = result.data
+                val summaryData = SummaryData(
+                    originalText = text,
+                    shortSummary = generateShortSummary(response.summary),
+                    mediumSummary = response.summary,
+                    detailedSummary = generateDetailedSummary(response.summary)
+                )
+                
+                // Save to local database
+                localDataSource.insertSummary(summaryData.toSummaryEntity())
+                
+                ApiResult.Success(summaryData)
+            }
+            is ApiResult.Error -> {
+                ApiResult.Error(result.message)
+            }
         }
     }
     
