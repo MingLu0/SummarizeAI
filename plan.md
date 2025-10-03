@@ -157,15 +157,15 @@ Building a native Android app using Jetpack Compose for text summarization with 
 **Goal**: App configuration and preferences
 
 #### Tasks:
-- [ ] Create settings screen layout
-- [ ] Implement language selector dropdown
-- [ ] Add summary length slider with labels
-- [ ] Create dark mode toggle switch
-- [ ] Add about card with app information
+- ✅ Create settings screen layout
+- ✅ Implement language selector dropdown
+- ✅ Add summary length slider with labels
+- ✅ Create dark mode toggle switch
+- ✅ Add about card with app information
 - [ ] Implement preference persistence with DataStore
-- [ ] Setup ViewModel for settings management
-- [ ] Add proper card styling and spacing
-- [ ] Test all settings functionality
+- ✅ Setup ViewModel for settings management
+- ✅ Add proper card styling and spacing
+- ✅ Test all settings functionality
 
 **Deliverable**: Complete settings screen with persistent preferences
 
