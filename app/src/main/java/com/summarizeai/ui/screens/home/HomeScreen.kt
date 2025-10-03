@@ -15,18 +15,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.summarizeai.presentation.viewmodel.HomeViewModel
 import com.summarizeai.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onNavigateToLoading: () -> Unit
+    onNavigateToLoading: () -> Unit,
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
-    var textInput by remember { mutableStateOf("") }
-    var isTextEmpty by remember { mutableStateOf(true) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     
     Column(
         modifier = Modifier
@@ -70,11 +75,8 @@ fun HomeScreen(
                 shape = RoundedCornerShape(CornerRadius.lg)
             ) {
                 BasicTextField(
-                    value = textInput,
-                    onValueChange = { 
-                        textInput = it
-                        isTextEmpty = it.isBlank()
-                    },
+                    value = uiState.textInput,
+                    onValueChange = viewModel::updateTextInput,
                     textStyle = TextStyle(
                         color = Gray900,
                         fontSize = MaterialTheme.typography.bodyLarge.fontSize,
@@ -89,7 +91,7 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.TopStart
                     ) {
-                        if (isTextEmpty) {
+                        if (uiState.textInput.isBlank()) {
                             Text(
                                 text = "Paste or upload your text here...",
                                 style = MaterialTheme.typography.bodyLarge,
@@ -139,7 +141,8 @@ fun HomeScreen(
             // Summarize Button
             Button(
                 onClick = {
-                    if (textInput.isNotBlank()) {
+                    viewModel.summarizeText()
+                    if (uiState.textInput.isNotBlank()) {
                         onNavigateToLoading()
                     }
                 },
@@ -156,7 +159,7 @@ fun HomeScreen(
                     containerColor = Cyan600
                 ),
                 shape = RoundedCornerShape(CornerRadius.xxl),
-                enabled = textInput.isNotBlank()
+                enabled = uiState.isSummarizeEnabled
             ) {
                 Text(
                     text = "Summarize",
@@ -167,6 +170,14 @@ fun HomeScreen(
             }
             
             Spacer(modifier = Modifier.height(Spacing.xl))
+            
+            // Error handling
+            uiState.error?.let { error ->
+                LaunchedEffect(error) {
+                    // Show toast or snackbar here
+                    viewModel.clearError()
+                }
+            }
         }
     }
 }
