@@ -21,24 +21,16 @@
 #-renamesourcefileattribute SourceFile
 
 # Retrofit
--keepattributes Signature, InnerClasses, EnclosingMethod
--keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
--keepclassmembers,allowshrinking,allowobfuscation interface * {
-    @retrofit2.http.* <methods>;
-}
--dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
--dontwarn javax.annotation.**
--dontwarn kotlin.Unit
--dontwarn retrofit2.KotlinExtensions
--dontwarn retrofit2.KotlinExtensions$*
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
 
 # OkHttp
 -dontwarn okhttp3.**
 -dontwarn okio.**
--dontwarn javax.annotation.**
--dontwarn org.conscrypt.**
--dontwarn org.bouncycastle.**
--dontwarn org.openjsse.**
+-keep class okhttp3.** { *; }
+-keep class okio.** { *; }
 
 # Gson
 -keepattributes Signature
@@ -58,13 +50,18 @@
 -dontwarn dagger.hilt.**
 -keep class dagger.hilt.** { *; }
 -keep class javax.inject.** { *; }
--keep class * extends dagger.hilt.android.internal.managers.ViewComponentManager$FragmentContextWrapper
--keep class * extends dagger.hilt.android.internal.managers.ViewComponentManager$ActivityContextWrapper
+-keep class * extends dagger.hilt.android.internal.managers.ViewComponentManager$FragmentContextWrapper { *; }
 
-# PDF Processing
--keep class org.apache.pdfbox.** { *; }
--dontwarn org.apache.pdfbox.**
+# PDFBox
+-keep class com.tom_roush.pdfbox.** { *; }
+-dontwarn com.tom_roush.pdfbox.**
 
 # Keep data classes
+-keep class com.summarizeai.data.model.** { *; }
+-keep class com.summarizeai.data.local.database.** { *; }
+
+# Keep API classes
 -keep class com.summarizeai.data.remote.api.** { *; }
--keep class com.summarizeai.data.local.entities.** { *; }
+
+# Keep utility classes
+-keep class com.summarizeai.utils.** { *; }

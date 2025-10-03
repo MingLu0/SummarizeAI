@@ -1,6 +1,7 @@
 package com.summarizeai.ui.navigation
 
 sealed class Screen(val route: String) {
+    object Splash : Screen("splash")
     object Welcome : Screen("welcome")
     object Main : Screen("main")
     object Home : Screen("home")

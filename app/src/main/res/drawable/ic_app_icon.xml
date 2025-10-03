@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Background circle -->
+    <path
+        android:fillColor="#00BCD4"
+        android:pathData="M54,54m-54,0a54,54 0,1 1,108 0a54,54 0,1 1,-108 0" />
+    
+    <!-- AI Brain/Neural Network Icon -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,40 C30,35 34,30 40,30 L68,30 C74,30 78,35 78,40 L78,68 C78,74 74,78 68,78 L40,78 C34,78 30,74 30,68 Z" />
+    
+    <!-- Document lines -->
+    <path
+        android:fillColor="#00BCD4"
+        android:pathData="M35,45 L73,45 L73,47 L35,47 Z" />
+    <path
+        android:fillColor="#00BCD4"
+        android:pathData="M35,52 L65,52 L65,54 L35,54 Z" />
+    <path
+        android:fillColor="#00BCD4"
+        android:pathData="M35,59 L70,59 L70,61 L35,61 Z" />
+    <path
+        android:fillColor="#00BCD4"
+        android:pathData="M35,66 L60,66 L60,68 L35,68 Z" />
+    
+    <!-- AI Sparkle -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M75,35 L77,35 L77,37 L75,37 Z" />
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M75,37 L77,37 L77,39 L75,39 Z" />
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M76,36 L76,38" />
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M75,36 L77,36" />
+</vector>

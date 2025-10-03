@@ -21,6 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.summarizeai.ui.screens.splash.SplashScreen
 import com.summarizeai.ui.screens.welcome.WelcomeScreen
 import com.summarizeai.ui.screens.home.HomeScreen
 import com.summarizeai.ui.screens.history.HistoryScreen
@@ -38,9 +39,19 @@ fun SummarizeAINavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Welcome.route,
+        startDestination = Screen.Splash.route,
         modifier = modifier
     ) {
+        composable(Screen.Splash.route) {
+            SplashScreen(
+                onNavigateToWelcome = {
+                    navController.navigate(Screen.Welcome.route) {
+                        popUpTo(Screen.Splash.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+        
         composable(Screen.Welcome.route) {
             WelcomeScreen(
                 onGetStarted = {
