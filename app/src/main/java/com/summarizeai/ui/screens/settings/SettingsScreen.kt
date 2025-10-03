@@ -4,8 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Globe
-import androidx.compose.material.icons.filled.Moon
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -56,7 +56,7 @@ fun SettingsScreen() {
         ) {
             // Language Card
             SettingsCard(
-                icon = Icons.Default.Globe,
+                icon = Icons.Default.Language,
                 iconBackground = Cyan50,
                 iconTint = Cyan600,
                 title = "Language",
@@ -135,7 +135,7 @@ fun SettingsScreen() {
             
             // Dark Mode Card
             SettingsCard(
-                icon = Icons.Default.Moon,
+                icon = Icons.Default.DarkMode,
                 iconBackground = Purple50,
                 iconTint = Purple600,
                 title = "Dark Mode",
