@@ -34,12 +34,12 @@ android {
     }
     
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     
     buildFeatures {
@@ -71,8 +71,11 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     
+    // Material 3 Theme for XML themes
+    implementation("com.google.android.material:material:1.11.0")
+    
     // Navigation
-    implementation("androidx.navigation:navigation-compose:2.7.5")
+    implementation("androidx.navigation:navigation-compose:2.7.6")
     
     // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
@@ -84,9 +87,9 @@ dependencies {
     kapt("com.google.dagger:hilt-compiler:2.48")
     
     // Room Database
-    implementation("androidx.room:room-runtime:2.6.0")
-    implementation("androidx.room:room-ktx:2.6.0")
-    kapt("androidx.room:room-compiler:2.6.0")
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
     
     // Retrofit & Networking
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -103,8 +106,7 @@ dependencies {
     // PDF Processing
     implementation("com.tom-roush:pdfbox-android:2.0.27.0")
     
-    // Document Picker
-    implementation("androidx.activity:activity-result:1.8.2")
+    // Document Picker (using activity-compose which includes result handling)
     
     // Testing
     testImplementation("junit:junit:4.13.2")
