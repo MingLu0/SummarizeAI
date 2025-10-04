@@ -5,10 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,6 +29,7 @@ import com.summarizeai.ui.theme.*
 @Composable
 fun OutputScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToHome: () -> Unit,
     viewModel: OutputViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -57,7 +59,7 @@ fun OutputScreen(
                         .clip(RoundedCornerShape(CornerRadius.md))
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
                         tint = Gray600,
                         modifier = Modifier.size(24.dp)
@@ -164,7 +166,7 @@ fun OutputScreen(
                     modifier = Modifier.padding(Spacing.xl),
                     verticalArrangement = Arrangement.spacedBy(Spacing.md)
                 ) {
-                    // Copy and Save Buttons Row
+                    // Copy, Save, and Home Buttons Row
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(Spacing.md)
@@ -216,6 +218,27 @@ fun OutputScreen(
                             )
                             Spacer(modifier = Modifier.width(Spacing.sm))
                             Text("Save")
+                        }
+                        
+                        // Home Button
+                        OutlinedButton(
+                            onClick = onNavigateToHome,
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = Gray900
+                            ),
+                            border = ButtonDefaults.outlinedButtonBorder.copy(
+                                brush = Brush.linearGradient(listOf(Gray200, Gray200))
+                            ),
+                            shape = RoundedCornerShape(CornerRadius.lg)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Home,
+                                contentDescription = "Home",
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(Spacing.sm))
+                            Text("Home")
                         }
                     }
                     

@@ -35,24 +35,30 @@ class HomeViewModel @Inject constructor(
         if (currentText.isBlank()) return
         
         viewModelScope.launch {
+            println("HomeViewModel: Starting API call")
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             
             repository.summarizeText(currentText)
                 .let { result ->
+                    println("HomeViewModel: API call completed with result: $result")
                     when (result) {
                         is ApiResult.Success -> {
+                            println("HomeViewModel: API Success - updating state with summaryData")
                             _uiState.value = _uiState.value.copy(
                                 isLoading = false,
                                 summaryData = result.data
                             )
+                            println("HomeViewModel: State updated - isLoading: false, summaryData: ${result.data}")
                         }
                         is ApiResult.Error -> {
+                            println("HomeViewModel: API Error - ${result.message}")
                             _uiState.value = _uiState.value.copy(
                                 isLoading = false,
                                 error = result.message
                             )
                         }
                         is ApiResult.Loading -> {
+                            println("HomeViewModel: API still loading")
                             _uiState.value = _uiState.value.copy(isLoading = true)
                         }
                     }

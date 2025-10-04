@@ -31,10 +31,19 @@ import com.summarizeai.ui.theme.*
 @Composable
 fun HomeScreen(
     onNavigateToLoading: () -> Unit,
+    onNavigateToOutput: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    
+    // Navigate to output screen when API call completes successfully
+    LaunchedEffect(uiState) {
+        if (uiState.summaryData != null && !uiState.isLoading) {
+            println("HomeScreen: API call completed, navigating to output")
+            onNavigateToOutput()
+        }
+    }
     
     val filePickerUtils = FilePickerUtils(context)
     val filePicker = filePickerUtils.rememberFilePicker { uri ->
@@ -151,7 +160,6 @@ fun HomeScreen(
             Button(
                 onClick = {
                     if (uiState.textInput.isNotBlank()) {
-                        onNavigateToLoading()
                         viewModel.summarizeText()
                     }
                 },
@@ -168,14 +176,29 @@ fun HomeScreen(
                     containerColor = Cyan600
                 ),
                 shape = RoundedCornerShape(CornerRadius.xxl),
-                enabled = uiState.isSummarizeEnabled
+                enabled = uiState.isSummarizeEnabled && !uiState.isLoading
             ) {
-                Text(
-                    text = "Summarize",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = White,
-                    fontWeight = FontWeight.Medium
-                )
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = White,
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(modifier = Modifier.width(Spacing.sm))
+                    Text(
+                        text = "Summarizing...",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = White,
+                        fontWeight = FontWeight.Medium
+                    )
+                } else {
+                    Text(
+                        text = "Summarize",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = White,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
             
             Spacer(modifier = Modifier.height(Spacing.xl))

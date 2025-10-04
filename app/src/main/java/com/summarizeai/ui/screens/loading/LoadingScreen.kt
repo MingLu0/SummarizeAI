@@ -27,17 +27,22 @@ fun LoadingScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     
-    // Navigate to output screen when API call completes successfully
-    LaunchedEffect(uiState.summaryData) {
-        if (uiState.summaryData != null && !uiState.isLoading) {
-            onNavigateToOutput()
-        }
-    }
-    
-    // Navigate back if there's an error
-    LaunchedEffect(uiState.error) {
-        if (uiState.error != null && !uiState.isLoading) {
-            onNavigateBack()
+    // Handle navigation based on API call result
+    LaunchedEffect(uiState) {
+        println("LoadingScreen: LaunchedEffect triggered")
+        println("LoadingScreen: summaryData = ${uiState.summaryData}")
+        println("LoadingScreen: isLoading = ${uiState.isLoading}")
+        println("LoadingScreen: error = ${uiState.error}")
+        
+        when {
+            uiState.summaryData != null && !uiState.isLoading -> {
+                println("LoadingScreen: Navigating to output screen")
+                onNavigateToOutput()
+            }
+            uiState.error != null && !uiState.isLoading -> {
+                println("LoadingScreen: Navigating back due to error")
+                onNavigateBack()
+            }
         }
     }
     

@@ -67,25 +67,6 @@ fun SummarizeAINavHost(
         composable(Screen.Main.route) {
             MainScreenWithBottomNavigation(navController = navController)
         }
-        
-            composable(Screen.Loading.route) {
-                LoadingScreen(
-                    onNavigateToOutput = {
-                        navController.navigate(Screen.Output.route)
-                    },
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    }
-                )
-            }
-            
-            composable(Screen.Output.route) {
-                OutputScreen(
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    }
-                )
-            }
     }
 }
 
@@ -169,7 +150,10 @@ fun MainScreenWithBottomNavigation(navController: NavHostController) {
             composable(Screen.Home.route) {
                 HomeScreen(
                     onNavigateToLoading = {
-                        navController.navigate(Screen.Loading.route)
+                        bottomNavController.navigate(Screen.Loading.route)
+                    },
+                    onNavigateToOutput = {
+                        bottomNavController.navigate(Screen.Output.route)
                     }
                 )
             }
@@ -184,6 +168,33 @@ fun MainScreenWithBottomNavigation(navController: NavHostController) {
             
             composable(Screen.Settings.route) {
                 SettingsScreen()
+            }
+            
+            composable(Screen.Loading.route) {
+                LoadingScreen(
+                    onNavigateToOutput = {
+                        bottomNavController.navigate(Screen.Output.route)
+                    },
+                    onNavigateBack = {
+                        bottomNavController.popBackStack()
+                    }
+                )
+            }
+            
+            composable(Screen.Output.route) {
+                OutputScreen(
+                    onNavigateBack = {
+                        bottomNavController.popBackStack()
+                    },
+                    onNavigateToHome = {
+                        bottomNavController.navigate(Screen.Home.route) {
+                            popUpTo(bottomNavController.graph.findStartDestination().id) {
+                                inclusive = false
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                )
             }
         }
     }
