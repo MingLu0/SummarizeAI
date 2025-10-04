@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
+import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import java.io.InputStream
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -39,12 +40,25 @@ class TextExtractionUtils @Inject constructor(
     
     private fun extractTextFromPdf(inputStream: InputStream): String {
         return try {
+            // Try to initialize PDFBox resources, but don't fail if it doesn't work
+            try {
+                PDFBoxResourceLoader.init(context)
+            } catch (e: Exception) {
+                android.util.Log.w("TextExtractionUtils", "Could not initialize PDFBox resources, continuing anyway", e)
+            }
+            
             val document = PDDocument.load(inputStream)
             val stripper = PDFTextStripper()
             val text = stripper.getText(document)
             document.close()
+            
+            if (text.isBlank()) {
+                throw Exception("PDF appears to be empty or contains no extractable text")
+            }
+            
             text
         } catch (e: Exception) {
+            android.util.Log.e("TextExtractionUtils", "Error reading PDF", e)
             throw Exception("Error reading PDF: ${e.message}")
         }
     }

@@ -202,14 +202,6 @@ fun HomeScreen(
             }
             
             Spacer(modifier = Modifier.height(Spacing.xl))
-            
-            // Error handling
-            uiState.error?.let { error ->
-                LaunchedEffect(error) {
-                    // Show toast or snackbar here
-                    viewModel.clearError()
-                }
-            }
         }
     }
 }

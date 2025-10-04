@@ -7,6 +7,7 @@ import com.summarizeai.data.model.ApiResult
 import com.summarizeai.data.model.SummaryData
 import com.summarizeai.domain.repository.SummaryRepository
 import com.summarizeai.utils.TextExtractionUtils
+import com.summarizeai.utils.ErrorHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: SummaryRepository,
-    private val textExtractionUtils: TextExtractionUtils
+    private val textExtractionUtils: TextExtractionUtils,
+    private val errorHandler: ErrorHandler
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -52,6 +54,8 @@ class HomeViewModel @Inject constructor(
                         }
                         is ApiResult.Error -> {
                             println("HomeViewModel: API Error - ${result.message}")
+                            // Show toast message for API error
+                            errorHandler.showErrorToast(result.message)
                             _uiState.value = _uiState.value.copy(
                                 isLoading = false,
                                 error = result.message
@@ -89,16 +93,22 @@ class HomeViewModel @Inject constructor(
                         )
                     },
                     onFailure = { error ->
+                        val errorMessage = error.message ?: "Failed to read file"
+                        // Show toast message for file upload error
+                        errorHandler.showErrorToast(errorMessage)
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            error = error.message ?: "Failed to read file"
+                            error = errorMessage
                         )
                     }
                 )
             } catch (e: Exception) {
+                val errorMessage = e.message ?: "Unknown error occurred"
+                // Show toast message for unexpected error
+                errorHandler.showErrorToast(errorMessage)
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = e.message ?: "Unknown error occurred"
+                    error = errorMessage
                 )
             }
         }

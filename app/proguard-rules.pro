@@ -55,6 +55,9 @@
 # PDFBox
 -keep class com.tom_roush.pdfbox.** { *; }
 -dontwarn com.tom_roush.pdfbox.**
+-keep class com.tom_roush.pdfbox.android.** { *; }
+-keep class com.tom_roush.pdfbox.resources.** { *; }
+-keep class com.tom_roush.pdfbox.pdmodel.font.encoding.** { *; }
 
 # Keep data classes
 -keep class com.summarizeai.data.model.** { *; }

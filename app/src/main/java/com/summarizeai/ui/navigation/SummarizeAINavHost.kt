@@ -123,18 +123,23 @@ fun MainScreenWithBottomNavigation(navController: NavHostController) {
                         },
                         selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                         onClick = {
-                            bottomNavController.navigate(item.route) {
-                                // Pop up to the start destination of the graph to
-                                // avoid building up a large stack of destinations
-                                // on the back stack as users select items
-                                popUpTo(bottomNavController.graph.findStartDestination().id) {
-                                    saveState = true
+                            println("Bottom nav clicked: ${item.route}, current: ${currentDestination?.route}")
+                            if (currentDestination?.route == Screen.Output.route) {
+                                // If on Output screen, clear the entire stack and navigate to the selected tab
+                                bottomNavController.navigate(item.route) {
+                                    popUpTo(bottomNavController.graph.id) {
+                                        inclusive = true
+                                    }
+                                    launchSingleTop = true
                                 }
-                                // Avoid multiple copies of the same destination when
-                                // reselecting the same item
-                                launchSingleTop = true
-                                // Restore state when reselecting a previously selected item
-                                restoreState = true
+                            } else {
+                                // Normal navigation for other screens
+                                bottomNavController.navigate(item.route) {
+                                    popUpTo(bottomNavController.graph.findStartDestination().id) {
+                                        inclusive = false
+                                    }
+                                    launchSingleTop = true
+                                }
                             }
                         }
                     )
@@ -184,12 +189,19 @@ fun MainScreenWithBottomNavigation(navController: NavHostController) {
             composable(Screen.Output.route) {
                 OutputScreen(
                     onNavigateBack = {
-                        bottomNavController.popBackStack()
+                        println("Back button clicked from Output screen")
+                        bottomNavController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Home.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
                     },
                     onNavigateToHome = {
+                        println("Home button clicked from Output screen")
                         bottomNavController.navigate(Screen.Home.route) {
-                            popUpTo(bottomNavController.graph.findStartDestination().id) {
-                                inclusive = false
+                            popUpTo(Screen.Home.route) {
+                                inclusive = true
                             }
                             launchSingleTop = true
                         }

@@ -1,8 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
+    <!-- Allow cleartext traffic for local development servers -->
     <domain-config cleartextTrafficPermitted="true">
+        <!-- Localhost and loopback -->
         <domain includeSubdomains="true">127.0.0.1</domain>
         <domain includeSubdomains="true">localhost</domain>
+        
+        <!-- Android emulator -->
         <domain includeSubdomains="true">10.0.2.2</domain>
+        
+        <!-- Common local network IPs (for development) -->
+        <domain includeSubdomains="true">192.168.88.3</domain>
+        <domain includeSubdomains="true">192.168.1.1</domain>
+        <domain includeSubdomains="true">192.168.0.1</domain>
+        <domain includeSubdomains="true">10.0.0.1</domain>
     </domain-config>
+    
+    <!-- For debug builds, allow cleartext traffic to any IP (development only) -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system"/>
+            <certificates src="user"/>
+        </trust-anchors>
+    </debug-overrides>
 </network-security-config>
