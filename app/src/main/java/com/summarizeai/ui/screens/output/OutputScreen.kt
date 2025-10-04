@@ -3,7 +3,9 @@ package com.summarizeai.ui.screens.output
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
@@ -134,13 +136,19 @@ fun OutputScreen(
                 colors = CardDefaults.cardColors(containerColor = White),
                 shape = RoundedCornerShape(CornerRadius.lg)
             ) {
-                Text(
-                    text = currentSummaryText.ifEmpty { "No summary available" },
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Gray700,
-                    modifier = Modifier.padding(Spacing.xl),
-                    lineHeight = MaterialTheme.typography.bodyLarge.lineHeight
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(Spacing.xl)
+                ) {
+                    Text(
+                        text = currentSummaryText.ifEmpty { "No summary available" },
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Gray700,
+                        lineHeight = MaterialTheme.typography.bodyLarge.lineHeight
+                    )
+                }
             }
             
             // Action Buttons Container
@@ -174,7 +182,9 @@ fun OutputScreen(
                         // Copy Button
                         OutlinedButton(
                             onClick = viewModel::copyToClipboard,
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
                             colors = ButtonDefaults.outlinedButtonColors(
                                 contentColor = Gray900
                             ),
@@ -183,19 +193,27 @@ fun OutputScreen(
                             ),
                             shape = RoundedCornerShape(CornerRadius.lg)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.ContentCopy,
-                                contentDescription = "Copy",
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(Spacing.sm))
-                            Text("Copy")
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ContentCopy,
+                                    contentDescription = "Copy",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(Spacing.sm))
+                                Text("Copy")
+                            }
                         }
                         
                         // Save Button
                         OutlinedButton(
                             onClick = viewModel::toggleSaveStatus,
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
                             colors = ButtonDefaults.outlinedButtonColors(
                                 contentColor = if (uiState.summaryData?.isSaved == true) Cyan600 else Gray900,
                                 containerColor = if (uiState.summaryData?.isSaved == true) Cyan50 else White
@@ -210,20 +228,28 @@ fun OutputScreen(
                             ),
                             shape = RoundedCornerShape(CornerRadius.lg)
                         ) {
-                            Icon(
-                                imageVector = if (uiState.summaryData?.isSaved == true) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                                contentDescription = "Save",
-                                modifier = Modifier.size(20.dp),
-                                tint = if (uiState.summaryData?.isSaved == true) Cyan600 else Gray600
-                            )
-                            Spacer(modifier = Modifier.width(Spacing.sm))
-                            Text("Save")
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = if (uiState.summaryData?.isSaved == true) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                                    contentDescription = "Save",
+                                    modifier = Modifier.size(20.dp),
+                                    tint = if (uiState.summaryData?.isSaved == true) Cyan600 else Gray600
+                                )
+                                Spacer(modifier = Modifier.width(Spacing.sm))
+                                Text("Save")
+                            }
                         }
                         
                         // Home Button
                         OutlinedButton(
                             onClick = onNavigateToHome,
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
                             colors = ButtonDefaults.outlinedButtonColors(
                                 contentColor = Gray900
                             ),
@@ -232,13 +258,19 @@ fun OutputScreen(
                             ),
                             shape = RoundedCornerShape(CornerRadius.lg)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Home,
-                                contentDescription = "Home",
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(Spacing.sm))
-                            Text("Home")
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Home,
+                                    contentDescription = "Home",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(Spacing.sm))
+                                Text("Home")
+                            }
                         }
                     }
                     
