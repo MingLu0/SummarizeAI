@@ -98,6 +98,22 @@ graph TB
         Utils[Utility Classes]
     end
 
+    %% Styling
+    classDef presentation fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000
+    classDef state fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,color:#000
+    classDef domain fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px,color:#000
+    classDef data fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    classDef external fill:#fce4ec,stroke:#880e4f,stroke-width:2px,color:#000
+    classDef infrastructure fill:#f1f8e9,stroke:#33691e,stroke-width:2px,color:#000
+
+    %% Apply styles
+    class UI,Compose,Material,Navigation presentation
+    class VM1,VM2,VM3,VM4,StateFlow state
+    class Repo,UseCases,Models domain
+    class Room,DAO,Entity,Retrofit,API,Network,PDF,Jsoup,TextExtract data
+    class AIService,FileSystem external
+    class Hilt,Coroutines,Utils infrastructure
+
     %% Connections
     UI --> VM1
     UI --> VM2
@@ -143,48 +159,6 @@ graph TB
     Coroutines --> Repo
 ```
 
-### **Navigation Flow Diagram**
-
-```mermaid
-graph TD
-    Start([App Start]) --> Splash[Splash Screen]
-    Splash --> Welcome[Welcome Screen]
-    Welcome --> Main[Main Navigation]
-    
-    subgraph "📱 Main Navigation"
-        Main --> Home[Home Screen]
-        Main --> History[History Screen]
-        Main --> Saved[Saved Screen]
-        Main --> Settings[Settings Screen]
-    end
-    
-    subgraph "🔄 Summary Flow"
-        Home --> |Enter Text| Loading[Loading Screen]
-        Loading --> |API Success| Output[Output Screen]
-        Output --> |Back Button| Home
-        Output --> |Home Tab| Home
-        Output --> |History Tab| History
-        Output --> |Saved Tab| Saved
-        Output --> |Settings Tab| Settings
-    end
-    
-    subgraph "📁 File Processing"
-        Home --> |Upload File| FilePicker[File Picker]
-        FilePicker --> |PDF/DOC| TextExtract[Text Extraction]
-        TextExtract --> Loading
-    end
-    
-    subgraph "💾 Data Persistence"
-        Output --> |Save Summary| Database[(Room Database)]
-        History --> |Load Summaries| Database
-        Saved --> |Load Saved| Database
-    end
-    
-    subgraph "🌐 API Integration"
-        Loading --> |POST Request| AIService[AI Service]
-        AIService --> |Response| Loading
-    end
-```
 
 ### **Key Components**
 - **Jetpack Compose** - Modern declarative UI
