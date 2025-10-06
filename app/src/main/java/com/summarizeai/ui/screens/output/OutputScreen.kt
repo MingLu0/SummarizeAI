@@ -78,8 +78,8 @@ fun OutputScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = Spacing.xl)
-                .padding(vertical = Spacing.xl),
-            verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+                .padding(top = Spacing.xs, bottom = Spacing.xl),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm)
         ) {
             // Tab Selector
             Card(
@@ -141,7 +141,7 @@ fun OutputScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
-                        .padding(Spacing.xl)
+                        .padding(Spacing.md)
                 ) {
                     Text(
                         text = currentSummaryText.ifEmpty { "No summary available" },

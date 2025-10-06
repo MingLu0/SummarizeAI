@@ -74,7 +74,7 @@ graph TB
         
         subgraph "Remote API"
             Retrofit[Retrofit Client]
-            API[SummarizerApi]
+            API[AI Service API]
             Network[Network Utils]
         end
         
@@ -87,7 +87,7 @@ graph TB
 
     %% External Services
     subgraph "🌐 External Services"
-        AIService[AI Summarization Service]
+        AIService[AI Service]
         FileSystem[File System]
     end
 
@@ -175,7 +175,6 @@ graph TB
 - Android SDK 24+ (compileSdk 34)
 - Kotlin 1.9.22+
 - Java 17
-- Local AI API service running on `http://127.0.0.1:8000`
 
 ### Installation
 
@@ -197,37 +196,13 @@ graph TB
    - Navigate to the cloned repository
    - Wait for Gradle sync to complete
 
-4. **Setup AI API Service**
-   - Ensure your local AI service is running on `http://127.0.0.1:8000`
-   - The service should have a POST endpoint at `/api/v1/summarize/`
-
-5. **Run the app**
+4. **Run the app**
    - Connect an Android device or start an emulator
    - Click the "Run" button in Android Studio
 
-## 📋 API Integration
+## 📋 AI Integration
 
-### Expected API Format
-
-**Request:**
-```json
-POST /api/v1/summarize/
-{
-  "text": "Your text to summarize...",
-  "max_tokens": 256,
-  "prompt": "Summarize the following text concisely:"
-}
-```
-
-**Response:**
-```json
-{
-  "summary": "Generated summary text...",
-  "model": "model-name",
-  "tokens_used": 150,
-  "latency_ms": 500.0
-}
-```
+The app integrates with AI services for text summarization. The specific AI service and API endpoints are configured within the app and may vary based on the deployment configuration.
 
 ## 🧪 Testing
 
@@ -389,7 +364,7 @@ The Summarize AI app follows a comprehensive testing strategy with multiple laye
 #### **Planned Additions**
 - [ ] **Repository Tests** - Data layer testing with Room database
 - [ ] **ViewModel Tests** - State management and business logic
-- [ ] **API Integration Tests** - Network layer testing
+- [ ] **AI Service Integration Tests** - Network layer testing
 - [ ] **Performance Tests** - Large dataset handling
 - [ ] **Accessibility Tests** - Screen reader and accessibility compliance
 
@@ -414,7 +389,7 @@ The Summarize AI app follows a comprehensive testing strategy with multiple laye
 ## 🔧 Configuration
 
 ### Environment Variables
-- `BASE_URL` - API service URL (default: `http://127.0.0.1:8000`)
+- `BASE_URL` - AI service URL (configured within the app)
 - `TIMEOUT_SECONDS` - Request timeout (default: 30)
 
 ### Build Variants
