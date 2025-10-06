@@ -17,6 +17,25 @@ class TextExtractionUtils @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     
+    companion object {
+        private var isPdfBoxInitialized = false
+        private var pdfBoxInitializationFailed = false
+        
+        init {
+            // Try to initialize PDFBox classes early to catch initialization errors
+            try {
+                Class.forName("com.tom_roush.pdfbox.text.LegacyPDFStreamEngine")
+                isPdfBoxInitialized = true
+            } catch (e: ExceptionInInitializerError) {
+                android.util.Log.w("TextExtractionUtils", "PDFBox static initialization failed", e)
+                pdfBoxInitializationFailed = true
+            } catch (e: Exception) {
+                android.util.Log.w("TextExtractionUtils", "PDFBox class loading failed", e)
+                pdfBoxInitializationFailed = true
+            }
+        }
+    }
+    
     suspend fun extractTextFromUri(uri: Uri): Result<String> = withContext(Dispatchers.IO) {
         try {
             val inputStream: InputStream = context.contentResolver.openInputStream(uri)
@@ -40,26 +59,62 @@ class TextExtractionUtils @Inject constructor(
     
     private fun extractTextFromPdf(inputStream: InputStream): String {
         return try {
-            // Try to initialize PDFBox resources, but don't fail if it doesn't work
+            // Initialize PDFBox resources with better error handling
             try {
                 PDFBoxResourceLoader.init(context)
             } catch (e: Exception) {
-                android.util.Log.w("TextExtractionUtils", "Could not initialize PDFBox resources, continuing anyway", e)
+                android.util.Log.w("TextExtractionUtils", "Could not initialize PDFBox resources", e)
+                // Continue anyway - some PDFs might still be readable
             }
             
-            val document = PDDocument.load(inputStream)
-            val stripper = PDFTextStripper()
-            val text = stripper.getText(document)
-            document.close()
-            
-            if (text.isBlank()) {
-                throw Exception("PDF appears to be empty or contains no extractable text")
+            var document: PDDocument? = null
+            try {
+                document = PDDocument.load(inputStream)
+                val stripper = PDFTextStripper()
+                
+                // Configure stripper for better text extraction
+                stripper.setSortByPosition(true)
+                stripper.setSuppressDuplicateOverlappingText(true)
+                
+                val text = stripper.getText(document)
+                
+                if (text.isBlank()) {
+                    throw Exception("PDF appears to be empty or contains no extractable text")
+                }
+                
+                text.trim()
+            } finally {
+                document?.close()
             }
-            
-            text
+        } catch (e: ExceptionInInitializerError) {
+            android.util.Log.e("TextExtractionUtils", "PDFBox initialization error - possibly corrupted glyph list", e)
+            throw Exception("PDF processing failed due to library initialization error. Please try with a different PDF file or contact support.")
+        } catch (e: RuntimeException) {
+            // Handle runtime exceptions that might be caused by glyph list issues
+            if (e.message?.contains("glyph", ignoreCase = true) == true || 
+                e.cause?.message?.contains("glyph", ignoreCase = true) == true) {
+                android.util.Log.e("TextExtractionUtils", "Glyph-related error in PDF", e)
+                throw Exception("PDF contains unsupported fonts or is corrupted. Please try with a different PDF file.")
+            } else {
+                android.util.Log.e("TextExtractionUtils", "Runtime error reading PDF", e)
+                throw Exception("Error processing PDF: ${e.message}")
+            }
         } catch (e: Exception) {
             android.util.Log.e("TextExtractionUtils", "Error reading PDF", e)
-            throw Exception("Error reading PDF: ${e.message}")
+            when {
+                e.message?.contains("glyph", ignoreCase = true) == true -> {
+                    throw Exception("PDF contains unsupported fonts or is corrupted. Please try with a different PDF file.")
+                }
+                e.message?.contains("password", ignoreCase = true) == true -> {
+                    throw Exception("PDF is password protected. Please provide an unprotected PDF file.")
+                }
+                e.message?.contains("invalid", ignoreCase = true) == true -> {
+                    throw Exception("PDF file appears to be corrupted or invalid. Please try with a different PDF file.")
+                }
+                else -> {
+                    throw Exception("Error reading PDF: ${e.message}")
+                }
+            }
         }
     }
     

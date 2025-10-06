@@ -10,4 +10,5 @@ sealed class Screen(val route: String) {
     object Settings : Screen("settings")
     object Loading : Screen("loading")
     object Output : Screen("output")
+    object WebPreview : Screen("webpreview")
 }

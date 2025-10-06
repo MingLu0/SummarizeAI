@@ -37,7 +37,8 @@ import com.summarizeai.ui.theme.White
 @Composable
 fun SummarizeAINavHost(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    extractedContent: String? = null
 ) {
     NavHost(
         navController = navController,
@@ -65,13 +66,19 @@ fun SummarizeAINavHost(
         }
         
         composable(Screen.Main.route) {
-            MainScreenWithBottomNavigation(navController = navController)
+            MainScreenWithBottomNavigation(
+                navController = navController,
+                extractedContent = extractedContent
+            )
         }
     }
 }
 
 @Composable
-fun MainScreenWithBottomNavigation(navController: NavHostController) {
+fun MainScreenWithBottomNavigation(
+    navController: NavHostController,
+    extractedContent: String? = null
+) {
     val bottomNavController = rememberNavController()
     
     val bottomNavItems = listOf(
@@ -159,7 +166,8 @@ fun MainScreenWithBottomNavigation(navController: NavHostController) {
                     },
                     onNavigateToOutput = {
                         bottomNavController.navigate(Screen.Output.route)
-                    }
+                    },
+                    extractedContent = extractedContent
                 )
             }
             
@@ -208,6 +216,7 @@ fun MainScreenWithBottomNavigation(navController: NavHostController) {
                     }
                 )
             }
+            
         }
     }
 }

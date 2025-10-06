@@ -54,3 +54,4 @@ echo "- OutputScreenTest: Tests Output screen functionality"
 echo ""
 echo "💡 If tests fail, check the test reports in:"
 echo "   app/build/reports/androidTests/connected/"
+

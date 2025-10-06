@@ -14,9 +14,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ApiModule {
-    
-//    private const val BASE_URL = "http://10.0.2.2:8000/"
-private const val BASE_URL = "http://192.168.88.3:8000/"
+
+private const val BASE_URL = "https://colin730-summarizerapp.hf.space/"
     
     @Provides
     @Singleton
@@ -27,9 +26,10 @@ private const val BASE_URL = "http://192.168.88.3:8000/"
         
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(60, TimeUnit.SECONDS)  // Increased for AI processing
+            .readTimeout(120, TimeUnit.SECONDS)    // Increased for large text processing
+            .writeTimeout(60, TimeUnit.SECONDS)    // Increased for large requests
+            .retryOnConnectionFailure(true)        // Enable automatic retry
             .build()
     }
     
@@ -47,5 +47,13 @@ private const val BASE_URL = "http://192.168.88.3:8000/"
     @Singleton
     fun provideSummarizerApi(retrofit: Retrofit): SummarizerApi {
         return retrofit.create(SummarizerApi::class.java)
+    }
+    
+    @Provides
+    @Singleton
+    fun provideWebContentRepository(
+        webContentRepositoryImpl: com.summarizeai.data.remote.repository.WebContentRepositoryImpl
+    ): com.summarizeai.domain.repository.WebContentRepository {
+        return webContentRepositoryImpl
     }
 }

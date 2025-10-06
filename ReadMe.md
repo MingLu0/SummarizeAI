@@ -1,254 +1,356 @@
-# How to Export to Cursor for Android Development
+# 📱 Summarize AI
 
-## 📋 Quick Start Guide
+A beautiful, modern Android app that uses AI to summarize text content. Built with Jetpack Compose, Material 3, and clean architecture principles.
 
-### Step 1: Download the Design Spec
-Download the `DESIGN_SPEC.md` file from this project. This contains everything needed to recreate the UI in Jetpack Compose.
+## ✨ Features
 
-### Step 2: Take Screenshots (Optional but Recommended)
-While viewing this Figma Make project:
-1. Take screenshots of each screen for visual reference
-2. Save them in a folder called `design-reference/`
-3. Name them clearly: `welcome-screen.png`, `home-screen.png`, etc.
+### 🎯 Core Functionality
+- **AI Text Summarization** - Generate concise summaries from long text
+- **Multiple Summary Lengths** - Short, Medium, and Detailed summaries
+- **File Upload Support** - Upload and process PDF/DOC files
+- **Real-time Processing** - Fast AI-powered text analysis
 
-### Step 3: Open Cursor
-1. Open Cursor IDE on your computer
-2. Create a new Android project or open existing one
+### 📱 User Experience
+- **Beautiful UI** - Material 3 design with smooth animations
+- **Intuitive Navigation** - Bottom tab navigation with 4 main sections
+- **Search & Filter** - Find past summaries quickly
+- **Copy & Share** - Easy sharing of summaries
+- **Save Favorites** - Bookmark important summaries
 
-### Step 4: Share with Cursor AI
-In Cursor, open the AI chat and provide:
+### 🔧 Technical Features
+- **Offline Support** - Local storage with Room database
+- **Network Resilience** - Handles network issues gracefully
+- **Performance Optimized** - Smooth scrolling and fast operations
+- **Comprehensive Testing** - Unit, UI, and integration tests
 
+## 🏗️ Architecture
+
+### **MVVM + Repository Pattern**
 ```
-I need to build a native Android app using Jetpack Compose based on this design specification. 
-The app is called "Summarize AI" - a text summarization app with a clean, modern UI.
-
-[Paste or attach the DESIGN_SPEC.md content here]
-
-Please help me:
-1. Setup the project structure
-2. Create the design system (colors, typography, spacing)
-3. Implement each screen as Composable functions
-4. Setup navigation between screens
-5. Add the bottom tab navigation
-
-Start with the project setup and design system.
+Presentation Layer (UI)
+    ↓
+ViewModel (State Management)
+    ↓
+Repository (Data Abstraction)
+    ↓
+Data Sources (Local DB + Remote API)
 ```
 
-### Step 5: Iterative Implementation
-Work with Cursor to implement each screen one at a time:
+### **System Architecture Diagram**
 
-1. **First:** Design system and theme
-2. **Second:** Welcome screen
-3. **Third:** Main navigation structure with bottom tabs
-4. **Fourth:** Home/Input screen
-5. **Fifth:** Loading screen
-6. **Sixth:** Output screen
-7. **Seventh:** History screen
-8. **Eighth:** Saved screen
-9. **Ninth:** Settings screen
+```mermaid
+graph TB
+    %% User Interface Layer
+    subgraph "🎨 Presentation Layer"
+        UI[UI Screens]
+        Compose[Jetpack Compose]
+        Material[Material 3]
+        Navigation[Navigation]
+    end
 
-### Step 6: Add Screenshots (If Available)
-If you took screenshots, share them with Cursor:
+    %% State Management Layer
+    subgraph "🧠 State Management"
+        VM1[HomeViewModel]
+        VM2[OutputViewModel]
+        VM3[HistoryViewModel]
+        VM4[SavedViewModel]
+        StateFlow[StateFlow/Flow]
+    end
+
+    %% Business Logic Layer
+    subgraph "🏢 Domain Layer"
+        Repo[SummaryRepository]
+        UseCases[Use Cases]
+        Models[Domain Models]
+    end
+
+    %% Data Layer
+    subgraph "💾 Data Layer"
+        subgraph "Local Storage"
+            Room[Room Database]
+            DAO[SummaryDao]
+            Entity[SummaryEntity]
+        end
+        
+        subgraph "Remote API"
+            Retrofit[Retrofit Client]
+            API[SummarizerApi]
+            Network[Network Utils]
+        end
+        
+        subgraph "File Processing"
+            PDF[PDFBox]
+            Jsoup[Jsoup]
+            TextExtract[Text Extraction]
+        end
+    end
+
+    %% External Services
+    subgraph "🌐 External Services"
+        AIService[AI Summarization Service]
+        FileSystem[File System]
+    end
+
+    %% Dependency Injection
+    subgraph "🔧 Infrastructure"
+        Hilt[Hilt DI]
+        Coroutines[Coroutines]
+        Utils[Utility Classes]
+    end
+
+    %% Connections
+    UI --> VM1
+    UI --> VM2
+    UI --> VM3
+    UI --> VM4
+    
+    VM1 --> StateFlow
+    VM2 --> StateFlow
+    VM3 --> StateFlow
+    VM4 --> StateFlow
+    
+    VM1 --> Repo
+    VM2 --> Repo
+    VM3 --> Repo
+    VM4 --> Repo
+    
+    Repo --> Room
+    Repo --> Retrofit
+    Repo --> TextExtract
+    
+    Room --> DAO
+    DAO --> Entity
+    
+    Retrofit --> API
+    API --> AIService
+    
+    TextExtract --> PDF
+    TextExtract --> Jsoup
+    TextExtract --> FileSystem
+    
+    Hilt --> VM1
+    Hilt --> VM2
+    Hilt --> VM3
+    Hilt --> VM4
+    Hilt --> Repo
+    Hilt --> Room
+    Hilt --> Retrofit
+    
+    Coroutines --> VM1
+    Coroutines --> VM2
+    Coroutines --> VM3
+    Coroutines --> VM4
+    Coroutines --> Repo
 ```
-Here's what the [screen name] should look like visually:
-[Attach screenshot]
 
-Please implement this screen matching the design exactly.
+### **Navigation Flow Diagram**
+
+```mermaid
+graph TD
+    Start([App Start]) --> Splash[Splash Screen]
+    Splash --> Welcome[Welcome Screen]
+    Welcome --> Main[Main Navigation]
+    
+    subgraph "📱 Main Navigation"
+        Main --> Home[Home Screen]
+        Main --> History[History Screen]
+        Main --> Saved[Saved Screen]
+        Main --> Settings[Settings Screen]
+    end
+    
+    subgraph "🔄 Summary Flow"
+        Home --> |Enter Text| Loading[Loading Screen]
+        Loading --> |API Success| Output[Output Screen]
+        Output --> |Back Button| Home
+        Output --> |Home Tab| Home
+        Output --> |History Tab| History
+        Output --> |Saved Tab| Saved
+        Output --> |Settings Tab| Settings
+    end
+    
+    subgraph "📁 File Processing"
+        Home --> |Upload File| FilePicker[File Picker]
+        FilePicker --> |PDF/DOC| TextExtract[Text Extraction]
+        TextExtract --> Loading
+    end
+    
+    subgraph "💾 Data Persistence"
+        Output --> |Save Summary| Database[(Room Database)]
+        History --> |Load Summaries| Database
+        Saved --> |Load Saved| Database
+    end
+    
+    subgraph "🌐 API Integration"
+        Loading --> |POST Request| AIService[AI Service]
+        AIService --> |Response| Loading
+    end
 ```
+
+### **Key Components**
+- **Jetpack Compose** - Modern declarative UI
+- **Material 3** - Latest design system
+- **Hilt** - Dependency injection
+- **Room** - Local database
+- **Retrofit** - API communication
+- **Coroutines & Flow** - Asynchronous programming
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Android Studio Arctic Fox or later
+- Android SDK 24+
+- Kotlin 1.9+
+- Local AI API service running on `http://127.0.0.1:8000`
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/MingLu0/SummarizeAI.git
+   cd SummarizeAI
+   ```
+
+2. **Setup local.properties**
+   ```bash
+   cp local.properties.template local.properties
+   # Edit local.properties and add your Android SDK path
+   ```
+
+3. **Open in Android Studio**
+   - Open Android Studio
+   - Select "Open an existing project"
+   - Navigate to the cloned repository
+   - Wait for Gradle sync to complete
+
+4. **Setup AI API Service**
+   - Ensure your local AI service is running on `http://127.0.0.1:8000`
+   - The service should have a POST endpoint at `/api/v1/summarize/`
+
+5. **Run the app**
+   - Connect an Android device or start an emulator
+   - Click the "Run" button in Android Studio
+
+## 📋 API Integration
+
+### Expected API Format
+
+**Request:**
+```json
+POST /api/v1/summarize/
+{
+  "text": "Your text to summarize...",
+  "max_tokens": 256,
+  "prompt": "Summarize the following text concisely:"
+}
+```
+
+**Response:**
+```json
+{
+  "summary": "Generated summary text...",
+  "model": "model-name",
+  "tokens_used": 150,
+  "latency_ms": 500.0
+}
+```
+
+## 🧪 Testing
+
+### Run Tests
+```bash
+# Unit tests
+./gradlew test
+
+# UI tests
+./gradlew connectedAndroidTest
+
+# All tests
+./gradlew check
+```
+
+### Test Coverage
+- **Unit Tests** - ViewModels, Repository, Utils
+- **UI Tests** - Critical user flows
+- **Integration Tests** - API and database operations
+- **Performance Tests** - Large datasets and concurrent operations
+
+## 📱 Screenshots
+
+### Main Screens
+- **Splash Screen** - Beautiful animated loading
+- **Welcome Screen** - Onboarding with app introduction
+- **Home Screen** - Text input and file upload
+- **Output Screen** - Summary display with actions
+- **History Screen** - Past summaries with search
+- **Saved Screen** - Bookmarked summaries
+- **Settings Screen** - App preferences
+
+## 🔧 Configuration
+
+### Environment Variables
+- `BASE_URL` - API service URL (default: `http://127.0.0.1:8000`)
+- `TIMEOUT_SECONDS` - Request timeout (default: 30)
+
+### Build Variants
+- **Debug** - Development build with logging
+- **Release** - Production build optimized for performance
+
+## 📦 Dependencies
+
+### Core Libraries
+- **Jetpack Compose** - UI framework
+- **Material 3** - Design system
+- **Hilt** - Dependency injection
+- **Room** - Local database
+- **Retrofit** - API client
+- **Coroutines** - Asynchronous programming
+
+### Testing Libraries
+- **JUnit** - Unit testing
+- **MockK** - Mocking framework
+- **Espresso** - UI testing
+- **Compose Testing** - Compose UI testing
+
+## 🚀 Deployment
+
+### Release Build
+```bash
+# Generate signed APK
+./gradlew assembleRelease
+
+# Generate App Bundle
+./gradlew bundleRelease
+```
+
+### Play Store Submission
+1. Generate signed App Bundle
+2. Upload to Google Play Console
+3. Fill in store listing details
+4. Submit for review
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Material 3** - Google's design system
+- **Jetpack Compose** - Modern Android UI toolkit
+- **Room** - Local database solution
+- **Retrofit** - Type-safe HTTP client
+
+## 📞 Support
+
+For support, email purringlab@gmail.com or create an issue in this repository.
 
 ---
 
-## 💡 Prompt Templates for Cursor
-
-### Initial Setup Prompt
-```
-Create a new Jetpack Compose Android app for "Summarize AI" with the following setup:
-
-1. Use Material 3 Design
-2. Setup the color scheme based on this palette:
-   - Primary: Cyan-600 (#0891B2)
-   - Secondary: Blue-600 (#2563EB)
-   - Background: Gray-50 (#F9FAFB)
-   [Include other colors from DESIGN_SPEC.md]
-
-3. Setup typography with these styles:
-   [Include typography from DESIGN_SPEC.md]
-
-4. Create a theme file that defines all design tokens
-
-Show me the complete Theme.kt file.
-```
-
-### For Each Screen
-```
-Implement the [Screen Name] for the Summarize AI app using Jetpack Compose.
-
-Requirements:
-- Follow the layout specification from the design doc
-- Use the established theme colors and typography
-- Include all interactive elements
-- Add proper state management
-
-Here's the detailed specification:
-[Paste the specific screen section from DESIGN_SPEC.md]
-
-Please provide the complete Composable function.
-```
-
-### For Navigation
-```
-Setup the navigation structure for the app:
-
-1. Bottom Tab Navigation with 4 tabs:
-   - Home (Input screen)
-   - History
-   - Saved
-   - Settings
-
-2. Modal overlay for Output screen
-3. Smooth transitions between screens
-4. Back navigation handling
-
-Use Jetpack Compose Navigation. Show me the NavHost setup.
-```
-
----
-
-## 📦 What's Included in DESIGN_SPEC.md
-
-✅ Complete color palette with hex codes  
-✅ Typography system (all text styles)  
-✅ Spacing and sizing system  
-✅ Detailed layout for all 7 screens  
-✅ Component specifications  
-✅ Interaction states and animations  
-✅ Navigation flow diagram  
-✅ Implementation notes and recommendations  
-✅ Jetpack Compose component mapping  
-✅ State management structure  
-
----
-
-## 🎯 Alternative: Direct Copy-Paste Approach
-
-If you want to give Cursor everything at once:
-
-### Create a New Chat in Cursor
-```
-I'm building a native Android app called "Summarize AI" using Jetpack Compose. 
-
-This is a text summarization app with 7 screens:
-1. Welcome/Onboarding
-2. Home (Input)
-3. Loading
-4. Output (Summary display)
-5. History
-6. Saved items
-7. Settings
-
-The app uses a bottom tab navigation for Home, History, Saved, and Settings.
-
-I have a complete design specification. Let me share it with you:
-
-[Paste entire DESIGN_SPEC.md content]
-
-Please help me build this app step by step. Let's start with:
-1. Creating the Android project structure
-2. Setting up the design system (Theme.kt)
-3. Creating the bottom navigation structure
-
-After that, we'll implement each screen one by one.
-```
-
----
-
-## 📸 How to Capture Screenshots
-
-### From Browser
-1. Press F12 to open DevTools
-2. Click the device toolbar icon (or Ctrl+Shift+M)
-3. Set device to "iPhone 12 Pro" or similar (390x844)
-4. Click the three dots in device toolbar
-5. Choose "Capture screenshot"
-6. Repeat for each screen
-
-### Using Browser Extensions
-- **Full Page Screen Capture** (Chrome/Edge)
-- **Fireshot** (Firefox)
-- **Awesome Screenshot** (All browsers)
-
----
-
-## 🔗 Files to Share with Cursor
-
-Essential files:
-1. ✅ **DESIGN_SPEC.md** - Complete design documentation
-2. ⭐ **Screenshots/** - Visual references (highly recommended)
-
-Optional files (if Cursor asks for React reference):
-3. All `.tsx` files from `/components/` folder
-4. The `/styles/globals.css` file
-
----
-
-## 🚀 Expected Timeline
-
-With Cursor AI assistance:
-- **Design System Setup:** 30 minutes
-- **Navigation Structure:** 30 minutes  
-- **Each Screen Implementation:** 45-60 minutes
-- **Polish & Refinement:** 2-3 hours
-
-**Total:** ~8-10 hours for complete implementation
-
----
-
-## 💪 Pro Tips
-
-1. **One screen at a time:** Don't try to implement everything at once
-2. **Test frequently:** Build and run after each screen
-3. **Use previews:** Leverage `@Preview` annotations in Compose
-4. **Reference screenshots:** Visual reference is faster than reading specs
-5. **Ask Cursor to explain:** If something is unclear, ask for clarification
-6. **Iterate:** First get it working, then make it pixel-perfect
-
----
-
-## 🆘 If You Get Stuck
-
-Share this prompt with Cursor:
-```
-I'm having trouble implementing [specific feature]. 
-
-Here's what I'm trying to achieve:
-[Describe the issue]
-
-Here's the design specification:
-[Paste relevant section from DESIGN_SPEC.md]
-
-Here's my current code:
-[Paste your code]
-
-Can you help me fix this and make it match the design?
-```
-
----
-
-## ✅ Final Checklist
-
-Before starting:
-- [ ] DESIGN_SPEC.md downloaded
-- [ ] Screenshots captured (optional)
-- [ ] Cursor IDE installed and ready
-- [ ] Android Studio setup (for Cursor)
-- [ ] Device emulator configured
-
-Ready to build:
-- [ ] Design spec shared with Cursor
-- [ ] Project structure created
-- [ ] Theme/design system implemented
-- [ ] Ready to implement first screen
-
----
-
-**Good luck with your Android app! The design spec has everything you need. 🚀**
+**Built with ❤️ using modern Android development practices**

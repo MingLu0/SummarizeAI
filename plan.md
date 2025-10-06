@@ -349,4 +349,26 @@ app/
 
 ---
 
+### Phase 13: Web Link Sharing Feature
+**Goal**: Allow users to share web links from other apps for direct summarization
+
+#### Tasks:
+- [x] Configure AndroidManifest.xml with intent filters for web link sharing
+- [x] Add intent handling in MainActivity to receive shared URLs
+- [x] Add Jsoup dependency for HTML parsing and web content extraction
+- [x] Create WebContentExtractor class to fetch and parse web content
+- [x] Extend SummarizerApi to support longer token limits for web content
+- [x] Create WebContentRepository to handle web content fetching with error handling
+- [x] Implement direct processing flow (Option A) - automatic content extraction and summarization
+- [x] Update MainActivity to handle shared URLs with direct processing
+- [x] Add comprehensive error handling with user-friendly messages
+- [x] Revert Home screen UI changes to original design
+- [x] Test web link sharing functionality with various URLs
+- [x] Test error handling for invalid URLs and network issues
+- [x] Test seamless integration with existing app flow
+
+**Deliverable**: Complete web link sharing feature with direct processing (no preview step)
+
+---
+
 *This plan will be updated as we progress through each phase and discover new requirements or constraints.*

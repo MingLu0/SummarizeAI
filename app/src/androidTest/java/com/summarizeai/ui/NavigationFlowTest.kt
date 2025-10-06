@@ -231,3 +231,4 @@ class NavigationFlowTest {
             .assertIsEnabled()
     }
 }
+

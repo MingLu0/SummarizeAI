@@ -111,10 +111,14 @@ Generate code, corrections, and refactorings that comply with the basic principl
 - Use xml and fragments instead of jetpack compose
 - Use Material 3 for the UI
 - Use Hilt for dependency injection
+- Use optimistic writes design strategy that immediately updates the app's UI in response to user reaction wouthout waiting for backend confirmation wherever appropriate 
+- Write @Previews for all the UI components 
+
 ### Testing
 
 - Use the standard widget testing for flutter
 - Use integration tests for each api module.   
+- Write unit tests right after an UI comonent or flow is completed
 
 You are a Senior Kotlin programmer with experience in the Android framework and a preference for clean programming and design patterns.
 

@@ -14,6 +14,12 @@ data class SummarizeRequest(
     val prompt: String = "Summarize the following text concisely:"
 )
 
+data class WebSummarizeRequest(
+    val text: String,
+    val max_tokens: Int = 1024, // Longer token limit for web content
+    val prompt: String = "Summarize the following web content concisely:"
+)
+
 data class SummarizeResponse(
     val summary: String,
     val model: String,

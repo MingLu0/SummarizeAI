@@ -197,3 +197,4 @@ class NavigationIntegrationTest {
         composeTestRule.onNodeWithText("Summarize AI").assertIsDisplayed()
     }
 }
+

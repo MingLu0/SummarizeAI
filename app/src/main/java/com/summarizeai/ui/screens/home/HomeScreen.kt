@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -32,13 +33,34 @@ import com.summarizeai.ui.theme.*
 fun HomeScreen(
     onNavigateToLoading: () -> Unit,
     onNavigateToOutput: () -> Unit,
+    extractedContent: String? = null,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     
+    // Handle extracted content from shared URL
+    LaunchedEffect(extractedContent) {
+        println("HomeScreen: LaunchedEffect triggered, extractedContent: ${extractedContent?.let { "length ${it.length}" } ?: "null"}")
+        extractedContent?.let { content ->
+            if (content.isNotBlank()) {
+                println("HomeScreen: Received extracted content, length: ${content.length}")
+                println("HomeScreen: Setting text input and starting summarization")
+                // Set the extracted content and start summarization
+                viewModel.updateTextInput(content)
+                viewModel.summarizeText()
+                println("HomeScreen: Summarization started")
+            } else {
+                println("HomeScreen: Content is blank, not starting summarization")
+            }
+        } ?: run {
+            println("HomeScreen: No extracted content received")
+        }
+    }
+    
     // Navigate to output screen when API call completes successfully
     LaunchedEffect(uiState) {
+        println("HomeScreen: UI state changed - isLoading: ${uiState.isLoading}, summaryData: ${uiState.summaryData != null}, textInput length: ${uiState.textInput.length}")
         if (uiState.summaryData != null && !uiState.isLoading) {
             println("HomeScreen: API call completed, navigating to output")
             onNavigateToOutput()
@@ -152,6 +174,47 @@ fun HomeScreen(
                         text = "Upload PDF or DOC",
                         style = MaterialTheme.typography.labelLarge,
                         color = Gray700
+                    )
+                }
+            }
+            
+            // Error Display
+            if (uiState.error != null) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.1f)),
+                    shape = RoundedCornerShape(CornerRadius.md)
+                ) {
+                    Text(
+                        text = "Error: ${uiState.error}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Red,
+                        modifier = Modifier.padding(Spacing.md)
+                    )
+                }
+            }
+            
+            // Test API Button (for debugging)
+            if (uiState.error != null) {
+                Button(
+                    onClick = {
+                        // Test with a simple text to verify API connection
+                        viewModel.updateTextInput("Test API connection")
+                        viewModel.summarizeText()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red
+                    ),
+                    shape = RoundedCornerShape(CornerRadius.md)
+                ) {
+                    Text(
+                        text = "Test API Connection",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = White
                     )
                 }
             }
