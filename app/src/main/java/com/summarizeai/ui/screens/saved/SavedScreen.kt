@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.summarizeai.ui.theme.*
 import java.text.SimpleDateFormat
@@ -284,4 +285,30 @@ fun createSampleSavedItems(): List<SavedItem> {
             formattedDate = "Jan 14"
         )
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SavedScreenPreview() {
+    SummarizeAITheme {
+        SavedScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SavedItemCardPreview() {
+    SummarizeAITheme {
+        val sampleItem = SavedItem(
+            id = "s1",
+            originalText = "This is a saved summary that was bookmarked...",
+            summary = "This is a saved summary with important insights that was bookmarked for future reference.",
+            savedDate = Date(),
+            formattedDate = "Jan 15"
+        )
+        SavedItemCard(
+            item = sampleItem,
+            onUnsave = {}
+        )
+    }
 }

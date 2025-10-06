@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.summarizeai.ui.theme.*
 
@@ -291,6 +292,34 @@ fun SettingsCard(
                 
                 content()
             }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SettingsScreenPreview() {
+    SummarizeAITheme {
+        SettingsScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SettingsCardPreview() {
+    SummarizeAITheme {
+        SettingsCard(
+            icon = Icons.Default.Public,
+            iconBackground = Cyan50,
+            iconTint = Cyan600,
+            title = "Language",
+            description = "Choose your preferred language"
+        ) {
+            Text(
+                text = "English",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Gray700
+            )
         }
     }
 }

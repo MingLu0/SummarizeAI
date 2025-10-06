@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -297,5 +298,17 @@ fun WebPreviewScreen(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun WebPreviewScreenPreview() {
+    SummarizeAITheme {
+        WebPreviewScreen(
+            initialUrl = "https://example.com",
+            onNavigateBack = {},
+            onProceedToSummarize = { _, _ -> }
+        )
     }
 }

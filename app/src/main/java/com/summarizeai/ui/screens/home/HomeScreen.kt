@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -266,5 +267,17 @@ fun HomeScreen(
             
             Spacer(modifier = Modifier.height(Spacing.xl))
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    SummarizeAITheme {
+        HomeScreen(
+            onNavigateToLoading = {},
+            onNavigateToOutput = {},
+            extractedContent = null
+        )
     }
 }

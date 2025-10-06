@@ -13,6 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -177,5 +178,16 @@ fun LoadingScreen(
             )
             
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LoadingScreenPreview() {
+    SummarizeAITheme {
+        LoadingScreen(
+            onNavigateToOutput = {},
+            onNavigateBack = {}
+        )
     }
 }

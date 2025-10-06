@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -32,6 +33,7 @@ import com.summarizeai.ui.screens.output.OutputScreen
 import com.summarizeai.ui.theme.Cyan600
 import com.summarizeai.ui.theme.Gray400
 import com.summarizeai.ui.theme.Gray600
+import com.summarizeai.ui.theme.SummarizeAITheme
 import com.summarizeai.ui.theme.White
 
 @Composable
@@ -226,3 +228,25 @@ data class BottomNavItem(
     val icon: androidx.compose.ui.graphics.vector.ImageVector,
     val label: String
 )
+
+@Preview(showBackground = true)
+@Composable
+fun SummarizeAINavHostPreview() {
+    SummarizeAITheme {
+        SummarizeAINavHost(
+            navController = rememberNavController(),
+            extractedContent = null
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainScreenWithBottomNavigationPreview() {
+    SummarizeAITheme {
+        MainScreenWithBottomNavigation(
+            navController = rememberNavController(),
+            extractedContent = null
+        )
+    }
+}
