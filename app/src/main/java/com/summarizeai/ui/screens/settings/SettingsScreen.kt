@@ -295,31 +295,3 @@ fun SettingsCard(
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun SettingsScreenPreview() {
-    SummarizeAITheme {
-        SettingsScreen()
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SettingsCardPreview() {
-    SummarizeAITheme {
-        SettingsCard(
-            icon = Icons.Default.Public,
-            iconBackground = Cyan50,
-            iconTint = Cyan600,
-            title = "Language",
-            description = "Choose your preferred language"
-        ) {
-            Text(
-                text = "English",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Gray700
-            )
-        }
-    }
-}

@@ -301,14 +301,3 @@ fun WebPreviewScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun WebPreviewScreenPreview() {
-    SummarizeAITheme {
-        WebPreviewScreen(
-            initialUrl = "https://example.com",
-            onNavigateBack = {},
-            onProceedToSummarize = { _, _ -> }
-        )
-    }
-}

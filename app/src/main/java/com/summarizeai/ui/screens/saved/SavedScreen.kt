@@ -286,29 +286,3 @@ fun createSampleSavedItems(): List<SavedItem> {
         )
     )
 }
-
-@Preview(showBackground = true)
-@Composable
-fun SavedScreenPreview() {
-    SummarizeAITheme {
-        SavedScreen()
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SavedItemCardPreview() {
-    SummarizeAITheme {
-        val sampleItem = SavedItem(
-            id = "s1",
-            originalText = "This is a saved summary that was bookmarked...",
-            summary = "This is a saved summary with important insights that was bookmarked for future reference.",
-            savedDate = Date(),
-            formattedDate = "Jan 15"
-        )
-        SavedItemCard(
-            item = sampleItem,
-            onUnsave = {}
-        )
-    }
-}

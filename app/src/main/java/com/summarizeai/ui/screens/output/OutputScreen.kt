@@ -73,7 +73,7 @@ fun OutputScreen(
                 containerColor = White
             )
         )
-        
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -122,7 +122,7 @@ fun OutputScreen(
                     }
                 }
             }
-            
+
             // Summary Card
             Card(
                 modifier = Modifier
@@ -151,173 +151,162 @@ fun OutputScreen(
                     )
                 }
             }
-            
-            // Action Buttons Container
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(
-                        elevation = Elevation.sm,
-                        shape = RoundedCornerShape(
-                            topStart = CornerRadius.lg,
-                            topEnd = CornerRadius.lg
-                        ),
-                        ambientColor = ShadowColor,
-                        spotColor = ShadowColor
-                    ),
-                colors = CardDefaults.cardColors(containerColor = White),
-                shape = RoundedCornerShape(
-                    topStart = CornerRadius.lg,
-                    topEnd = CornerRadius.lg
-                )
-            ) {
-                Column(
-                    modifier = Modifier.padding(Spacing.xl),
-                    verticalArrangement = Arrangement.spacedBy(Spacing.md)
-                ) {
-                    // Copy, Save, and Home Buttons Row
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(Spacing.md)
-                    ) {
-                        // Copy Button
-                        OutlinedButton(
-                            onClick = viewModel::copyToClipboard,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(48.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = Gray900
-                            ),
-                            border = ButtonDefaults.outlinedButtonBorder.copy(
-                                brush = Brush.linearGradient(listOf(Gray200, Gray200))
-                            ),
-                            shape = RoundedCornerShape(CornerRadius.lg)
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.ContentCopy,
-                                    contentDescription = "Copy",
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Spacer(modifier = Modifier.width(Spacing.sm))
-                                Text("Copy")
-                            }
-                        }
-                        
-                        // Save Button
-                        OutlinedButton(
-                            onClick = viewModel::toggleSaveStatus,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(48.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = if (uiState.summaryData?.isSaved == true) Cyan600 else Gray900,
-                                containerColor = if (uiState.summaryData?.isSaved == true) Cyan50 else White
-                            ),
-                            border = ButtonDefaults.outlinedButtonBorder.copy(
-                                brush = Brush.linearGradient(
-                                    listOf(
-                                        if (uiState.summaryData?.isSaved == true) Cyan600 else Gray200,
-                                        if (uiState.summaryData?.isSaved == true) Cyan600 else Gray200
-                                    )
-                                )
-                            ),
-                            shape = RoundedCornerShape(CornerRadius.lg)
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = if (uiState.summaryData?.isSaved == true) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                                    contentDescription = "Save",
-                                    modifier = Modifier.size(20.dp),
-                                    tint = if (uiState.summaryData?.isSaved == true) Cyan600 else Gray600
-                                )
-                                Spacer(modifier = Modifier.width(Spacing.sm))
-                                Text("Save")
-                            }
-                        }
-                        
-                        // Home Button
-                        OutlinedButton(
-                            onClick = onNavigateToHome,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(48.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = Gray900
-                            ),
-                            border = ButtonDefaults.outlinedButtonBorder.copy(
-                                brush = Brush.linearGradient(listOf(Gray200, Gray200))
-                            ),
-                            shape = RoundedCornerShape(CornerRadius.lg)
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Home,
-                                    contentDescription = "Home",
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Spacer(modifier = Modifier.width(Spacing.sm))
-                                Text("Home")
-                            }
-                        }
-                    }
-                    
-                    // Share Button
-                    Button(
-                        onClick = viewModel::shareSummary,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .shadow(
-                                elevation = Elevation.lg,
-                                shape = RoundedCornerShape(CornerRadius.xxl),
-                                ambientColor = AccentShadow,
-                                spotColor = AccentShadow
-                            ),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Cyan600
-                        ),
-                        shape = RoundedCornerShape(CornerRadius.xxl)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Share,
-                            contentDescription = "Share",
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(Spacing.sm))
-                        Text(
-                            text = "Share",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = White,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun OutputScreenPreview() {
-    SummarizeAITheme {
-        OutputScreen(
-            onNavigateBack = {},
-            onNavigateToHome = {}
-        )
+//            // Action Buttons Container
+//            Card(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .shadow(
+//                        elevation = Elevation.sm,
+//                        shape = RoundedCornerShape(
+//                            topStart = CornerRadius.lg,
+//                            topEnd = CornerRadius.lg
+//                        ),
+//                        ambientColor = ShadowColor,
+//                        spotColor = ShadowColor
+//                    ),
+//                colors = CardDefaults.cardColors(containerColor = White),
+//                shape = RoundedCornerShape(
+//                    topStart = CornerRadius.lg,
+//                    topEnd = CornerRadius.lg
+//                )
+//            ) {
+//                Column(
+//                    modifier = Modifier.padding(Spacing.xl),
+//                    verticalArrangement = Arrangement.spacedBy(Spacing.md)
+//                ) {
+//                    // Copy, Save, and Home Buttons Row
+//                    Row(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        horizontalArrangement = Arrangement.spacedBy(Spacing.md)
+//                    ) {
+//                        // Copy Button
+//                        OutlinedButton(
+//                            onClick = viewModel::copyToClipboard,
+//                            modifier = Modifier
+//                                .weight(1f)
+//                                .height(48.dp),
+//                            colors = ButtonDefaults.outlinedButtonColors(
+//                                contentColor = Gray900
+//                            ),
+//                            border = ButtonDefaults.outlinedButtonBorder.copy(
+//                                brush = Brush.linearGradient(listOf(Gray200, Gray200))
+//                            ),
+//                            shape = RoundedCornerShape(CornerRadius.lg)
+//                        ) {
+//                            Row(
+//                                modifier = Modifier.fillMaxWidth(),
+//                                horizontalArrangement = Arrangement.Center,
+//                                verticalAlignment = Alignment.CenterVertically
+//                            ) {
+//                                Icon(
+//                                    imageVector = Icons.Default.ContentCopy,
+//                                    contentDescription = "Copy",
+//                                    modifier = Modifier.size(20.dp)
+//                                )
+//                                Spacer(modifier = Modifier.width(Spacing.sm))
+//                                Text("Copy")
+//                            }
+//                        }
+//
+//                        // Save Button
+//                        OutlinedButton(
+//                            onClick = viewModel::toggleSaveStatus,
+//                            modifier = Modifier
+//                                .weight(1f)
+//                                .height(48.dp),
+//                            colors = ButtonDefaults.outlinedButtonColors(
+//                                contentColor = if (uiState.summaryData?.isSaved == true) Cyan600 else Gray900,
+//                                containerColor = if (uiState.summaryData?.isSaved == true) Cyan50 else White
+//                            ),
+//                            border = ButtonDefaults.outlinedButtonBorder.copy(
+//                                brush = Brush.linearGradient(
+//                                    listOf(
+//                                        if (uiState.summaryData?.isSaved == true) Cyan600 else Gray200,
+//                                        if (uiState.summaryData?.isSaved == true) Cyan600 else Gray200
+//                                    )
+//                                )
+//                            ),
+//                            shape = RoundedCornerShape(CornerRadius.lg)
+//                        ) {
+//                            Row(
+//                                modifier = Modifier.fillMaxWidth(),
+//                                horizontalArrangement = Arrangement.Center,
+//                                verticalAlignment = Alignment.CenterVertically
+//                            ) {
+//                                Icon(
+//                                    imageVector = if (uiState.summaryData?.isSaved == true) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+//                                    contentDescription = "Save",
+//                                    modifier = Modifier.size(20.dp),
+//                                    tint = if (uiState.summaryData?.isSaved == true) Cyan600 else Gray600
+//                                )
+//                                Spacer(modifier = Modifier.width(Spacing.sm))
+//                                Text("Save")
+//                            }
+//                        }
+//
+//                        // Home Button
+//                        OutlinedButton(
+//                            onClick = onNavigateToHome,
+//                            modifier = Modifier
+//                                .weight(1f)
+//                                .height(48.dp),
+//                            colors = ButtonDefaults.outlinedButtonColors(
+//                                contentColor = Gray900
+//                            ),
+//                            border = ButtonDefaults.outlinedButtonBorder.copy(
+//                                brush = Brush.linearGradient(listOf(Gray200, Gray200))
+//                            ),
+//                            shape = RoundedCornerShape(CornerRadius.lg)
+//                        ) {
+//                            Row(
+//                                modifier = Modifier.fillMaxWidth(),
+//                                horizontalArrangement = Arrangement.Center,
+//                                verticalAlignment = Alignment.CenterVertically
+//                            ) {
+//                                Icon(
+//                                    imageVector = Icons.Default.Home,
+//                                    contentDescription = "Home",
+//                                    modifier = Modifier.size(20.dp)
+//                                )
+//                                Spacer(modifier = Modifier.width(Spacing.sm))
+//                                Text("Home")
+//                            }
+//                        }
+//                    }
+//
+//                    // Share Button
+//                    Button(
+//                        onClick = viewModel::shareSummary,
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .height(56.dp)
+//                            .shadow(
+//                                elevation = Elevation.lg,
+//                                shape = RoundedCornerShape(CornerRadius.xxl),
+//                                ambientColor = AccentShadow,
+//                                spotColor = AccentShadow
+//                            ),
+//                        colors = ButtonDefaults.buttonColors(
+//                            containerColor = Cyan600
+//                        ),
+//                        shape = RoundedCornerShape(CornerRadius.xxl)
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Default.Share,
+//                            contentDescription = "Share",
+//                            modifier = Modifier.size(20.dp)
+//                        )
+//                        Spacer(modifier = Modifier.width(Spacing.sm))
+//                        Text(
+//                            text = "Share",
+//                            style = MaterialTheme.typography.labelLarge,
+//                            color = White,
+//                            fontWeight = FontWeight.Medium
+//                        )
+//                    }
+//                }
+//            }
+        }
     }
 }

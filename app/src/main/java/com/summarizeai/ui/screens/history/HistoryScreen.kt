@@ -266,31 +266,3 @@ private fun formatDate(date: Date): String {
         else -> "${diffInMinutes / 1440}d ago"
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun HistoryScreenPreview() {
-    SummarizeAITheme {
-        HistoryScreen()
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HistoryItemCardPreview() {
-    SummarizeAITheme {
-        val sampleItem = SummaryData(
-            id = "1",
-            originalText = "This is a sample original text that was summarized.",
-            shortSummary = "Short summary",
-            mediumSummary = "This is a sample medium summary that shows how the history item card looks with some content.",
-            detailedSummary = "This is a detailed summary with more information.",
-            createdAt = Date(),
-            isSaved = false
-        )
-        HistoryItemCard(
-            item = sampleItem,
-            onDelete = {}
-        )
-    }
-}

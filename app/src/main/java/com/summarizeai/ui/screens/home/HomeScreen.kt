@@ -270,14 +270,3 @@ fun HomeScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    SummarizeAITheme {
-        HomeScreen(
-            onNavigateToLoading = {},
-            onNavigateToOutput = {},
-            extractedContent = null
-        )
-    }
-}

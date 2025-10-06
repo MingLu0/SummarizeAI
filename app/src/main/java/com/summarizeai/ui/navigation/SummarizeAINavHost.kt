@@ -229,24 +229,3 @@ data class BottomNavItem(
     val label: String
 )
 
-@Preview(showBackground = true)
-@Composable
-fun SummarizeAINavHostPreview() {
-    SummarizeAITheme {
-        SummarizeAINavHost(
-            navController = rememberNavController(),
-            extractedContent = null
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MainScreenWithBottomNavigationPreview() {
-    SummarizeAITheme {
-        MainScreenWithBottomNavigation(
-            navController = rememberNavController(),
-            extractedContent = null
-        )
-    }
-}

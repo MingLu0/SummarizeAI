@@ -180,14 +180,3 @@ fun LoadingScreen(
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun LoadingScreenPreview() {
-    SummarizeAITheme {
-        LoadingScreen(
-            onNavigateToOutput = {},
-            onNavigateBack = {}
-        )
-    }
-}
