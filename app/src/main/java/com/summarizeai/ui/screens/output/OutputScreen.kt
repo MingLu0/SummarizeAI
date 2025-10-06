@@ -78,7 +78,7 @@ fun OutputScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = Spacing.xl)
-                .padding(top = Spacing.xl),
+                .padding(vertical = Spacing.xl),
             verticalArrangement = Arrangement.spacedBy(Spacing.xl)
         ) {
             // Tab Selector
