@@ -1,5 +1,6 @@
 package com.summarizeai.ui.navigation
 
+import android.net.Uri
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
@@ -231,7 +232,9 @@ fun MainScreenWithBottomNavigation(
                     navArgument("inputText") { type = NavType.StringType }
                 )
             ) { backStackEntry ->
-                val inputText = backStackEntry.arguments?.getString("inputText") ?: ""
+                val inputText = backStackEntry.arguments?.getString("inputText")?.let { 
+                    Uri.decode(it) 
+                } ?: ""
                 StreamingOutputScreen(
                     onNavigateBack = {
                         println("Back button clicked from StreamingOutput screen")
