@@ -54,33 +54,15 @@ class SummaryRepositoryImpl @Inject constructor(
     
     override fun summarizeTextStreaming(text: String): Flow<StreamingResult> = flow {
         try {
-            var buffer = ""
             var fullSummary = ""
             
             streamingService.streamSummary(text, "https://colin730-summarizerapp.hf.space").collect { chunk ->
-                buffer += chunk.content
                 fullSummary += chunk.content
                 
-                // Check if we have a complete sentence
-                val sentenceEndings = listOf(".", "!", "?")
-                val lastSentenceEndIndex = sentenceEndings.mapNotNull { ending ->
-                    buffer.lastIndexOf(ending).takeIf { it != -1 }
-                }.maxOrNull()
-                
-                if (lastSentenceEndIndex != null) {
-                    val completeSentence = buffer.substring(0, lastSentenceEndIndex + 1).trim()
-                    if (completeSentence.isNotEmpty()) {
-                        emit(StreamingResult.Progress(completeSentence))
-                        buffer = buffer.substring(lastSentenceEndIndex + 1).trim()
-                    }
-                }
+                // Emit progress for every chunk immediately
+                emit(StreamingResult.Progress(chunk.content))
                 
                 if (chunk.done) {
-                    // Emit any remaining buffer as final progress
-                    if (buffer.isNotEmpty()) {
-                        emit(StreamingResult.Progress(buffer))
-                    }
-                    
                     // Create final summary data
                     val summaryData = SummaryData(
                         originalText = text,

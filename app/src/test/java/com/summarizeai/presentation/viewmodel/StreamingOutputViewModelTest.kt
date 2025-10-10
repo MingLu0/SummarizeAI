@@ -9,11 +9,20 @@ import com.summarizeai.utils.ShareUtils
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.junit.Rule
+import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.resetMain
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class StreamingOutputViewModelTest {
 
     private lateinit var mockRepository: SummaryRepository
@@ -21,9 +30,11 @@ class StreamingOutputViewModelTest {
     private lateinit var mockShareUtils: ShareUtils
     private lateinit var mockSavedStateHandle: SavedStateHandle
     private lateinit var streamingOutputViewModel: StreamingOutputViewModel
+    private val testDispatcher = UnconfinedTestDispatcher()
 
     @Before
     fun setup() {
+        Dispatchers.setMain(testDispatcher)
         mockRepository = mock()
         mockClipboardUtils = mock()
         mockShareUtils = mock()
@@ -34,6 +45,11 @@ class StreamingOutputViewModelTest {
             mockShareUtils,
             mockSavedStateHandle
         )
+    }
+
+    @org.junit.After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
@@ -60,6 +76,7 @@ class StreamingOutputViewModelTest {
 
         // When
         streamingOutputViewModel.startStreaming(testText)
+        advanceUntilIdle() // Wait for all coroutines to complete
 
         // Then
         verify(mockRepository).summarizeTextStreaming(testText)
@@ -99,6 +116,7 @@ class StreamingOutputViewModelTest {
 
         // When
         streamingOutputViewModel.startStreaming(testText)
+        advanceUntilIdle() // Wait for all coroutines to complete
 
         // Then
         val uiState = streamingOutputViewModel.uiState.first()
@@ -118,6 +136,7 @@ class StreamingOutputViewModelTest {
 
         // When
         streamingOutputViewModel.startStreaming(testText)
+        advanceUntilIdle() // Wait for all coroutines to complete
         val currentText = streamingOutputViewModel.getCurrentSummaryText()
 
         // Then
@@ -145,6 +164,7 @@ class StreamingOutputViewModelTest {
 
         // When
         streamingOutputViewModel.startStreaming(testText)
+        advanceUntilIdle() // Wait for all coroutines to complete
         
         // Test medium summary (default tab)
         var currentText = streamingOutputViewModel.getCurrentSummaryText()
@@ -182,6 +202,7 @@ class StreamingOutputViewModelTest {
 
         // When
         streamingOutputViewModel.startStreaming(testText)
+        advanceUntilIdle() // Wait for all coroutines to complete
         streamingOutputViewModel.copyToClipboard()
 
         // Then
@@ -209,6 +230,7 @@ class StreamingOutputViewModelTest {
 
         // When
         streamingOutputViewModel.startStreaming(testText)
+        advanceUntilIdle() // Wait for all coroutines to complete
         streamingOutputViewModel.shareSummary()
 
         // Then
@@ -236,6 +258,7 @@ class StreamingOutputViewModelTest {
 
         // When
         streamingOutputViewModel.startStreaming(testText)
+        advanceUntilIdle() // Wait for all coroutines to complete
         streamingOutputViewModel.toggleSaveStatus()
 
         // Then

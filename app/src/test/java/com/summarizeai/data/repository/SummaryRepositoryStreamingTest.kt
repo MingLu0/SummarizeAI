@@ -27,7 +27,7 @@ class SummaryRepositoryStreamingTest {
     }
 
     @Test
-    fun `summarizeTextStreaming should emit Progress events for complete sentences`() = runTest {
+    fun `summarizeTextStreaming should emit Progress events for each chunk`() = runTest {
         // Given
         val testText = "This is a test. This is another sentence! And a third one?"
         val chunks = listOf(
@@ -44,21 +44,30 @@ class SummaryRepositoryStreamingTest {
         val results = repository.summarizeTextStreaming(testText).toList()
 
         // Then
-        assertEquals(3, results.size) // Should emit 3 complete sentences
+        assertEquals(6, results.size) // Should emit 5 Progress + 1 Complete
         
         assertTrue(results[0] is StreamingResult.Progress)
-        assertEquals("This is a test.", (results[0] as StreamingResult.Progress).text)
+        assertEquals("This is a", (results[0] as StreamingResult.Progress).text)
         
         assertTrue(results[1] is StreamingResult.Progress)
-        assertEquals("This is another sentence!", (results[1] as StreamingResult.Progress).text)
+        assertEquals(" test.", (results[1] as StreamingResult.Progress).text)
         
-        assertTrue(results[2] is StreamingResult.Complete)
-        val summaryData = (results[2] as StreamingResult.Complete).summaryData
-        assertEquals("And a third one?", summaryData.mediumSummary)
+        assertTrue(results[2] is StreamingResult.Progress)
+        assertEquals(" This is another", (results[2] as StreamingResult.Progress).text)
+        
+        assertTrue(results[3] is StreamingResult.Progress)
+        assertEquals(" sentence!", (results[3] as StreamingResult.Progress).text)
+        
+        assertTrue(results[4] is StreamingResult.Progress)
+        assertEquals(" And a third one?", (results[4] as StreamingResult.Progress).text)
+        
+        assertTrue(results[5] is StreamingResult.Complete)
+        val summaryData = (results[5] as StreamingResult.Complete).summaryData
+        assertEquals("This is a test. This is another sentence! And a third one?", summaryData.mediumSummary)
     }
 
     @Test
-    fun `summarizeTextStreaming should buffer incomplete sentences`() = runTest {
+    fun `summarizeTextStreaming should emit all chunks including incomplete sentences`() = runTest {
         // Given
         val testText = "This is an incomplete"
         val chunks = listOf(
@@ -72,9 +81,15 @@ class SummaryRepositoryStreamingTest {
         val results = repository.summarizeTextStreaming(testText).toList()
 
         // Then
-        assertEquals(1, results.size) // Should emit only when complete
-        assertTrue(results[0] is StreamingResult.Complete)
-        val summaryData = (results[0] as StreamingResult.Complete).summaryData
+        assertEquals(3, results.size) // Should emit 2 Progress + 1 Complete
+        assertTrue(results[0] is StreamingResult.Progress)
+        assertEquals("This is an", (results[0] as StreamingResult.Progress).text)
+        
+        assertTrue(results[1] is StreamingResult.Progress)
+        assertEquals(" incomplete", (results[1] as StreamingResult.Progress).text)
+        
+        assertTrue(results[2] is StreamingResult.Complete)
+        val summaryData = (results[2] as StreamingResult.Complete).summaryData
         assertEquals("This is an incomplete", summaryData.mediumSummary)
     }
 
@@ -124,9 +139,12 @@ class SummaryRepositoryStreamingTest {
         val results = repository.summarizeTextStreaming(testText).toList()
 
         // Then
-        assertEquals(1, results.size)
-        assertTrue(results[0] is StreamingResult.Complete)
-        val summaryData = (results[0] as StreamingResult.Complete).summaryData
+        assertEquals(2, results.size) // Should emit 1 Progress + 1 Complete
+        assertTrue(results[0] is StreamingResult.Progress)
+        assertEquals("", (results[0] as StreamingResult.Progress).text)
+        
+        assertTrue(results[1] is StreamingResult.Complete)
+        val summaryData = (results[1] as StreamingResult.Complete).summaryData
         assertEquals("", summaryData.mediumSummary)
     }
 
@@ -147,19 +165,22 @@ class SummaryRepositoryStreamingTest {
         val results = repository.summarizeTextStreaming(testText).toList()
 
         // Then
-        assertEquals(4, results.size) // Should emit 4 complete sentences
+        assertEquals(5, results.size) // Should emit 4 Progress + 1 Complete
         
         assertTrue(results[0] is StreamingResult.Progress)
         assertEquals("First sentence.", (results[0] as StreamingResult.Progress).text)
         
         assertTrue(results[1] is StreamingResult.Progress)
-        assertEquals("Second sentence!", (results[1] as StreamingResult.Progress).text)
+        assertEquals(" Second sentence!", (results[1] as StreamingResult.Progress).text)
         
         assertTrue(results[2] is StreamingResult.Progress)
-        assertEquals("Third sentence?", (results[2] as StreamingResult.Progress).text)
+        assertEquals(" Third sentence?", (results[2] as StreamingResult.Progress).text)
         
-        assertTrue(results[3] is StreamingResult.Complete)
-        val summaryData = (results[3] as StreamingResult.Complete).summaryData
-        assertEquals("Fourth sentence.", summaryData.mediumSummary)
+        assertTrue(results[3] is StreamingResult.Progress)
+        assertEquals(" Fourth sentence.", (results[3] as StreamingResult.Progress).text)
+        
+        assertTrue(results[4] is StreamingResult.Complete)
+        val summaryData = (results[4] as StreamingResult.Complete).summaryData
+        assertEquals("First sentence. Second sentence! Third sentence? Fourth sentence.", summaryData.mediumSummary)
     }
 }

@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,6 +29,9 @@ class StreamingOutputViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(StreamingOutputUiState())
     val uiState: StateFlow<StreamingOutputUiState> = _uiState.asStateFlow()
     
+    private var textBuffer = StringBuilder()
+    private var displayJob: Job? = null
+    
     fun startStreaming(inputText: String) {
         if (inputText.isBlank()) {
             _uiState.value = _uiState.value.copy(
@@ -34,6 +40,10 @@ class StreamingOutputViewModel @Inject constructor(
             return
         }
         
+        // Cancel any previous display job
+        displayJob?.cancel()
+        textBuffer.clear()
+        
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 isStreaming = true,
@@ -41,25 +51,48 @@ class StreamingOutputViewModel @Inject constructor(
                 error = null
             )
             
+            // Launch parallel coroutine for letter-by-letter display
+            displayJob = launch {
+                var displayedLength = 0
+                while (isActive) {
+                    if (displayedLength < textBuffer.length) {
+                        displayedLength++
+                        _uiState.value = _uiState.value.copy(
+                            streamingText = textBuffer.substring(0, displayedLength)
+                        )
+                        delay(25) // 25ms per character
+                    } else {
+                        delay(50) // Check for new buffer content
+                    }
+                }
+            }
+            
+            // Collect from repository and add to buffer
             repository.summarizeTextStreaming(inputText).collect { result ->
                 when (result) {
                     is StreamingResult.Progress -> {
-                        _uiState.value = _uiState.value.copy(
-                            streamingText = result.text
-                        )
+                        textBuffer.append(result.text)
                     }
                     is StreamingResult.Complete -> {
+                        // Wait for display to catch up with buffer
+                        while (textBuffer.length > _uiState.value.streamingText.length) {
+                            delay(100)
+                        }
+                        displayJob?.cancel()
                         _uiState.value = _uiState.value.copy(
                             isStreaming = false,
                             summaryData = result.summaryData,
                             streamingText = ""
                         )
+                        textBuffer.clear()
                     }
                     is StreamingResult.Error -> {
+                        displayJob?.cancel()
                         _uiState.value = _uiState.value.copy(
                             isStreaming = false,
                             error = result.message
                         )
+                        textBuffer.clear()
                     }
                 }
             }
