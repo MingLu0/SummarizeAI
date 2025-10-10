@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Nightlight
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,18 +17,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.summarizeai.presentation.viewmodel.SettingsViewModel
 import com.summarizeai.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    viewModel: SettingsViewModel = hiltViewModel()
+) {
     var selectedLanguage by remember { mutableStateOf("English") }
     var summaryLength by remember { mutableStateOf(50f) }
     var darkModeEnabled by remember { mutableStateOf(false) }
+    
+    val isStreamingEnabled by viewModel.isStreamingEnabled.collectAsStateWithLifecycle(initialValue = true)
     
     val languages = listOf("English", "Spanish", "French", "German", "Chinese")
     
@@ -164,6 +173,39 @@ fun SettingsScreen() {
                             uncheckedThumbColor = White,
                             uncheckedTrackColor = Gray200
                         )
+                    )
+                }
+            }
+            
+            // Text Streaming Card
+            SettingsCard(
+                icon = Icons.Default.Speed,
+                iconBackground = Green50,
+                iconTint = Green600,
+                title = "Text Streaming",
+                description = "Show summaries as they're being generated"
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        // Content is handled by the card
+                    }
+                    
+                    Switch(
+                        checked = isStreamingEnabled,
+                        onCheckedChange = { viewModel.setStreamingEnabled(it) },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = White,
+                            checkedTrackColor = Cyan600,
+                            uncheckedThumbColor = White,
+                            uncheckedTrackColor = Gray200
+                        ),
+                        modifier = Modifier.testTag("streaming_toggle")
                     )
                 }
             }

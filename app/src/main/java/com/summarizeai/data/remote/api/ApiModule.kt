@@ -1,8 +1,13 @@
 package com.summarizeai.data.remote.api
 
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -16,6 +21,8 @@ import javax.inject.Singleton
 object ApiModule {
 
 private const val BASE_URL = "https://colin730-summarizerapp.hf.space/"
+
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
     
     @Provides
     @Singleton
@@ -47,6 +54,12 @@ private const val BASE_URL = "https://colin730-summarizerapp.hf.space/"
     @Singleton
     fun provideSummarizerApi(retrofit: Retrofit): SummarizerApi {
         return retrofit.create(SummarizerApi::class.java)
+    }
+    
+    @Provides
+    @Singleton
+    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return context.dataStore
     }
     
     @Provides

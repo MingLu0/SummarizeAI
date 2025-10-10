@@ -5,11 +5,14 @@ import com.summarizeai.data.local.mapper.SummaryMapper.toSummaryData
 import com.summarizeai.data.local.mapper.SummaryMapper.toSummaryDataList
 import com.summarizeai.data.local.mapper.SummaryMapper.toSummaryEntity
 import com.summarizeai.data.model.ApiResult
+import com.summarizeai.data.model.StreamingResult
 import com.summarizeai.data.model.SummaryData
 import com.summarizeai.data.remote.api.SummarizeRequest
+import com.summarizeai.data.remote.api.StreamingSummarizerService
 import com.summarizeai.data.remote.datasource.SummaryRemoteDataSource
 import com.summarizeai.domain.repository.SummaryRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,7 +20,8 @@ import javax.inject.Singleton
 @Singleton
 class SummaryRepositoryImpl @Inject constructor(
     private val remoteDataSource: SummaryRemoteDataSource,
-    private val localDataSource: SummaryLocalDataSource
+    private val localDataSource: SummaryLocalDataSource,
+    private val streamingService: StreamingSummarizerService
 ) : SummaryRepository {
     
     override suspend fun summarizeText(text: String): ApiResult<SummaryData> {
@@ -45,6 +49,54 @@ class SummaryRepositoryImpl @Inject constructor(
             is ApiResult.Loading -> {
                 ApiResult.Error("Request is still loading")
             }
+        }
+    }
+    
+    override fun summarizeTextStreaming(text: String): Flow<StreamingResult> = flow {
+        try {
+            var buffer = ""
+            var fullSummary = ""
+            
+            streamingService.streamSummary(text, "https://colin730-summarizerapp.hf.space").collect { chunk ->
+                buffer += chunk.content
+                fullSummary += chunk.content
+                
+                // Check if we have a complete sentence
+                val sentenceEndings = listOf(".", "!", "?")
+                val lastSentenceEndIndex = sentenceEndings.mapNotNull { ending ->
+                    buffer.lastIndexOf(ending).takeIf { it != -1 }
+                }.maxOrNull()
+                
+                if (lastSentenceEndIndex != null) {
+                    val completeSentence = buffer.substring(0, lastSentenceEndIndex + 1).trim()
+                    if (completeSentence.isNotEmpty()) {
+                        emit(StreamingResult.Progress(completeSentence))
+                        buffer = buffer.substring(lastSentenceEndIndex + 1).trim()
+                    }
+                }
+                
+                if (chunk.done) {
+                    // Emit any remaining buffer as final progress
+                    if (buffer.isNotEmpty()) {
+                        emit(StreamingResult.Progress(buffer))
+                    }
+                    
+                    // Create final summary data
+                    val summaryData = SummaryData(
+                        originalText = text,
+                        shortSummary = generateShortSummary(fullSummary),
+                        mediumSummary = fullSummary,
+                        detailedSummary = generateDetailedSummary(fullSummary)
+                    )
+                    
+                    // Save to local database
+                    localDataSource.insertSummary(summaryData.toSummaryEntity())
+                    
+                    emit(StreamingResult.Complete(summaryData))
+                }
+            }
+        } catch (e: Exception) {
+            emit(StreamingResult.Error(e.message ?: "Unknown error occurred"))
         }
     }
     

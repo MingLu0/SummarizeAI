@@ -34,6 +34,7 @@ import com.summarizeai.ui.theme.*
 fun HomeScreen(
     onNavigateToLoading: () -> Unit,
     onNavigateToOutput: () -> Unit,
+    onNavigateToStreamingOutput: (String) -> Unit,
     extractedContent: String? = null,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -59,12 +60,18 @@ fun HomeScreen(
         }
     }
     
-    // Navigate to output screen when API call completes successfully
+    // Navigate to appropriate output screen based on state
     LaunchedEffect(uiState) {
-        println("HomeScreen: UI state changed - isLoading: ${uiState.isLoading}, summaryData: ${uiState.summaryData != null}, textInput length: ${uiState.textInput.length}")
-        if (uiState.summaryData != null && !uiState.isLoading) {
-            println("HomeScreen: API call completed, navigating to output")
+        println("HomeScreen: UI state changed - isLoading: ${uiState.isLoading}, shouldNavigateToStreaming: ${uiState.shouldNavigateToStreaming}, shouldNavigateToOutput: ${uiState.shouldNavigateToOutput}, textInput length: ${uiState.textInput.length}")
+        
+        if (uiState.shouldNavigateToStreaming) {
+            println("HomeScreen: Navigating to streaming output")
+            onNavigateToStreamingOutput(uiState.textInput)
+            viewModel.clearNavigationFlags()
+        } else if (uiState.shouldNavigateToOutput) {
+            println("HomeScreen: Navigating to output")
             onNavigateToOutput()
+            viewModel.clearNavigationFlags()
         }
     }
     

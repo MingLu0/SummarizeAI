@@ -18,10 +18,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.summarizeai.ui.screens.splash.SplashScreen
 import com.summarizeai.ui.screens.welcome.WelcomeScreen
 import com.summarizeai.ui.screens.home.HomeScreen
@@ -30,6 +32,7 @@ import com.summarizeai.ui.screens.saved.SavedScreen
 import com.summarizeai.ui.screens.settings.SettingsScreen
 import com.summarizeai.ui.screens.loading.LoadingScreen
 import com.summarizeai.ui.screens.output.OutputScreen
+import com.summarizeai.ui.screens.output.StreamingOutputScreen
 import com.summarizeai.ui.theme.Cyan600
 import com.summarizeai.ui.theme.Gray400
 import com.summarizeai.ui.theme.Gray600
@@ -133,8 +136,8 @@ fun MainScreenWithBottomNavigation(
                         selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                         onClick = {
                             println("Bottom nav clicked: ${item.route}, current: ${currentDestination?.route}")
-                            if (currentDestination?.route == Screen.Output.route) {
-                                // If on Output screen, clear the entire stack and navigate to the selected tab
+                            if (currentDestination?.route == Screen.Output.route || currentDestination?.route == Screen.StreamingOutput.route) {
+                                // If on Output or StreamingOutput screen, clear the entire stack and navigate to the selected tab
                                 bottomNavController.navigate(item.route) {
                                     popUpTo(bottomNavController.graph.id) {
                                         inclusive = true
@@ -168,6 +171,9 @@ fun MainScreenWithBottomNavigation(
                     },
                     onNavigateToOutput = {
                         bottomNavController.navigate(Screen.Output.route)
+                    },
+                    onNavigateToStreamingOutput = { inputText ->
+                        bottomNavController.navigate(Screen.StreamingOutput.createRoute(inputText))
                     },
                     extractedContent = extractedContent
                 )
@@ -216,6 +222,36 @@ fun MainScreenWithBottomNavigation(
                             launchSingleTop = true
                         }
                     }
+                )
+            }
+            
+            composable(
+                route = Screen.StreamingOutput.route,
+                arguments = listOf(
+                    navArgument("inputText") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val inputText = backStackEntry.arguments?.getString("inputText") ?: ""
+                StreamingOutputScreen(
+                    onNavigateBack = {
+                        println("Back button clicked from StreamingOutput screen")
+                        bottomNavController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Home.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    },
+                    onNavigateToHome = {
+                        println("Home button clicked from StreamingOutput screen")
+                        bottomNavController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Home.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    },
+                    inputText = inputText
                 )
             }
             

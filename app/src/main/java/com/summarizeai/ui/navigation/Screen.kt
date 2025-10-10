@@ -10,5 +10,8 @@ sealed class Screen(val route: String) {
     object Settings : Screen("settings")
     object Loading : Screen("loading")
     object Output : Screen("output")
+    object StreamingOutput : Screen("streaming_output/{inputText}") {
+        fun createRoute(inputText: String) = "streaming_output/$inputText"
+    }
     object WebPreview : Screen("webpreview")
 }

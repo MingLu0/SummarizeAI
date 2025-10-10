@@ -3,7 +3,9 @@ package com.summarizeai.presentation.viewmodel
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.summarizeai.data.local.preferences.UserPreferences
 import com.summarizeai.data.model.ApiResult
+import com.summarizeai.data.model.StreamingResult
 import com.summarizeai.data.model.SummaryData
 import com.summarizeai.domain.repository.SummaryRepository
 import com.summarizeai.utils.TextExtractionUtils
@@ -12,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,7 +22,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val repository: SummaryRepository,
     private val textExtractionUtils: TextExtractionUtils,
-    private val errorHandler: ErrorHandler
+    private val errorHandler: ErrorHandler,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -37,36 +41,49 @@ class HomeViewModel @Inject constructor(
         if (currentText.isBlank()) return
         
         viewModelScope.launch {
-            println("HomeViewModel: Starting API call")
+            println("HomeViewModel: Starting summarization")
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             
-            repository.summarizeText(currentText)
-                .let { result ->
-                    println("HomeViewModel: API call completed with result: $result")
-                    when (result) {
-                        is ApiResult.Success -> {
-                            println("HomeViewModel: API Success - updating state with summaryData")
-                            _uiState.value = _uiState.value.copy(
-                                isLoading = false,
-                                summaryData = result.data
-                            )
-                            println("HomeViewModel: State updated - isLoading: false, summaryData: ${result.data}")
-                        }
-                        is ApiResult.Error -> {
-                            println("HomeViewModel: API Error - ${result.message}")
-                            // Show toast message for API error
-                            errorHandler.showErrorToast(result.message)
-                            _uiState.value = _uiState.value.copy(
-                                isLoading = false,
-                                error = result.message
-                            )
-                        }
-                        is ApiResult.Loading -> {
-                            println("HomeViewModel: API still loading")
-                            _uiState.value = _uiState.value.copy(isLoading = true)
+            // Check if streaming is enabled
+            val isStreamingEnabled = userPreferences.isStreamingEnabled.first()
+            
+            if (isStreamingEnabled) {
+                // Navigate to streaming output screen
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    shouldNavigateToStreaming = true
+                )
+            } else {
+                // Use traditional API
+                repository.summarizeText(currentText)
+                    .let { result ->
+                        println("HomeViewModel: API call completed with result: $result")
+                        when (result) {
+                            is ApiResult.Success -> {
+                                println("HomeViewModel: API Success - updating state with summaryData")
+                                _uiState.value = _uiState.value.copy(
+                                    isLoading = false,
+                                    summaryData = result.data,
+                                    shouldNavigateToOutput = true
+                                )
+                                println("HomeViewModel: State updated - isLoading: false, summaryData: ${result.data}")
+                            }
+                            is ApiResult.Error -> {
+                                println("HomeViewModel: API Error - ${result.message}")
+                                // Show toast message for API error
+                                errorHandler.showErrorToast(result.message)
+                                _uiState.value = _uiState.value.copy(
+                                    isLoading = false,
+                                    error = result.message
+                                )
+                            }
+                            is ApiResult.Loading -> {
+                                println("HomeViewModel: API still loading")
+                                _uiState.value = _uiState.value.copy(isLoading = true)
+                            }
                         }
                     }
-                }
+            }
         }
     }
     
@@ -76,6 +93,13 @@ class HomeViewModel @Inject constructor(
     
     fun resetState() {
         _uiState.value = HomeUiState()
+    }
+    
+    fun clearNavigationFlags() {
+        _uiState.value = _uiState.value.copy(
+            shouldNavigateToStreaming = false,
+            shouldNavigateToOutput = false
+        )
     }
     
     fun uploadFile(uri: Uri) {
@@ -120,5 +144,7 @@ data class HomeUiState(
     val isLoading: Boolean = false,
     val isSummarizeEnabled: Boolean = false,
     val summaryData: SummaryData? = null,
-    val error: String? = null
+    val error: String? = null,
+    val shouldNavigateToStreaming: Boolean = false,
+    val shouldNavigateToOutput: Boolean = false
 )

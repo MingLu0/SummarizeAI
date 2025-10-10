@@ -26,6 +26,7 @@ val Cyan50 = Color(0xFFECFEFF)       // Light backgrounds
 val Blue50 = Color(0xFFEFF6FF)       // Light backgrounds
 val Purple50 = Color(0xFFFAF5FF)     // Settings icon bg
 val Purple600 = Color(0xFF9333EA)    // Settings icon
+val Green50 = Color(0xFFF0FDF4)      // Streaming icon bg
 
 // Semantic Colors
 val Green600 = Color(0xFF16A34A)     // Success states
