@@ -15,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -60,7 +59,8 @@ fun SummarizeAINavHost(
     outputViewModel: com.summarizeai.presentation.viewmodel.OutputViewModel,
     streamingOutputViewModel: com.summarizeai.presentation.viewmodel.StreamingOutputViewModel,
     historyViewModel: com.summarizeai.presentation.viewmodel.HistoryViewModel,
-    savedViewModel: com.summarizeai.presentation.viewmodel.SavedViewModel
+    savedViewModel: com.summarizeai.presentation.viewmodel.SavedViewModel,
+    webContentViewModel: com.summarizeai.presentation.viewmodel.WebContentViewModel
 ) {
     NavHost(
         navController = navController,
@@ -103,7 +103,8 @@ fun SummarizeAINavHost(
                 outputViewModel = outputViewModel,
                 streamingOutputViewModel = streamingOutputViewModel,
                 historyViewModel = historyViewModel,
-                savedViewModel = savedViewModel
+                savedViewModel = savedViewModel,
+                webContentViewModel = webContentViewModel
             )
         }
         
@@ -126,7 +127,8 @@ fun MainScreenWithBottomNavigation(
     outputViewModel: OutputViewModel,
     streamingOutputViewModel: StreamingOutputViewModel,
     historyViewModel: HistoryViewModel,
-    savedViewModel: SavedViewModel
+    savedViewModel: SavedViewModel,
+    webContentViewModel: WebContentViewModel
 ) {
     val bottomNavController = rememberNavController()
     
@@ -216,9 +218,13 @@ fun MainScreenWithBottomNavigation(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) {
+                // Collect webContentUiState to get error state
+                val webContentUiState by webContentViewModel.uiState.collectAsStateWithLifecycle()
+                
                 HomeScreen(
                     uiState = homeUiState,
                     extractedContent = extractedContent,
+                    webContentError = webContentUiState.error,
                     onUpdateTextInput = homeViewModel::updateTextInput,
                     onSummarizeText = homeViewModel::summarizeText,
                     onClearError = homeViewModel::clearError,
@@ -229,7 +235,8 @@ fun MainScreenWithBottomNavigation(
                     onNavigateToOutput = {
                         bottomNavController.navigate(Screen.Output.route)
                     },
-                    onClearNavigationFlags = homeViewModel::clearNavigationFlags
+                    onClearNavigationFlags = homeViewModel::clearNavigationFlags,
+                    onClearExtractedContent = webContentViewModel::clearExtractedContent
                 )
             }
             
@@ -274,6 +281,7 @@ fun MainScreenWithBottomNavigation(
                     uiState = outputUiState,
                     onNavigateBack = {
                         println("Back button clicked from Output screen")
+                        homeViewModel.resetState()
                         bottomNavController.navigate(Screen.Home.route) {
                             popUpTo(Screen.Home.route) {
                                 inclusive = true
@@ -283,6 +291,7 @@ fun MainScreenWithBottomNavigation(
                     },
                     onNavigateToHome = {
                         println("Home button clicked from Output screen")
+                        homeViewModel.resetState()
                         bottomNavController.navigate(Screen.Home.route) {
                             popUpTo(Screen.Home.route) {
                                 inclusive = true
@@ -307,21 +316,20 @@ fun MainScreenWithBottomNavigation(
                     Uri.decode(it) 
                 } ?: ""
                 
-                // Get ViewModel scoped to this navigation route
-                val routeStreamingOutputViewModel: StreamingOutputViewModel = hiltViewModel()
-                
-                // Collect state INSIDE the composable lambda
-                val streamingOutputUiState by routeStreamingOutputViewModel.uiState.collectAsStateWithLifecycle()
+                // Collect state INSIDE the composable lambda (maintains Single Source of Truth)
+                val streamingOutputUiState by streamingOutputViewModel.uiState.collectAsStateWithLifecycle()
                 
                 StreamingOutputScreen(
                     uiState = streamingOutputUiState,
                     inputText = inputText,
                     onNavigateBack = {
                         println("Back button clicked from StreamingOutput screen")
+                        homeViewModel.resetState()
                         bottomNavController.popBackStack()
                     },
                     onNavigateToHome = {
                         println("Home button clicked from StreamingOutput screen")
+                        homeViewModel.resetState()
                         bottomNavController.navigate(Screen.Home.route) {
                             popUpTo(Screen.Home.route) {
                                 inclusive = false
@@ -329,11 +337,12 @@ fun MainScreenWithBottomNavigation(
                             launchSingleTop = true
                         }
                     },
-                    onStartStreaming = routeStreamingOutputViewModel::startStreaming,
-                    onSelectTab = routeStreamingOutputViewModel::selectTab,
-                    onCopyToClipboard = routeStreamingOutputViewModel::copyToClipboard,
-                    onShareSummary = routeStreamingOutputViewModel::shareSummary,
-                    onToggleSaveStatus = routeStreamingOutputViewModel::toggleSaveStatus
+                    onStartStreaming = streamingOutputViewModel::startStreaming,
+                    onSelectTab = streamingOutputViewModel::selectTab,
+                    onCopyToClipboard = streamingOutputViewModel::copyToClipboard,
+                    onShareSummary = streamingOutputViewModel::shareSummary,
+                    onToggleSaveStatus = streamingOutputViewModel::toggleSaveStatus,
+                    onResetState = streamingOutputViewModel::resetState
                 )
             }
             

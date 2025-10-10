@@ -14,13 +14,21 @@ import com.summarizeai.ui.navigation.Screen
 import com.summarizeai.ui.theme.SummarizeAITheme
 import com.summarizeai.presentation.viewmodel.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     
+    private val _intentFlow = MutableStateFlow<Intent?>(null)
+    private val intentFlow = _intentFlow.asStateFlow()
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        // Set initial intent
+        _intentFlow.value = intent
         
         setContent {
             SummarizeAITheme {
@@ -44,10 +52,14 @@ class MainActivity : ComponentActivity() {
                 val savedUiState by savedViewModel.uiState.collectAsStateWithLifecycle()
                 val savedSearchQuery by savedViewModel.searchQuery.collectAsStateWithLifecycle()
                 val webContentUiState by webContentViewModel.uiState.collectAsStateWithLifecycle()
+                val currentIntent by intentFlow.collectAsStateWithLifecycle()
                 
-                // Handle intent on first launch
-                LaunchedEffect(Unit) {
-                    webContentViewModel.handleIntent(intent)
+                // Handle intent changes (both initial and new intents)
+                LaunchedEffect(currentIntent) {
+                    currentIntent?.let { intent ->
+                        println("MainActivity: Handling intent - action: ${intent.action}")
+                        webContentViewModel.handleIntent(intent)
+                    }
                 }
                 
                 // HANDLE ALL NAVIGATION LOGIC HERE
@@ -78,7 +90,8 @@ class MainActivity : ComponentActivity() {
                     outputViewModel = outputViewModel,
                     streamingOutputViewModel = streamingOutputViewModel,
                     historyViewModel = historyViewModel,
-                    savedViewModel = savedViewModel
+                    savedViewModel = savedViewModel,
+                    webContentViewModel = webContentViewModel
                 )
             }
         }
@@ -87,5 +100,8 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         setIntent(intent)
+        // Emit new intent to flow so LaunchedEffect reacts to it
+        println("MainActivity: onNewIntent called - action: ${intent?.action}")
+        _intentFlow.value = intent
     }
 }

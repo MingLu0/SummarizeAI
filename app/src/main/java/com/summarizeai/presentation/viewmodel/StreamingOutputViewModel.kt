@@ -147,6 +147,12 @@ class StreamingOutputViewModel @Inject constructor(
             )
         }
     }
+    
+    fun resetState() {
+        displayJob?.cancel()
+        textBuffer.clear()
+        _uiState.value = StreamingOutputUiState()
+    }
 }
 
 data class StreamingOutputUiState(

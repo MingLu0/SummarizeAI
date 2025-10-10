@@ -23,7 +23,8 @@ fun AppScaffold(
     outputViewModel: OutputViewModel,
     streamingOutputViewModel: StreamingOutputViewModel,
     historyViewModel: HistoryViewModel,
-    savedViewModel: SavedViewModel
+    savedViewModel: SavedViewModel,
+    webContentViewModel: WebContentViewModel
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize()
@@ -44,7 +45,8 @@ fun AppScaffold(
             outputViewModel = outputViewModel,
             streamingOutputViewModel = streamingOutputViewModel,
             historyViewModel = historyViewModel,
-            savedViewModel = savedViewModel
+            savedViewModel = savedViewModel,
+            webContentViewModel = webContentViewModel
         )
     }
 }

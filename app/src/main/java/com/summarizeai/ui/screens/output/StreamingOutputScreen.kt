@@ -33,7 +33,8 @@ fun StreamingOutputScreen(
     onSelectTab: (Int) -> Unit,
     onCopyToClipboard: () -> Unit,
     onShareSummary: () -> Unit,
-    onToggleSaveStatus: () -> Unit
+    onToggleSaveStatus: () -> Unit,
+    onResetState: () -> Unit = {}
 ) {
     // Compute current summary text locally
     val currentSummaryText by remember(uiState) {
@@ -55,6 +56,7 @@ fun StreamingOutputScreen(
     // Start streaming when screen loads
     LaunchedEffect(inputText) {
         if (inputText.isNotBlank()) {
+            onResetState() // Reset state for fresh streaming session
             onStartStreaming(inputText)
         }
     }
@@ -128,7 +130,7 @@ fun StreamingOutputScreen(
                 if (uiState.isStreaming) {
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxWidth() 
                             .padding(Spacing.lg),
                         verticalAlignment = Alignment.CenterVertically
                     ) {

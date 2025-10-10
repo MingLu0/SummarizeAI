@@ -8,24 +8,55 @@ A beautiful, modern Android app that uses AI to summarize text content. Built wi
 - **AI Text Summarization** - Generate concise summaries from long text
 - **Multiple Summary Lengths** - Short, Medium, and Detailed summaries
 - **File Upload Support** - Upload and process PDF/DOC files
-- **Real-time Processing** - Fast AI-powered text analysis
+- **Real-time Streaming** - Live streaming summaries with progressive updates
+- **Web Content Extraction** - Extract and summarize content from shared URLs
+- **Smart Content Processing** - Intelligent text analysis and processing
 
 ### 📱 User Experience
 - **Beautiful UI** - Material 3 design with smooth animations
-- **Intuitive Navigation** - Bottom tab navigation with 4 main sections
+- **Intuitive Navigation** - Bottom tab navigation with clean architecture
 - **Search & Filter** - Find past summaries quickly
 - **Copy & Share** - Easy sharing of summaries
 - **Save Favorites** - Bookmark important summaries
+- **URL Sharing Support** - Share URLs from other apps for instant summarization
+- **Streaming Toggle** - Choose between traditional and streaming summarization
 
 ### 🔧 Technical Features
 - **Offline Support** - Local storage with Room database
 - **Network Resilience** - Handles network issues gracefully
 - **Performance Optimized** - Smooth scrolling and fast operations
+- **Clean Architecture** - Maintainable, testable, and scalable code structure
+- **Unidirectional Data Flow** - Predictable state management
 - **Comprehensive Testing** - Unit, UI, and integration tests
 
 ## 🏗️ Architecture
 
-### **MVVM + Repository Pattern**
+### **Clean Architecture with Scaffold Pattern**
+
+The app follows a **Clean Architecture with Scaffold Pattern** that ensures maintainable, testable, and scalable code. This architecture implements a unidirectional data flow with centralized state management.
+
+#### **Core Architecture Principles**
+
+1. **Single Source of Truth** - All app state is observed at the MainActivity level
+2. **Unidirectional Data Flow** - State flows DOWN, Events flow UP
+3. **Pure Composables** - Screen composables have no direct ViewModel dependencies
+4. **Centralized Navigation** - All navigation logic is handled in MainActivity
+
+#### **Architecture Flow**
+```
+MainActivity (Entry Point)
+├── Observe ALL ViewModels
+├── Collect ALL State Flows  
+├── Handle ALL Navigation Logic
+└── AppScaffold
+    ├── Material3 Scaffold Wrapper
+    └── SummarizeAINavHost
+        ├── MainScreenWithBottomNavigation (Inner Scaffold)
+        │   └── NavHost with Screen Composables
+        └── Other Navigation Routes
+```
+
+#### **MVVM + Repository Pattern**
 ```
 Presentation Layer (UI)
     ↓
@@ -52,8 +83,12 @@ graph TB
     subgraph "🧠 State Management"
         VM1[HomeViewModel]
         VM2[OutputViewModel]
-        VM3[HistoryViewModel]
-        VM4[SavedViewModel]
+        VM3[StreamingOutputViewModel]
+        VM4[HistoryViewModel]
+        VM5[SavedViewModel]
+        VM6[SettingsViewModel]
+        VM7[WebContentViewModel]
+        VM8[WebPreviewViewModel]
         StateFlow[StateFlow/Flow]
     end
 
@@ -108,7 +143,7 @@ graph TB
 
     %% Apply styles
     class UI,Compose,Material,Navigation presentation
-    class VM1,VM2,VM3,VM4,StateFlow state
+    class VM1,VM2,VM3,VM4,VM5,VM6,VM7,VM8,StateFlow state
     class Repo,UseCases,Models domain
     class Room,DAO,Entity,Retrofit,API,Network,PDF,Jsoup,TextExtract data
     class AIService,FileSystem external
@@ -119,16 +154,28 @@ graph TB
     UI --> VM2
     UI --> VM3
     UI --> VM4
+    UI --> VM5
+    UI --> VM6
+    UI --> VM7
+    UI --> VM8
     
     VM1 --> StateFlow
     VM2 --> StateFlow
     VM3 --> StateFlow
     VM4 --> StateFlow
+    VM5 --> StateFlow
+    VM6 --> StateFlow
+    VM7 --> StateFlow
+    VM8 --> StateFlow
     
     VM1 --> Repo
     VM2 --> Repo
     VM3 --> Repo
     VM4 --> Repo
+    VM5 --> Repo
+    VM6 --> Repo
+    VM7 --> Repo
+    VM8 --> Repo
     
     Repo --> Room
     Repo --> Retrofit
@@ -148,6 +195,10 @@ graph TB
     Hilt --> VM2
     Hilt --> VM3
     Hilt --> VM4
+    Hilt --> VM5
+    Hilt --> VM6
+    Hilt --> VM7
+    Hilt --> VM8
     Hilt --> Repo
     Hilt --> Room
     Hilt --> Retrofit
@@ -156,17 +207,186 @@ graph TB
     Coroutines --> VM2
     Coroutines --> VM3
     Coroutines --> VM4
+    Coroutines --> VM5
+    Coroutines --> VM6
+    Coroutines --> VM7
+    Coroutines --> VM8
     Coroutines --> Repo
 ```
 
 
 ### **Key Components**
+
+#### **Architecture Components**
+- **AppScaffold** - Material3 scaffold wrapper for consistent navigation structure
+- **SummarizeAINavHost** - Centralized navigation host with state management
+- **MainScreenWithBottomNavigation** - Inner scaffold for bottom tab navigation
+- **Clean Architecture Pattern** - Unidirectional data flow with centralized state
+
+#### **Core Libraries**
 - **Jetpack Compose** - Modern declarative UI
 - **Material 3** - Latest design system
 - **Hilt** - Dependency injection
 - **Room** - Local database
 - **Retrofit** - API communication
 - **Coroutines & Flow** - Asynchronous programming
+
+#### **ViewModels (8 Total)**
+- **HomeViewModel** - Text input and summarization logic
+- **OutputViewModel** - Summary display and actions
+- **StreamingOutputViewModel** - Real-time streaming summaries
+- **HistoryViewModel** - Past summaries management
+- **SavedViewModel** - Bookmarked summaries
+- **SettingsViewModel** - App preferences and configuration
+- **WebContentViewModel** - Web content extraction from shared URLs
+- **WebPreviewViewModel** - Web content preview functionality
+
+## 🏛️ Clean Architecture Implementation
+
+### **Architecture Benefits**
+
+#### **🎯 Maintainability**
+- Single source of truth for all app state
+- Clear separation of concerns
+- Predictable state flow
+- Centralized navigation logic
+
+#### **🧪 Testability**
+- Pure composables are easy to test
+- Mock state and callbacks for unit tests
+- No ViewModel dependencies in UI tests
+- Isolated business logic testing
+
+#### **🔄 Reusability**
+- Screens can be reused in different contexts
+- Preview composables work easily
+- Components are more modular
+- State and callbacks are explicit
+
+#### **🚀 Performance**
+- Optimized state collection at top level
+- Reduced recomposition
+- Better memory management
+- Efficient navigation handling
+
+### **Implementation Pattern**
+
+#### **MainActivity Structure**
+```kotlin
+@AndroidEntryPoint
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            SummarizeAITheme {
+                // 🔑 OBSERVE ALL VIEWMODELS AT TOP LEVEL
+                val homeViewModel: HomeViewModel = hiltViewModel()
+                val settingsViewModel: SettingsViewModel = hiltViewModel()
+                // ... other ViewModels
+                
+                // 🔑 COLLECT ALL STATE FLOWS
+                val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+                val isStreamingEnabled by settingsViewModel.isStreamingEnabled.collectAsStateWithLifecycle()
+                // ... other states
+                
+                // 🔑 HANDLE ALL NAVIGATION LOGIC HERE
+                LaunchedEffect(homeUiState) {
+                    if (homeUiState.shouldNavigateToStreaming) {
+                        navController.navigate(Screen.StreamingOutput.createRoute(homeUiState.textInput))
+                        homeViewModel.clearNavigationFlags()
+                    }
+                }
+                
+                // 🔑 PASS ALL STATE AND CALLBACKS DOWN
+                AppScaffold(
+                    navController = navController,
+                    homeUiState = homeUiState,
+                    isStreamingEnabled = isStreamingEnabled,
+                    // ... other states and ViewModels
+                )
+            }
+        }
+    }
+}
+```
+
+#### **Screen Composable Pattern**
+```kotlin
+// ✅ CORRECT - Pure Composable with State and Callbacks
+@Composable
+fun HomeScreen(
+    uiState: HomeUiState,
+    extractedContent: String? = null,
+    onUpdateTextInput: (String) -> Unit,
+    onSummarizeText: () -> Unit,
+    onUploadFile: (Uri) -> Unit
+) {
+    // Use state directly, call callbacks for events
+    BasicTextField(
+        value = uiState.textInput,
+        onValueChange = onUpdateTextInput
+    )
+    
+    Button(
+        onClick = onSummarizeText,
+        enabled = uiState.isSummarizeEnabled && !uiState.isLoading
+    ) {
+        Text("Summarize")
+    }
+}
+```
+
+### **Key Rules**
+
+#### **✅ DO's**
+1. **Observe ViewModels at MainActivity Level**
+2. **Pass State and Callbacks Down**
+3. **Handle Navigation in MainActivity**
+4. **Use Pure Composables**
+
+#### **❌ DON'Ts**
+1. **Don't Use ViewModels in Screen Composables**
+2. **Don't Handle Navigation in Screens**
+3. **Don't Scatter State Management**
+
+For detailed implementation guidelines, see [CLEAN_ARCHITECTURE_SCAFFOLD_PATTERN.md](CLEAN_ARCHITECTURE_SCAFFOLD_PATTERN.md).
+
+### **Project Structure**
+
+```
+app/src/main/java/com/summarizeai/
+├── MainActivity.kt                    # Entry point with ViewModel observation
+├── ui/
+│   ├── navigation/
+│   │   ├── AppScaffold.kt            # Material3 scaffold wrapper
+│   │   └── SummarizeAINavHost.kt     # Centralized navigation host
+│   └── screens/
+│       ├── home/HomeScreen.kt        # Text input and file upload
+│       ├── output/
+│       │   ├── OutputScreen.kt       # Traditional summary display
+│       │   └── StreamingOutputScreen.kt # Real-time streaming display
+│       ├── history/HistoryScreen.kt  # Past summaries
+│       ├── saved/SavedScreen.kt      # Bookmarked summaries
+│       ├── settings/SettingsScreen.kt # App preferences
+│       ├── webpreview/WebPreviewScreen.kt # Web content preview
+│       ├── splash/SplashScreen.kt    # App loading screen
+│       └── welcome/WelcomeScreen.kt  # Onboarding screen
+├── presentation/
+│   └── viewmodel/                    # 8 ViewModels for state management
+│       ├── HomeViewModel.kt
+│       ├── OutputViewModel.kt
+│       ├── StreamingOutputViewModel.kt
+│       ├── HistoryViewModel.kt
+│       ├── SavedViewModel.kt
+│       ├── SettingsViewModel.kt
+│       ├── WebContentViewModel.kt
+│       └── WebPreviewViewModel.kt
+├── data/
+│   ├── repository/                   # Data abstraction layer
+│   ├── remote/                       # API and network layer
+│   └── local/                        # Room database layer
+└── domain/                           # Business logic and models
+```
 
 ## 🚀 Getting Started
 
@@ -378,13 +598,14 @@ The Summarize AI app follows a comprehensive testing strategy with multiple laye
 ### Main Screens
 - **Splash Screen** - Beautiful animated loading with app branding
 - **Welcome Screen** - Onboarding with app introduction and gradient design
-- **Home Screen** - Text input, file upload, and summarization trigger
+- **Home Screen** - Text input, file upload, and summarization trigger with web content support
 - **Loading Screen** - Animated progress during AI processing
 - **Output Screen** - Summary display with multiple length options and actions
+- **Streaming Output Screen** - Real-time streaming summary display with live updates
 - **History Screen** - Past summaries with search and filtering
 - **Saved Screen** - Bookmarked summaries with management options
-- **Settings Screen** - App preferences and configuration
-- **Web Preview Screen** - Web content extraction and preview
+- **Settings Screen** - App preferences and configuration with streaming toggle
+- **Web Preview Screen** - Web content extraction and preview functionality
 
 ## 🔧 Configuration
 
@@ -407,6 +628,8 @@ The Summarize AI app follows a comprehensive testing strategy with multiple laye
 - **Coroutines** - Asynchronous programming
 - **PDFBox 2.0.27.0** - PDF processing
 - **Jsoup 1.17.2** - Web content extraction
+- **Navigation Compose** - Type-safe navigation
+- **Lifecycle Compose** - Lifecycle-aware composables
 
 ### Testing Libraries
 - **JUnit 4.13.2** - Unit testing
@@ -450,6 +673,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Jetpack Compose** - Modern Android UI toolkit
 - **Room** - Local database solution
 - **Retrofit** - Type-safe HTTP client
+- **Clean Architecture** - Robert C. Martin's architectural principles
+- **MVVM Pattern** - Microsoft's architectural pattern
+- **Hilt** - Google's dependency injection framework
 
 ## 📞 Support
 

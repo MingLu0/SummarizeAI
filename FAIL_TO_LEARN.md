@@ -526,6 +526,172 @@ onClick = {
 
 ---
 
+---
+
+## Problem 8: Streaming Animation Not Recomposing in StreamingOutputScreen
+
+### Issue Description
+The streaming text animation in `StreamingOutputScreen` was not working. Even though the `streamingOutputUiState` was being updated in the ViewModel with new streaming text, the UI was not recomposing to display the animation. The typing indicator and cursor animations were also not visible.
+
+### Root Cause Analysis
+The issue had two main causes:
+
+#### 1. State Collection Scope Problem
+The `streamingOutputUiState` was being collected at the top level in `MainActivity` and passed down through multiple composable layers:
+```kotlin
+// MainActivity.kt
+val streamingOutputUiState by streamingOutputViewModel.uiState.collectAsStateWithLifecycle()
+
+// Then passed through:
+MainActivity → AppScaffold → SummarizeAINavHost → MainScreenWithBottomNavigation → StreamingOutputScreen
+```
+
+When using Jetpack Compose Navigation, state changes in parent composables don't automatically trigger recomposition in navigation destination composables because the composable lambda is created once and the captured state variables don't update.
+
+#### 2. Remember Block Without Key
+In `StreamingOutputScreen.kt`, the `currentSummaryText` was using `remember` with `derivedStateOf` but without including `uiState` as a key:
+```kotlin
+// ❌ WRONG: remember without key doesn't recompose when uiState changes
+val currentSummaryText by remember {
+    derivedStateOf {
+        if (uiState.isStreaming) {
+            uiState.streamingText
+        } else {
+            // ... other logic
+        }
+    }
+}
+```
+
+### Initial Attempt (Violated Architecture)
+First attempted solution was to create a new ViewModel instance scoped to the navigation route:
+```kotlin
+// ❌ WRONG: Violates Single Source of Truth principle
+composable(route = Screen.StreamingOutput.route) { backStackEntry ->
+    val routeStreamingOutputViewModel: StreamingOutputViewModel = hiltViewModel()
+    val streamingOutputUiState by routeStreamingOutputViewModel.uiState.collectAsStateWithLifecycle()
+    // ...
+}
+```
+
+**Problem**: This violated the Clean Architecture Single Source of Truth principle that states:
+- "All app state is observed at the MainActivity level"
+- "ViewModels are instantiated once and their state flows down"
+- "Screen composables have no direct ViewModel dependencies"
+
+### Solution 8: Fix Recomposition While Maintaining Architecture
+
+The correct solution involved two key changes:
+
+#### Change 1: Add uiState as Remember Key
+```kotlin
+// ✅ CORRECT: remember with uiState key triggers recomposition
+val currentSummaryText by remember(uiState) {
+    derivedStateOf {
+        if (uiState.isStreaming) {
+            uiState.streamingText
+        } else {
+            val summaryData = uiState.summaryData ?: return@derivedStateOf ""
+            when (uiState.selectedTabIndex) {
+                0 -> summaryData.shortSummary
+                1 -> summaryData.mediumSummary
+                2 -> summaryData.detailedSummary
+                else -> summaryData.mediumSummary
+            }
+        }
+    }
+}
+```
+
+#### Change 2: Collect State in Composable Scope
+Instead of passing pre-collected state, collect it within the composable lambda:
+```kotlin
+// ✅ CORRECT: State collected in composable scope
+composable(
+    route = Screen.StreamingOutput.route,
+    arguments = listOf(
+        navArgument("inputText") { type = NavType.StringType }
+    )
+) { backStackEntry ->
+    val inputText = backStackEntry.arguments?.getString("inputText")?.let { 
+        Uri.decode(it) 
+    } ?: ""
+    
+    // Collect state INSIDE the composable lambda (maintains Single Source of Truth)
+    val streamingOutputUiState by streamingOutputViewModel.uiState.collectAsStateWithLifecycle()
+    
+    StreamingOutputScreen(
+        uiState = streamingOutputUiState,
+        inputText = inputText,
+        onNavigateBack = { ... },
+        onStartStreaming = streamingOutputViewModel::startStreaming,
+        // ... other callbacks
+        onResetState = streamingOutputViewModel::resetState
+    )
+}
+```
+
+#### Change 3: Add Reset State Method
+To ensure fresh state on each navigation, added a reset method to the ViewModel:
+```kotlin
+// StreamingOutputViewModel.kt
+fun resetState() {
+    displayJob?.cancel()
+    textBuffer.clear()
+    _uiState.value = StreamingOutputUiState()
+}
+```
+
+And call it in the LaunchedEffect:
+```kotlin
+// StreamingOutputScreen.kt
+LaunchedEffect(inputText) {
+    if (inputText.isNotBlank()) {
+        onResetState() // Reset state for fresh streaming session
+        onStartStreaming(inputText)
+    }
+}
+```
+
+### Why This Maintains Single Source of Truth
+
+✅ **ViewModel created once** - The `StreamingOutputViewModel` is still instantiated once in MainActivity  
+✅ **State flows down** - The ViewModel is passed down through the component hierarchy  
+✅ **No ViewModel duplication** - We're using the same instance, just collecting state at the right scope  
+✅ **Pure composables** - StreamingOutputScreen still receives callbacks, not the ViewModel directly  
+✅ **Manual reset control** - State is reset explicitly when needed, maintaining predictable behavior
+
+### Files Modified
+- `app/src/main/java/com/summarizeai/ui/screens/output/StreamingOutputScreen.kt`
+- `app/src/main/java/com/summarizeai/ui/navigation/SummarizeAINavHost.kt`
+- `app/src/main/java/com/summarizeai/presentation/viewmodel/StreamingOutputViewModel.kt`
+
+---
+
+## Additional Key Learnings
+
+### 10. Remember Block Key Management in Compose
+- **Problem**: Using `remember { derivedStateOf { ... } }` without keys doesn't recompose when dependencies change
+- **Solution**: Always include dependencies as keys: `remember(dependency) { derivedStateOf { ... } }`
+- **Best Practice**: Include all state variables that the derived state depends on as remember keys
+
+### 11. State Collection Scope in Navigation
+- **Problem**: State collected outside composable lambda may not trigger recomposition in navigation destinations
+- **Solution**: Collect state inside the composable lambda while still using the same ViewModel instance
+- **Best Practice**: Balance between Single Source of Truth and composition scope needs
+
+### 12. ViewModel State Reset Patterns
+- **Problem**: Persisted ViewModel state from previous navigation can cause stale UI
+- **Solution**: Implement explicit reset methods and call them when needed
+- **Best Practice**: Reset state at the beginning of user flows that require fresh state
+
+### 13. Architectural Principles vs. Implementation Details
+- **Problem**: Solving technical issues (like recomposition) shouldn't violate architectural principles
+- **Solution**: Find solutions that address both the technical problem and maintain architecture
+- **Best Practice**: When a solution violates core principles, iterate to find a better approach
+
+---
+
 ## Conclusion
 
 The main issues were:
@@ -536,5 +702,6 @@ The main issues were:
 5. **Bottom tab navigation** - Fixed by implementing conditional navigation logic with proper stack management
 6. **Build system issues** - Fixed by resolving dependency conflicts and adding missing dependencies
 7. **UI testing challenges** - Addressed by creating comprehensive test suites
+8. **Streaming animation recomposition** - Fixed by adding remember keys and collecting state in proper scope while maintaining Single Source of Truth
 
-The final solution provides a more reliable, maintainable, and user-friendly navigation experience while eliminating the ViewModel scoping issues and navigation stack problems that were causing the original issues. The comprehensive test suite ensures that navigation behavior is verified and maintained over time.
+The final solution provides a more reliable, maintainable, and user-friendly navigation experience while eliminating the ViewModel scoping issues and navigation stack problems that were causing the original issues. The comprehensive test suite ensures that navigation behavior is verified and maintained over time. The streaming animation fix demonstrates how to solve recomposition issues while maintaining architectural integrity.

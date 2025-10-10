@@ -128,6 +128,7 @@ dependencies {
     
     // Web Content Extraction
     implementation("org.jsoup:jsoup:1.17.2")
+    implementation("net.dankito.readability4j:readability4j:1.0.8") // Mozilla Readability for better article extraction
     
     // Document Picker (using activity-compose which includes result handling)
     

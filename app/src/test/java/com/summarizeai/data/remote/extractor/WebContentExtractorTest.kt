@@ -2,6 +2,7 @@ package com.summarizeai.data.remote.extractor
 
 import com.summarizeai.utils.NetworkUtils
 import kotlinx.coroutines.test.runTest
+import okhttp3.OkHttpClient
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -14,6 +15,7 @@ class WebContentExtractorTest {
     @Mock
     private lateinit var networkUtils: NetworkUtils
 
+    private lateinit var okHttpClient: OkHttpClient
     private lateinit var webContentExtractor: WebContentExtractor
 
     @Before
@@ -21,7 +23,8 @@ class WebContentExtractorTest {
         MockitoAnnotations.openMocks(this)
         // Mock network as available for tests
         whenever(networkUtils.isNetworkAvailable()).thenReturn(true)
-        webContentExtractor = WebContentExtractor(networkUtils)
+        okHttpClient = OkHttpClient()
+        webContentExtractor = WebContentExtractor(networkUtils, okHttpClient)
     }
 
     @Test

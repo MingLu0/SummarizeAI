@@ -32,13 +32,15 @@ import com.summarizeai.ui.theme.*
 fun HomeScreen(
     uiState: HomeUiState,
     extractedContent: String? = null,
+    webContentError: String? = null,
     onUpdateTextInput: (String) -> Unit,
     onSummarizeText: () -> Unit,
     onClearError: () -> Unit,
     onUploadFile: (Uri) -> Unit,
     onNavigateToStreaming: (String) -> Unit = {},
     onNavigateToOutput: () -> Unit = {},
-    onClearNavigationFlags: () -> Unit = {}
+    onClearNavigationFlags: () -> Unit = {},
+    onClearExtractedContent: () -> Unit = {}
 ) {
     val context = LocalContext.current
     
@@ -48,13 +50,18 @@ fun HomeScreen(
         extractedContent?.let { content ->
             if (content.isNotBlank()) {
                 println("HomeScreen: Received extracted content, length: ${content.length}")
-                println("HomeScreen: Setting text input and starting summarization")
-                // Set the extracted content and start summarization
+                println("HomeScreen: Navigating directly to StreamingOutputScreen with content")
+                // Set the text input for record keeping
                 onUpdateTextInput(content)
-                onSummarizeText()
-                println("HomeScreen: Summarization started")
+                // Navigate directly to streaming screen with the extracted content
+                onNavigateToStreaming(content)
+                println("HomeScreen: Navigation to StreamingOutputScreen triggered")
+                // Clear extracted content so the effect can trigger again for new shares
+                onClearExtractedContent()
             } else {
                 println("HomeScreen: Content is blank, not starting summarization")
+                // Clear even if blank to reset state
+                onClearExtractedContent()
             }
         } ?: run {
             println("HomeScreen: No extracted content received")
@@ -199,6 +206,58 @@ fun HomeScreen(
                         color = Color.Red,
                         modifier = Modifier.padding(Spacing.md)
                     )
+                }
+            }
+            
+            // Web Content Extraction Error Display
+            if (webContentError != null) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFF9800).copy(alpha = 0.1f)),
+                    shape = RoundedCornerShape(CornerRadius.md)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(Spacing.md)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = "Failed to extract web content",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = Color(0xFFFF9800),
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = webContentError,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color(0xFFFF9800)
+                                )
+                            }
+                        }
+                        
+                        Spacer(modifier = Modifier.height(Spacing.md))
+                        
+                        Text(
+                            text = "💡 Tip: You can copy the article text and paste it in the text area above to summarize it manually.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Gray700,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    color = Color(0xFFFF9800).copy(alpha = 0.05f),
+                                    shape = RoundedCornerShape(CornerRadius.sm)
+                                )
+                                .padding(Spacing.sm)
+                        )
+                    }
                 }
             }
             
