@@ -23,10 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.summarizeai.data.model.SummaryData
-import com.summarizeai.presentation.viewmodel.HistoryViewModel
+import com.summarizeai.presentation.viewmodel.HistoryUiState
 import com.summarizeai.ui.theme.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -34,10 +32,11 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
-    viewModel: HistoryViewModel = hiltViewModel()
+    uiState: HistoryUiState,
+    searchQuery: String,
+    onUpdateSearchQuery: (String) -> Unit,
+    onDeleteSummary: (SummaryData) -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     
     Column(
         modifier = Modifier
@@ -79,7 +78,7 @@ fun HistoryScreen(
                 // Search Input
                 OutlinedTextField(
                     value = searchQuery,
-                    onValueChange = viewModel::updateSearchQuery,
+                    onValueChange = onUpdateSearchQuery,
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text(
@@ -161,7 +160,7 @@ fun HistoryScreen(
                     ) { item ->
                         HistoryItemCard(
                             item = item,
-                            onDelete = viewModel::deleteSummary
+                            onDelete = onDeleteSummary
                         )
                     }
                 }

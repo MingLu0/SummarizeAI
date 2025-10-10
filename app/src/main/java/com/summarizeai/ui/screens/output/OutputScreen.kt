@@ -23,22 +23,32 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.summarizeai.presentation.viewmodel.OutputViewModel
+import com.summarizeai.presentation.viewmodel.OutputUiState
 import com.summarizeai.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutputScreen(
+    uiState: OutputUiState,
     onNavigateBack: () -> Unit,
     onNavigateToHome: () -> Unit,
-    viewModel: OutputViewModel = hiltViewModel()
+    onSelectTab: (Int) -> Unit,
+    onCopyToClipboard: () -> Unit,
+    onShareSummary: () -> Unit,
+    onToggleSaveStatus: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    
     val tabs = listOf("Short", "Medium", "Detailed")
-    val currentSummaryText = viewModel.getCurrentSummaryText()
+    
+    // Compute current summary text locally
+    val currentSummaryText = remember(uiState.summaryData, uiState.selectedTabIndex) {
+        val summaryData = uiState.summaryData ?: return@remember ""
+        when (uiState.selectedTabIndex) {
+            0 -> summaryData.shortSummary
+            1 -> summaryData.mediumSummary
+            2 -> summaryData.detailedSummary
+            else -> summaryData.mediumSummary
+        }
+    }
     
     Column(
         modifier = Modifier
@@ -116,7 +126,7 @@ fun OutputScreen(
                                 style = MaterialTheme.typography.labelMedium,
                                 color = if (uiState.selectedTabIndex == index) White else Gray600,
                                 fontWeight = if (uiState.selectedTabIndex == index) FontWeight.Medium else FontWeight.Normal,
-                                modifier = Modifier.clickable { viewModel.selectTab(index) }
+                                modifier = Modifier.clickable { onSelectTab(index) }
                             )
                         }
                     }

@@ -23,21 +23,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.summarizeai.data.model.SummaryData
+import com.summarizeai.presentation.viewmodel.SavedUiState
 import com.summarizeai.ui.theme.*
-import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SavedScreen() {
-    var searchText by remember { mutableStateOf("") }
-    var savedItems by remember { mutableStateOf(createSampleSavedItems()) }
-    
-    // Filter saved items based on search
-    val filteredItems = savedItems.filter { item ->
-        item.summary.contains(searchText, ignoreCase = true) ||
-        item.originalText.contains(searchText, ignoreCase = true)
-    }
+fun SavedScreen(
+    uiState: SavedUiState,
+    searchQuery: String,
+    onUpdateSearchQuery: (String) -> Unit,
+    onUnsaveSummary: (SummaryData) -> Unit
+) {
     
     Column(
         modifier = Modifier
@@ -78,8 +76,8 @@ fun SavedScreen() {
                 
                 // Search Input
                 OutlinedTextField(
-                    value = searchText,
-                    onValueChange = { searchText = it },
+                    value = searchQuery,
+                    onValueChange = onUpdateSearchQuery,
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text(
@@ -114,7 +112,7 @@ fun SavedScreen() {
                 .background(Gray50)
                 .padding(Spacing.xl)
         ) {
-            if (filteredItems.isEmpty()) {
+            if (uiState.filteredSummaries.isEmpty()) {
                 // Empty State
                 Column(
                     modifier = Modifier.align(Alignment.Center),
@@ -156,14 +154,12 @@ fun SavedScreen() {
                     verticalArrangement = Arrangement.spacedBy(Spacing.md)
                 ) {
                     items(
-                        items = filteredItems,
+                        items = uiState.filteredSummaries,
                         key = { it.id }
                     ) { item ->
                         SavedItemCard(
                             item = item,
-                            onUnsave = { itemToUnsave ->
-                                savedItems = savedItems.filter { it.id != itemToUnsave.id }
-                            }
+                            onUnsave = onUnsaveSummary
                         )
                     }
                 }
@@ -174,8 +170,8 @@ fun SavedScreen() {
 
 @Composable
 fun SavedItemCard(
-    item: SavedItem,
-    onUnsave: (SavedItem) -> Unit
+    item: SummaryData,
+    onUnsave: (SummaryData) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -220,7 +216,7 @@ fun SavedItemCard(
                     .padding(vertical = Spacing.xs)
             ) {
                 Text(
-                    text = item.summary,
+                    text = item.mediumSummary,
                     style = MaterialTheme.typography.bodyMedium,
                     color = Gray800,
                     maxLines = 2,
@@ -231,7 +227,7 @@ fun SavedItemCard(
                 Spacer(modifier = Modifier.height(Spacing.sm))
                 
                 Text(
-                    text = item.formattedDate,
+                    text = formatDate(item.createdAt),
                     style = MaterialTheme.typography.bodySmall,
                     color = Gray500
                 )
@@ -257,32 +253,14 @@ fun SavedItemCard(
     }
 }
 
-data class SavedItem(
-    val id: String,
-    val originalText: String,
-    val summary: String,
-    val savedDate: Date,
-    val formattedDate: String
-)
-
-fun createSampleSavedItems(): List<SavedItem> {
-    val formatter = SimpleDateFormat("MMM dd", Locale.getDefault())
+private fun formatDate(date: Date): String {
     val now = Date()
+    val diffInMinutes = (now.time - date.time) / (1000 * 60)
     
-    return listOf(
-        SavedItem(
-            id = "s1",
-            originalText = "This is a saved summary that was bookmarked...",
-            summary = "This is a saved summary with important insights that was bookmarked for future reference.",
-            savedDate = Date(now.time - 86400000), // 1 day ago
-            formattedDate = "Jan 15"
-        ),
-        SavedItem(
-            id = "s2",
-            originalText = "Another piece of content that was saved...",
-            summary = "Another saved summary with valuable information that the user wanted to keep.",
-            savedDate = Date(now.time - 172800000), // 2 days ago
-            formattedDate = "Jan 14"
-        )
-    )
+    return when {
+        diffInMinutes < 1 -> "Just now"
+        diffInMinutes < 60 -> "${diffInMinutes}m ago"
+        diffInMinutes < 1440 -> "${diffInMinutes / 60}h ago"
+        else -> "${diffInMinutes / 1440}d ago"
+    }
 }

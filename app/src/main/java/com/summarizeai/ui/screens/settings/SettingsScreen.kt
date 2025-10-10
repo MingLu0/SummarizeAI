@@ -22,23 +22,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.summarizeai.presentation.viewmodel.SettingsViewModel
 import com.summarizeai.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel = hiltViewModel()
+    isStreamingEnabled: Boolean,
+    onSetStreamingEnabled: (Boolean) -> Unit
 ) {
     var selectedLanguage by remember { mutableStateOf("English") }
     var summaryLength by remember { mutableStateOf(50f) }
     var darkModeEnabled by remember { mutableStateOf(false) }
     
-    val isStreamingEnabled by viewModel.isStreamingEnabled.collectAsStateWithLifecycle(initialValue = true)
-    
-    val languages = listOf("English", "Spanish", "French", "German", "Chinese")
     
     Column(
         modifier = Modifier
@@ -198,7 +193,7 @@ fun SettingsScreen(
                     
                     Switch(
                         checked = isStreamingEnabled,
-                        onCheckedChange = { viewModel.setStreamingEnabled(it) },
+                        onCheckedChange = onSetStreamingEnabled,
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = White,
                             checkedTrackColor = Cyan600,

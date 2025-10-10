@@ -23,22 +23,23 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.summarizeai.presentation.viewmodel.HomeViewModel
+import com.summarizeai.presentation.viewmodel.HomeUiState
 import com.summarizeai.utils.FilePickerUtils
 import com.summarizeai.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onNavigateToLoading: () -> Unit,
-    onNavigateToOutput: () -> Unit,
-    onNavigateToStreamingOutput: (String) -> Unit,
+    uiState: HomeUiState,
     extractedContent: String? = null,
-    viewModel: HomeViewModel = hiltViewModel()
+    onUpdateTextInput: (String) -> Unit,
+    onSummarizeText: () -> Unit,
+    onClearError: () -> Unit,
+    onUploadFile: (Uri) -> Unit,
+    onNavigateToStreaming: (String) -> Unit = {},
+    onNavigateToOutput: () -> Unit = {},
+    onClearNavigationFlags: () -> Unit = {}
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     
     // Handle extracted content from shared URL
@@ -49,8 +50,8 @@ fun HomeScreen(
                 println("HomeScreen: Received extracted content, length: ${content.length}")
                 println("HomeScreen: Setting text input and starting summarization")
                 // Set the extracted content and start summarization
-                viewModel.updateTextInput(content)
-                viewModel.summarizeText()
+                onUpdateTextInput(content)
+                onSummarizeText()
                 println("HomeScreen: Summarization started")
             } else {
                 println("HomeScreen: Content is blank, not starting summarization")
@@ -60,24 +61,22 @@ fun HomeScreen(
         }
     }
     
-    // Navigate to appropriate output screen based on state
-    LaunchedEffect(uiState) {
-        println("HomeScreen: UI state changed - isLoading: ${uiState.isLoading}, shouldNavigateToStreaming: ${uiState.shouldNavigateToStreaming}, shouldNavigateToOutput: ${uiState.shouldNavigateToOutput}, textInput length: ${uiState.textInput.length}")
-        
+    // Handle navigation based on UI state
+    LaunchedEffect(uiState.shouldNavigateToStreaming, uiState.shouldNavigateToOutput) {
         if (uiState.shouldNavigateToStreaming) {
-            println("HomeScreen: Navigating to streaming output")
-            onNavigateToStreamingOutput(uiState.textInput)
-            viewModel.clearNavigationFlags()
+            onNavigateToStreaming(uiState.textInput)
+            // Clear the navigation flag to prevent auto-navigation on return
+            onClearNavigationFlags()
         } else if (uiState.shouldNavigateToOutput) {
-            println("HomeScreen: Navigating to output")
             onNavigateToOutput()
-            viewModel.clearNavigationFlags()
+            // Clear the navigation flag to prevent auto-navigation on return
+            onClearNavigationFlags()
         }
     }
     
     val filePickerUtils = FilePickerUtils(context)
     val filePicker = filePickerUtils.rememberFilePicker { uri ->
-        viewModel.uploadFile(uri)
+        onUploadFile(uri)
     }
     
     Column(
@@ -123,7 +122,7 @@ fun HomeScreen(
             ) {
                 BasicTextField(
                     value = uiState.textInput,
-                    onValueChange = viewModel::updateTextInput,
+                    onValueChange = onUpdateTextInput,
                     textStyle = TextStyle(
                         color = Gray900,
                         fontSize = MaterialTheme.typography.bodyLarge.fontSize,
@@ -208,8 +207,8 @@ fun HomeScreen(
                 Button(
                     onClick = {
                         // Test with a simple text to verify API connection
-                        viewModel.updateTextInput("Test API connection")
-                        viewModel.summarizeText()
+                        onUpdateTextInput("Test API connection")
+                        onSummarizeText()
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -231,7 +230,7 @@ fun HomeScreen(
             Button(
                 onClick = {
                     if (uiState.textInput.isNotBlank()) {
-                        viewModel.summarizeText()
+                        onSummarizeText()
                     }
                 },
                 modifier = Modifier

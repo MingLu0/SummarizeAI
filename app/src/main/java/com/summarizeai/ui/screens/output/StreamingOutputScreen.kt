@@ -18,22 +18,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.summarizeai.presentation.viewmodel.StreamingOutputViewModel
+import com.summarizeai.presentation.viewmodel.StreamingOutputUiState
 import com.summarizeai.ui.theme.*
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StreamingOutputScreen(
+    uiState: StreamingOutputUiState,
+    inputText: String,
     onNavigateBack: () -> Unit,
     onNavigateToHome: () -> Unit,
-    inputText: String,
-    viewModel: StreamingOutputViewModel = hiltViewModel()
+    onStartStreaming: (String) -> Unit,
+    onSelectTab: (Int) -> Unit,
+    onCopyToClipboard: () -> Unit,
+    onShareSummary: () -> Unit,
+    onToggleSaveStatus: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val currentSummaryText by remember {
+    // Compute current summary text locally
+    val currentSummaryText by remember(uiState) {
         derivedStateOf {
             if (uiState.isStreaming) {
                 uiState.streamingText
@@ -51,7 +54,9 @@ fun StreamingOutputScreen(
     
     // Start streaming when screen loads
     LaunchedEffect(inputText) {
-        viewModel.startStreaming(inputText)
+        if (inputText.isNotBlank()) {
+            onStartStreaming(inputText)
+        }
     }
     
     // Auto-scroll to bottom when new text arrives
@@ -139,33 +144,33 @@ fun StreamingOutputScreen(
                         )
                     }
                 } else if (uiState.summaryData != null) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(Spacing.lg),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Summary completed!",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Gray700
-                        )
-                        
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
-                        ) {
-                            TextButton(onClick = { viewModel.copyToClipboard() }) {
-                                Text("Copy")
-                            }
-                            TextButton(onClick = { viewModel.shareSummary() }) {
-                                Text("Share")
-                            }
-                            TextButton(onClick = { viewModel.toggleSaveStatus() }) {
-                                Text(if (uiState.summaryData?.isSaved == true) "Unsave" else "Save")
-                            }
-                        }
-                    }
+//                    Row(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(Spacing.lg),
+//                        verticalAlignment = Alignment.CenterVertically,
+//                        horizontalArrangement = Arrangement.SpaceBetween
+//                    ) {
+//                        Text(
+//                            text = "Summary completed!",
+//                            style = MaterialTheme.typography.bodyMedium,
+//                            color = Gray700
+//                        )
+//
+//                        Row(
+//                            horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
+//                        ) {
+//                            TextButton(onClick = onCopyToClipboard) {
+//                                Text("Copy")
+//                            }
+//                            TextButton(onClick = onShareSummary) {
+//                                Text("Share")
+//                            }
+//                            TextButton(onClick = onToggleSaveStatus) {
+//                                Text(if (uiState.summaryData.isSaved) "Unsave" else "Save")
+//                            }
+//                        }
+//                    }
                 }
             }
 
@@ -253,7 +258,7 @@ fun TypingIndicator() {
 @Composable
 fun TypingCursor() {
     val infiniteTransition = rememberInfiniteTransition(label = "cursor")
-    val alpha by infiniteTransition.animateFloat(
+    infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
@@ -266,7 +271,7 @@ fun TypingCursor() {
     Text(
         text = "|",
         style = MaterialTheme.typography.bodyLarge,
-        color = Cyan600.copy(alpha = alpha),
+        color = Cyan600.copy(alpha = 0.5f),
         fontWeight = FontWeight.Bold
     )
 }
@@ -276,9 +281,15 @@ fun TypingCursor() {
 fun StreamingOutputScreenPreview() {
     SummarizeAITheme {
         StreamingOutputScreen(
+            uiState = StreamingOutputUiState(),
+            inputText = "This is a test input for the preview",
             onNavigateBack = {},
             onNavigateToHome = {},
-            inputText = "This is a test input for the preview"
+            onStartStreaming = {},
+            onSelectTab = {},
+            onCopyToClipboard = {},
+            onShareSummary = {},
+            onToggleSaveStatus = {}
         )
     }
 }

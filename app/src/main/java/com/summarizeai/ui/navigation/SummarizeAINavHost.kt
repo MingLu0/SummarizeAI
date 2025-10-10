@@ -15,6 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -34,6 +36,7 @@ import com.summarizeai.ui.screens.settings.SettingsScreen
 import com.summarizeai.ui.screens.loading.LoadingScreen
 import com.summarizeai.ui.screens.output.OutputScreen
 import com.summarizeai.ui.screens.output.StreamingOutputScreen
+import com.summarizeai.presentation.viewmodel.*
 import com.summarizeai.ui.theme.Cyan600
 import com.summarizeai.ui.theme.Gray400
 import com.summarizeai.ui.theme.Gray600
@@ -44,7 +47,20 @@ import com.summarizeai.ui.theme.White
 fun SummarizeAINavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    extractedContent: String? = null
+    homeUiState: com.summarizeai.presentation.viewmodel.HomeUiState,
+    isStreamingEnabled: Boolean,
+    outputUiState: com.summarizeai.presentation.viewmodel.OutputUiState,
+    historyUiState: com.summarizeai.presentation.viewmodel.HistoryUiState,
+    historySearchQuery: String,
+    savedUiState: com.summarizeai.presentation.viewmodel.SavedUiState,
+    savedSearchQuery: String,
+    extractedContent: String?,
+    homeViewModel: com.summarizeai.presentation.viewmodel.HomeViewModel,
+    settingsViewModel: com.summarizeai.presentation.viewmodel.SettingsViewModel,
+    outputViewModel: com.summarizeai.presentation.viewmodel.OutputViewModel,
+    streamingOutputViewModel: com.summarizeai.presentation.viewmodel.StreamingOutputViewModel,
+    historyViewModel: com.summarizeai.presentation.viewmodel.HistoryViewModel,
+    savedViewModel: com.summarizeai.presentation.viewmodel.SavedViewModel
 ) {
     NavHost(
         navController = navController,
@@ -74,16 +90,43 @@ fun SummarizeAINavHost(
         composable(Screen.Main.route) {
             MainScreenWithBottomNavigation(
                 navController = navController,
-                extractedContent = extractedContent
+                homeUiState = homeUiState,
+                isStreamingEnabled = isStreamingEnabled,
+                outputUiState = outputUiState,
+                historyUiState = historyUiState,
+                historySearchQuery = historySearchQuery,
+                savedUiState = savedUiState,
+                savedSearchQuery = savedSearchQuery,
+                extractedContent = extractedContent,
+                homeViewModel = homeViewModel,
+                settingsViewModel = settingsViewModel,
+                outputViewModel = outputViewModel,
+                streamingOutputViewModel = streamingOutputViewModel,
+                historyViewModel = historyViewModel,
+                savedViewModel = savedViewModel
             )
         }
+        
     }
 }
 
 @Composable
 fun MainScreenWithBottomNavigation(
     navController: NavHostController,
-    extractedContent: String? = null
+    homeUiState: HomeUiState,
+    isStreamingEnabled: Boolean,
+    outputUiState: OutputUiState,
+    historyUiState: HistoryUiState,
+    historySearchQuery: String,
+    savedUiState: SavedUiState,
+    savedSearchQuery: String,
+    extractedContent: String?,
+    homeViewModel: HomeViewModel,
+    settingsViewModel: SettingsViewModel,
+    outputViewModel: OutputViewModel,
+    streamingOutputViewModel: StreamingOutputViewModel,
+    historyViewModel: HistoryViewModel,
+    savedViewModel: SavedViewModel
 ) {
     val bottomNavController = rememberNavController()
     
@@ -137,15 +180,22 @@ fun MainScreenWithBottomNavigation(
                         selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                         onClick = {
                             println("Bottom nav clicked: ${item.route}, current: ${currentDestination?.route}")
-                            if (currentDestination?.route == Screen.Output.route || currentDestination?.route == Screen.StreamingOutput.route) {
-                                // If on Output or StreamingOutput screen, clear the entire stack and navigate to the selected tab
+                            
+                            // Check if we're on Output or StreamingOutput screen
+                            val isOnOutputScreen = currentDestination?.route == Screen.Output.route
+                            val isOnStreamingOutputScreen = currentDestination?.route?.startsWith("streaming_output/") == true
+                            
+                            if (isOnOutputScreen || isOnStreamingOutputScreen) {
+                                println("Navigating from Output/StreamingOutput screen to ${item.route}")
+                                // If on Output or StreamingOutput screen, navigate directly to the selected tab
                                 bottomNavController.navigate(item.route) {
-                                    popUpTo(bottomNavController.graph.id) {
-                                        inclusive = true
+                                    popUpTo(bottomNavController.graph.findStartDestination().id) {
+                                        inclusive = false
                                     }
                                     launchSingleTop = true
                                 }
                             } else {
+                                println("Normal navigation to ${item.route}")
                                 // Normal navigation for other screens
                                 bottomNavController.navigate(item.route) {
                                     popUpTo(bottomNavController.graph.findStartDestination().id) {
@@ -167,29 +217,45 @@ fun MainScreenWithBottomNavigation(
         ) {
             composable(Screen.Home.route) {
                 HomeScreen(
-                    onNavigateToLoading = {
-                        bottomNavController.navigate(Screen.Loading.route)
+                    uiState = homeUiState,
+                    extractedContent = extractedContent,
+                    onUpdateTextInput = homeViewModel::updateTextInput,
+                    onSummarizeText = homeViewModel::summarizeText,
+                    onClearError = homeViewModel::clearError,
+                    onUploadFile = homeViewModel::uploadFile,
+                    onNavigateToStreaming = { inputText ->
+                        bottomNavController.navigate(Screen.StreamingOutput.createRoute(inputText))
                     },
                     onNavigateToOutput = {
                         bottomNavController.navigate(Screen.Output.route)
                     },
-                    onNavigateToStreamingOutput = { inputText ->
-                        bottomNavController.navigate(Screen.StreamingOutput.createRoute(inputText))
-                    },
-                    extractedContent = extractedContent
+                    onClearNavigationFlags = homeViewModel::clearNavigationFlags
                 )
             }
             
             composable(Screen.History.route) {
-                HistoryScreen()
+                HistoryScreen(
+                    uiState = historyUiState,
+                    searchQuery = historySearchQuery,
+                    onUpdateSearchQuery = historyViewModel::updateSearchQuery,
+                    onDeleteSummary = historyViewModel::deleteSummary
+                )
             }
             
             composable(Screen.Saved.route) {
-                SavedScreen()
+                SavedScreen(
+                    uiState = savedUiState,
+                    searchQuery = savedSearchQuery,
+                    onUpdateSearchQuery = savedViewModel::updateSearchQuery,
+                    onUnsaveSummary = savedViewModel::unsaveSummary
+                )
             }
             
             composable(Screen.Settings.route) {
-                SettingsScreen()
+                SettingsScreen(
+                    isStreamingEnabled = isStreamingEnabled,
+                    onSetStreamingEnabled = settingsViewModel::setStreamingEnabled
+                )
             }
             
             composable(Screen.Loading.route) {
@@ -205,6 +271,7 @@ fun MainScreenWithBottomNavigation(
             
             composable(Screen.Output.route) {
                 OutputScreen(
+                    uiState = outputUiState,
                     onNavigateBack = {
                         println("Back button clicked from Output screen")
                         bottomNavController.navigate(Screen.Home.route) {
@@ -222,7 +289,11 @@ fun MainScreenWithBottomNavigation(
                             }
                             launchSingleTop = true
                         }
-                    }
+                    },
+                    onSelectTab = outputViewModel::selectTab,
+                    onCopyToClipboard = outputViewModel::copyToClipboard,
+                    onShareSummary = outputViewModel::shareSummary,
+                    onToggleSaveStatus = outputViewModel::toggleSaveStatus
                 )
             }
             
@@ -235,26 +306,34 @@ fun MainScreenWithBottomNavigation(
                 val inputText = backStackEntry.arguments?.getString("inputText")?.let { 
                     Uri.decode(it) 
                 } ?: ""
+                
+                // Get ViewModel scoped to this navigation route
+                val routeStreamingOutputViewModel: StreamingOutputViewModel = hiltViewModel()
+                
+                // Collect state INSIDE the composable lambda
+                val streamingOutputUiState by routeStreamingOutputViewModel.uiState.collectAsStateWithLifecycle()
+                
                 StreamingOutputScreen(
+                    uiState = streamingOutputUiState,
+                    inputText = inputText,
                     onNavigateBack = {
                         println("Back button clicked from StreamingOutput screen")
-                        bottomNavController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Home.route) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                        }
+                        bottomNavController.popBackStack()
                     },
                     onNavigateToHome = {
                         println("Home button clicked from StreamingOutput screen")
                         bottomNavController.navigate(Screen.Home.route) {
                             popUpTo(Screen.Home.route) {
-                                inclusive = true
+                                inclusive = false
                             }
                             launchSingleTop = true
                         }
                     },
-                    inputText = inputText
+                    onStartStreaming = routeStreamingOutputViewModel::startStreaming,
+                    onSelectTab = routeStreamingOutputViewModel::selectTab,
+                    onCopyToClipboard = routeStreamingOutputViewModel::copyToClipboard,
+                    onShareSummary = routeStreamingOutputViewModel::shareSummary,
+                    onToggleSaveStatus = routeStreamingOutputViewModel::toggleSaveStatus
                 )
             }
             
