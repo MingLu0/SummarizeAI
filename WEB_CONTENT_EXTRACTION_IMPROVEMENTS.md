@@ -156,3 +156,7 @@ When extraction fails, check logs for:
 
 If content length < 100 → Website likely requires JavaScript, suggest manual paste to user.
 
+
+
+
+

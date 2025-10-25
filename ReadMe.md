@@ -29,7 +29,7 @@ A beautiful, modern Android app that uses AI to summarize text content. Built wi
 - **Unidirectional Data Flow** - Predictable state management
 - **Comprehensive Testing** - Unit, UI, and integration tests
 
-## 🏗️ Architecture
+## 🏗️ Architecture\|||||||||||||||||||||||||||||||||||||||||||||||||||
 
 ### **Clean Architecture with Scaffold Pattern**
 
@@ -44,7 +44,7 @@ The app follows a **Clean Architecture with Scaffold Pattern** that ensures main
 
 #### **Architecture Flow**
 ```
-MainActivity (Entry Point)
+MainActivity |||»»»»»||||||||»»»||||||||||||||YT(Entry Point)
 ├── Observe ALL ViewModels
 ├── Collect ALL State Flows  
 ├── Handle ALL Navigation Logic

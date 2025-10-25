@@ -7,14 +7,26 @@ import com.summarizeai.data.model.SummaryData
 import com.summarizeai.domain.repository.SummaryRepository
 import com.summarizeai.utils.ErrorHandler
 import com.summarizeai.utils.TextExtractionUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.*
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [28])
 class HomeViewModelStreamingTest {
 
     private lateinit var mockRepository: SummaryRepository
@@ -22,9 +34,11 @@ class HomeViewModelStreamingTest {
     private lateinit var mockErrorHandler: ErrorHandler
     private lateinit var mockUserPreferences: UserPreferences
     private lateinit var homeViewModel: HomeViewModel
+    private val testDispatcher = UnconfinedTestDispatcher()
 
     @Before
     fun setup() {
+        Dispatchers.setMain(testDispatcher)
         mockRepository = mock()
         mockTextExtractionUtils = mock()
         mockErrorHandler = mock()
@@ -35,6 +49,11 @@ class HomeViewModelStreamingTest {
             mockErrorHandler,
             mockUserPreferences
         )
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test

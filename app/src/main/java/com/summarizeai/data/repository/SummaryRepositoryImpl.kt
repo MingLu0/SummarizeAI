@@ -1,5 +1,6 @@
 package com.summarizeai.data.repository
 
+import android.util.Log
 import com.summarizeai.data.local.datasource.SummaryLocalDataSource
 import com.summarizeai.data.local.mapper.SummaryMapper.toSummaryData
 import com.summarizeai.data.local.mapper.SummaryMapper.toSummaryDataList
@@ -23,6 +24,10 @@ class SummaryRepositoryImpl @Inject constructor(
     private val localDataSource: SummaryLocalDataSource,
     private val streamingService: StreamingSummarizerService
 ) : SummaryRepository {
+    
+    companion object {
+        private const val TAG = "SummaryRepositoryImpl"
+    }
     
     override suspend fun summarizeText(text: String): ApiResult<SummaryData> {
         val request = SummarizeRequest(text = text)
@@ -54,14 +59,17 @@ class SummaryRepositoryImpl @Inject constructor(
     
     override fun summarizeTextStreaming(text: String): Flow<StreamingResult> = flow {
         try {
+            Log.d(TAG, "summarizeTextStreaming: Starting streaming summary generation")
             var fullSummary = ""
-            
+            var chunkCount = 0
             streamingService.streamSummary(text, "https://colin730-summarizerapp.hf.space").collect { chunk ->
+                chunkCount++
+                Log.d(TAG, "summarizeTextStreaming: Received chunk #$chunkCount")
+                Log.d(TAG, "summarizeTextStreaming: Chunk content preview: ${chunk.content.take(50)}")
+                Log.d(TAG, "summarizeTextStreaming: Chunk done status: ${chunk.done}")
                 fullSummary += chunk.content
-                
-                // Emit progress for every chunk immediately
+                Log.d(TAG, "summarizeTextStreaming: Accumulated summary length: ${fullSummary.length} characters")
                 emit(StreamingResult.Progress(chunk.content))
-                
                 if (chunk.done) {
                     // Create final summary data
                     val summaryData = SummaryData(
@@ -70,14 +78,18 @@ class SummaryRepositoryImpl @Inject constructor(
                         mediumSummary = fullSummary,
                         detailedSummary = generateDetailedSummary(fullSummary)
                     )
-                    
-                    // Save to local database
+                    Log.d(TAG, "summarizeTextStreaming: Created SummaryData with ID: ${summaryData.id}")
+                    Log.d(TAG, "summarizeTextStreaming: Saving to local database...")
                     localDataSource.insertSummary(summaryData.toSummaryEntity())
-                    
+                    Log.d(TAG, "summarizeTextStreaming: Successfully saved to database")
                     emit(StreamingResult.Complete(summaryData))
+                    Log.d(TAG, "summarizeTextStreaming: Emitted StreamingResult.Complete")
                 }
             }
         } catch (e: Exception) {
+            Log.e(TAG, "summarizeTextStreaming: Error occurred during streaming", e)
+            Log.e(TAG, "summarizeTextStreaming: Error message: ${e.message}")
+            Log.e(TAG, "summarizeTextStreaming: Error type: ${e.javaClass.simpleName}")
             emit(StreamingResult.Error(e.message ?: "Unknown error occurred"))
         }
     }

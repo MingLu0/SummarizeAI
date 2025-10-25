@@ -1,5 +1,6 @@
 package com.summarizeai.presentation.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,9 +14,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,11 +24,12 @@ class StreamingOutputViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     
+    companion object {
+        private const val TAG = "StreamingOutputVM"
+    }
+    
     private val _uiState = MutableStateFlow(StreamingOutputUiState())
     val uiState: StateFlow<StreamingOutputUiState> = _uiState.asStateFlow()
-    
-    private var textBuffer = StringBuilder()
-    private var displayJob: Job? = null
     
     fun startStreaming(inputText: String) {
         if (inputText.isBlank()) {
@@ -40,10 +39,6 @@ class StreamingOutputViewModel @Inject constructor(
             return
         }
         
-        // Cancel any previous display job
-        displayJob?.cancel()
-        textBuffer.clear()
-        
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 isStreaming = true,
@@ -51,48 +46,32 @@ class StreamingOutputViewModel @Inject constructor(
                 error = null
             )
             
-            // Launch parallel coroutine for letter-by-letter display
-            displayJob = launch {
-                var displayedLength = 0
-                while (isActive) {
-                    if (displayedLength < textBuffer.length) {
-                        displayedLength++
-                        _uiState.value = _uiState.value.copy(
-                            streamingText = textBuffer.substring(0, displayedLength)
-                        )
-                        delay(25) // 25ms per character
-                    } else {
-                        delay(50) // Check for new buffer content
-                    }
-                }
-            }
-            
-            // Collect from repository and add to buffer
+            // Collect from repository and display chunks as they arrive
+            var chunkCount = 0
             repository.summarizeTextStreaming(inputText).collect { result ->
                 when (result) {
                     is StreamingResult.Progress -> {
-                        textBuffer.append(result.text)
+                        chunkCount++
+                        // Append chunk and update UI state immediately
+                        // Server already provides natural streaming pace (30-50ms between chunks)
+                        val newText = _uiState.value.streamingText + result.text
+                        _uiState.value = _uiState.value.copy(streamingText = newText)
+                        Log.d(TAG, "Updated UI with chunk #$chunkCount, length: ${newText.length}")
                     }
                     is StreamingResult.Complete -> {
-                        // Wait for display to catch up with buffer
-                        while (textBuffer.length > _uiState.value.streamingText.length) {
-                            delay(100)
-                        }
-                        displayJob?.cancel()
+                        Log.d(TAG, "Streaming complete, total chunks: $chunkCount")
                         _uiState.value = _uiState.value.copy(
                             isStreaming = false,
                             summaryData = result.summaryData,
                             streamingText = ""
                         )
-                        textBuffer.clear()
                     }
                     is StreamingResult.Error -> {
-                        displayJob?.cancel()
+                        Log.e(TAG, "Streaming error: ${result.message}")
                         _uiState.value = _uiState.value.copy(
                             isStreaming = false,
                             error = result.message
                         )
-                        textBuffer.clear()
                     }
                 }
             }
@@ -149,8 +128,6 @@ class StreamingOutputViewModel @Inject constructor(
     }
     
     fun resetState() {
-        displayJob?.cancel()
-        textBuffer.clear()
         _uiState.value = StreamingOutputUiState()
     }
 }

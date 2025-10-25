@@ -1,5 +1,6 @@
 package com.summarizeai.data.remote.api
 
+import android.util.Log
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -20,6 +21,10 @@ class StreamingSummarizerService @Inject constructor(
     private val okHttpClient: OkHttpClient
 ) {
     
+    companion object {
+        private const val TAG = "StreamingSummarizerSvc"
+    }
+    
     private val client = HttpClient(OkHttp) {
         install(ContentNegotiation) {
             gson()
@@ -31,7 +36,8 @@ class StreamingSummarizerService @Inject constructor(
     
     fun streamSummary(text: String, baseUrl: String): Flow<StreamChunk> = flow {
         try {
-            println("StreamingSummarizerService: Starting SSE connection to $baseUrl/api/v1/summarize/stream")
+            Log.d(TAG, "streamSummary: Starting SSE connection to $baseUrl/api/v1/summarize/stream")
+            Log.d(TAG, "streamSummary: Input text length: ${text.length} characters")
             
             val requestBody = mapOf(
                 "text" to text,
@@ -39,13 +45,14 @@ class StreamingSummarizerService @Inject constructor(
                 "prompt" to "Summarize the following text concisely:"
             )
             
-            client.preparePost("$baseUrl/api/v1/summarize/stream") {
+            client.preparePost("$baseUrl/api/v1/summarize/pipeline/stream") {
                 contentType(ContentType.Application.Json)
                 setBody(requestBody)
             }.execute { response ->
-                println("StreamingSummarizerService: Response status: ${response.status}")
+                Log.d(TAG, "streamSummary: Response status: ${response.status}")
                 
                 val channel: ByteReadChannel = response.bodyAsChannel()
+                var chunkCount = 0
                 
                 while (!channel.isClosedForRead) {
                     val line = channel.readUTF8Line() ?: continue
@@ -59,31 +66,39 @@ class StreamingSummarizerService @Inject constructor(
                             
                             // Check for error field first (backend sends errors as SSE events)
                             if (json.has("error")) {
-                                println("StreamingSummarizerService: Error from backend: ${json.getString("error")}")
-                                throw Exception(json.getString("error"))
+                                val errorMsg = json.getString("error")
+                                Log.e(TAG, "streamSummary: Error from backend: $errorMsg")
+                                throw Exception(errorMsg)
                             }
                             
                             val content = json.getString("content")
                             val done = json.getBoolean("done")
                             
-                            println("StreamingSummarizerService: Received chunk - content: ${content.take(50)}..., done: $done")
+                            chunkCount++
+                            Log.d(TAG, "streamSummary: Received chunk #$chunkCount from server")
+                            Log.d(TAG, "streamSummary: Chunk content length: ${content.length} characters")
+                            Log.d(TAG, "streamSummary: Chunk content preview: ${content.take(50)}")
+                            Log.d(TAG, "streamSummary: Chunk done status: $done")
+                            
                             emit(StreamChunk(content, done))
+                            Log.d(TAG, "streamSummary: Emitted chunk #$chunkCount to Flow")
                             
                             if (done) {
-                                println("StreamingSummarizerService: Stream completed")
+                                Log.d(TAG, "streamSummary: Stream completed. Total chunks: $chunkCount")
                                 break
                             }
                         } catch (e: Exception) {
-                            println("StreamingSummarizerService: Error parsing SSE chunk: ${e.message}")
+                            Log.e(TAG, "streamSummary: Error parsing SSE chunk: ${e.message}")
                             // Continue reading even if one chunk fails
                         }
                     }
                 }
             }
             
-            println("StreamingSummarizerService: SSE connection closed")
+            Log.d(TAG, "streamSummary: SSE connection closed")
         } catch (e: Exception) {
-            println("StreamingSummarizerService: Connection failed: ${e.message}")
+            Log.e(TAG, "streamSummary: Connection failed: ${e.message}")
+            Log.e(TAG, "streamSummary: Exception type: ${e.javaClass.simpleName}")
             e.printStackTrace()
             throw e
         }

@@ -142,6 +142,12 @@ dependencies {
     testImplementation("androidx.test:runner:1.5.2")
     testImplementation("androidx.test:core:1.5.0")
     
+    // Robolectric for Android framework mocking in unit tests
+    testImplementation("org.robolectric:robolectric:4.11.1")
+    
+    // MockK for better Kotlin mocking (optional, for static mocking)
+    testImplementation("io.mockk:mockk:1.13.8")
+    
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test:runner:1.5.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

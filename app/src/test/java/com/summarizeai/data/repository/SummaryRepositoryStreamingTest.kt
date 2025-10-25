@@ -10,8 +10,13 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.*
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [28])
 class SummaryRepositoryStreamingTest {
 
     private lateinit var mockStreamingService: StreamingSummarizerService
@@ -120,7 +125,12 @@ class SummaryRepositoryStreamingTest {
         val results = repository.summarizeTextStreaming(testText).toList()
 
         // Then
-        val summaryData = (results[0] as StreamingResult.Complete).summaryData
+        // Should emit: 1 Progress + 1 Complete = 2 results
+        assertEquals(2, results.size)
+        assertTrue(results[0] is StreamingResult.Progress)
+        assertTrue(results[1] is StreamingResult.Complete)
+        
+        val summaryData = (results[1] as StreamingResult.Complete).summaryData
         assertEquals("This is a test sentence.", summaryData.mediumSummary)
         assertTrue(summaryData.shortSummary.isNotEmpty())
         assertTrue(summaryData.detailedSummary.isNotEmpty())
