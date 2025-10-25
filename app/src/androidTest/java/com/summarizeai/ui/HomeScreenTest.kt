@@ -3,7 +3,9 @@ package com.summarizeai.ui
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.summarizeai.presentation.viewmodel.HomeUiState
 import com.summarizeai.ui.screens.home.HomeScreen
+import com.summarizeai.ui.theme.SummarizeAITheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,10 +20,24 @@ class HomeScreenTest {
     fun homeScreen_displaysCorrectElements() {
         // When
         composeTestRule.setContent {
-            HomeScreen(
-                onNavigateToLoading = { }
-            )
+            SummarizeAITheme {
+                HomeScreen(
+                    uiState = HomeUiState(),
+                    extractedContent = null,
+                    webContentError = null,
+                    onUpdateTextInput = { },
+                    onSummarizeText = { },
+                    onClearError = { },
+                    onUploadFile = { },
+                    onNavigateToStreaming = { },
+                    onNavigateToOutput = { },
+                    onClearNavigationFlags = { },
+                    onClearExtractedContent = { }
+                )
+            }
         }
+        
+        composeTestRule.waitForIdle()
         
         // Then
         composeTestRule.onNodeWithText("Summarize AI").assertIsDisplayed()
@@ -34,10 +50,24 @@ class HomeScreenTest {
     fun homeScreen_summarizeButtonDisabledWhenTextEmpty() {
         // When
         composeTestRule.setContent {
-            HomeScreen(
-                onNavigateToLoading = { }
-            )
+            SummarizeAITheme {
+                HomeScreen(
+                    uiState = HomeUiState(isSummarizeEnabled = false),
+                    extractedContent = null,
+                    webContentError = null,
+                    onUpdateTextInput = { },
+                    onSummarizeText = { },
+                    onClearError = { },
+                    onUploadFile = { },
+                    onNavigateToStreaming = { },
+                    onNavigateToOutput = { },
+                    onClearNavigationFlags = { },
+                    onClearExtractedContent = { }
+                )
+            }
         }
+        
+        composeTestRule.waitForIdle()
         
         // Then
         composeTestRule.onNodeWithText("Summarize")
@@ -49,14 +79,27 @@ class HomeScreenTest {
     fun homeScreen_summarizeButtonEnabledWhenTextEntered() {
         // When
         composeTestRule.setContent {
-            HomeScreen(
-                onNavigateToLoading = { }
-            )
+            SummarizeAITheme {
+                HomeScreen(
+                    uiState = HomeUiState(
+                        textInput = "Test text to summarize",
+                        isSummarizeEnabled = true
+                    ),
+                    extractedContent = null,
+                    webContentError = null,
+                    onUpdateTextInput = { },
+                    onSummarizeText = { },
+                    onClearError = { },
+                    onUploadFile = { },
+                    onNavigateToStreaming = { },
+                    onNavigateToOutput = { },
+                    onClearNavigationFlags = { },
+                    onClearExtractedContent = { }
+                )
+            }
         }
         
-        // Enter text
-        composeTestRule.onNodeWithText("Paste or upload your text here...")
-            .performTextInput("Test text to summarize")
+        composeTestRule.waitForIdle()
         
         // Then
         composeTestRule.onNodeWithText("Summarize")
@@ -68,10 +111,24 @@ class HomeScreenTest {
     fun homeScreen_uploadButtonClickable() {
         // When
         composeTestRule.setContent {
-            HomeScreen(
-                onNavigateToLoading = { }
-            )
+            SummarizeAITheme {
+                HomeScreen(
+                    uiState = HomeUiState(),
+                    extractedContent = null,
+                    webContentError = null,
+                    onUpdateTextInput = { },
+                    onSummarizeText = { },
+                    onClearError = { },
+                    onUploadFile = { },
+                    onNavigateToStreaming = { },
+                    onNavigateToOutput = { },
+                    onClearNavigationFlags = { },
+                    onClearExtractedContent = { }
+                )
+            }
         }
+        
+        composeTestRule.waitForIdle()
         
         // Then
         composeTestRule.onNodeWithText("Upload")

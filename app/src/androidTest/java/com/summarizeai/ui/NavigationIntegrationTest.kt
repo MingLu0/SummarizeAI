@@ -4,11 +4,6 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.summarizeai.MainActivity
-import com.summarizeai.ui.navigation.SummarizeAINavHost
-import com.summarizeai.ui.theme.SummarizeAITheme
-import androidx.navigation.compose.rememberNavController
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -19,24 +14,9 @@ class NavigationIntegrationTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
-    @Composable
-    private fun TestNavigationHost() {
-        SummarizeAITheme {
-            val navController = rememberNavController()
-            SummarizeAINavHost(
-                navController = navController,
-                modifier = Modifier
-            )
-        }
-    }
-
     @Test
     fun navigationIntegration_fullFlowFromHomeToOutputAndBack() {
-        // Given - Start with the full navigation host
-        composeTestRule.setContent {
-            TestNavigationHost()
-        }
-
+        // Given - MainActivity is launched with full app setup via Hilt
         // Wait for splash screen to complete and navigate to main screen
         composeTestRule.waitUntil(timeoutMillis = 5000) {
             composeTestRule.onAllNodesWithText("Summarize AI").fetchSemanticsNodes().isNotEmpty()
@@ -84,11 +64,7 @@ class NavigationIntegrationTest {
 
     @Test
     fun navigationIntegration_bottomTabNavigationFromOutputScreen() {
-        // Given - Start with the full navigation host
-        composeTestRule.setContent {
-            TestNavigationHost()
-        }
-
+        // Given - MainActivity is launched with full app setup via Hilt
         // Wait for splash screen to complete
         composeTestRule.waitUntil(timeoutMillis = 5000) {
             composeTestRule.onAllNodesWithText("Summarize AI").fetchSemanticsNodes().isNotEmpty()
@@ -167,11 +143,7 @@ class NavigationIntegrationTest {
 
     @Test
     fun navigationIntegration_homeButtonInActionAreaNavigation() {
-        // Given - Start with the full navigation host
-        composeTestRule.setContent {
-            TestNavigationHost()
-        }
-
+        // Given - MainActivity is launched with full app setup via Hilt
         // Wait for splash screen to complete
         composeTestRule.waitUntil(timeoutMillis = 5000) {
             composeTestRule.onAllNodesWithText("Summarize AI").fetchSemanticsNodes().isNotEmpty()

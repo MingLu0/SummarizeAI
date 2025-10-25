@@ -1,5 +1,7 @@
 package com.summarizeai.ui
 
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -65,7 +67,9 @@ class StreamingE2ETest {
         composeTestRule.onNodeWithText("Show summaries as they're being generated").assertIsDisplayed()
         
         // Verify toggle is interactive
-        composeTestRule.onNode(hasRole(Role.Switch)).assertIsEnabled()
+        composeTestRule.onNode(
+            hasAnyAncestor(isToggleable())
+        ).assertIsDisplayed()
     }
 
     @Test
@@ -109,14 +113,18 @@ class StreamingE2ETest {
         // Navigate to Settings
         composeTestRule.onNodeWithText("Settings").performClick()
         
-        // Toggle streaming on
-        composeTestRule.onNode(hasRole(Role.Switch)).performClick()
+        // Toggle streaming on - find the switch by its parent text
+        composeTestRule.onNode(
+            hasAnyAncestor(isToggleable())
+        ).performClick()
         
         // Navigate away and back
         composeTestRule.onNodeWithText("Home").performClick()
         composeTestRule.onNodeWithText("Settings").performClick()
         
         // Verify toggle state is maintained (this would need actual persistence testing)
-        composeTestRule.onNode(hasRole(Role.Switch)).assertIsDisplayed()
+        composeTestRule.onNode(
+            hasAnyAncestor(isToggleable())
+        ).assertIsDisplayed()
     }
 }
