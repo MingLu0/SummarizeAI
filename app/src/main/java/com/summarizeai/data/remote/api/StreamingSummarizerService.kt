@@ -9,6 +9,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.gson.*
 import io.ktor.utils.io.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.json.JSONObject
@@ -36,7 +37,7 @@ class StreamingSummarizerService @Inject constructor(
     
     fun streamSummary(text: String, baseUrl: String): Flow<StreamChunk> = flow {
         try {
-            Log.d(TAG, "streamSummary: Starting SSE connection to $baseUrl/api/v1/summarize/stream")
+            Log.d(TAG, "streamSummary: Starting SSE connection to $baseUrl/api/v2/summarize/stream")
             Log.d(TAG, "streamSummary: Input text length: ${text.length} characters")
             
             val requestBody = mapOf(
@@ -45,7 +46,7 @@ class StreamingSummarizerService @Inject constructor(
                 "prompt" to "Summarize the following text concisely:"
             )
             
-            client.preparePost("$baseUrl/api/v1/summarize/pipeline/stream") {
+            client.preparePost("$baseUrl/api/v2/summarize/stream") {
                 contentType(ContentType.Application.Json)
                 setBody(requestBody)
             }.execute { response ->
@@ -82,6 +83,12 @@ class StreamingSummarizerService @Inject constructor(
                             
                             emit(StreamChunk(content, done))
                             Log.d(TAG, "streamSummary: Emitted chunk #$chunkCount to Flow")
+                            
+                            // Add delay to allow UI to recompose between chunks
+                            // This prevents all chunks from being batched together in a single frame
+                            if (!done) {
+                                delay(30) // 30ms delay between chunks for smooth streaming effect
+                            }
                             
                             if (done) {
                                 Log.d(TAG, "streamSummary: Stream completed. Total chunks: $chunkCount")
