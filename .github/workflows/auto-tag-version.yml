@@ -19,6 +19,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetch all history for accurate tagging
+          token: ${{ secrets.PAT_TOKEN }}  # Use PAT to trigger other workflows
       
       - name: Extract current version
         id: current-version
@@ -57,6 +58,7 @@ jobs:
           TAG_NAME: ${{ steps.check-tag.outputs.tag-name }}
           VERSION_NAME: ${{ steps.current-version.outputs.version-name }}
           VERSION_CODE: ${{ steps.current-version.outputs.version-code }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}  # Use PAT to trigger other workflows
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -64,10 +66,11 @@ jobs:
           # Create annotated tag with version info
           git tag -a "$TAG_NAME" -m "Release $VERSION_NAME (Build $VERSION_CODE)" -m "" -m "Auto-generated tag for version $VERSION_NAME"
           
-          # Push the tag
+          # Push the tag using PAT authentication
           git push origin "$TAG_NAME"
           
           echo "✅ Created and pushed tag: $TAG_NAME"
+          echo "🚀 This should now trigger the Firebase App Distribution workflow"
       
       - name: Tag already exists
         if: steps.check-tag.outputs.exists == 'true'
