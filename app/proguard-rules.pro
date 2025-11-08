@@ -68,3 +68,22 @@
 
 # Keep utility classes
 -keep class com.summarizeai.utils.** { *; }
+
+# SLF4J - Ignore missing implementation (optional logging dependency)
+-dontwarn org.slf4j.**
+-dontwarn org.slf4j.impl.**
+-keep class org.slf4j.** { *; }
+
+# Jsoup - Web scraping library
+-keep class org.jsoup.** { *; }
+-dontwarn org.jsoup.**
+
+# Readability4J - Article extraction library
+-keep class net.dankito.readability4j.** { *; }
+-dontwarn net.dankito.readability4j.**
+
+# Keep Nutshell classes (updated package name)
+-keep class com.nutshell.data.model.** { *; }
+-keep class com.nutshell.data.local.database.** { *; }
+-keep class com.nutshell.data.remote.api.** { *; }
+-keep class com.nutshell.utils.** { *; }
