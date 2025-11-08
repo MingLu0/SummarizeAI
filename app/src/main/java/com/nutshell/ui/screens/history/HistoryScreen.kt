@@ -43,7 +43,7 @@ fun HistoryScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(PureWhite)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
     ) {
         // Content - Flat Minimalist Design
@@ -61,7 +61,7 @@ fun HistoryScreen(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 0.sp
                 ),
-                color = PureBlack
+                color = MaterialTheme.colorScheme.onBackground
             )
             
             // Search Input - Flat with Border
@@ -74,7 +74,7 @@ fun HistoryScreen(
                         color = Gray300,
                         shape = RoundedCornerShape(12.dp)
                     )
-                    .background(PureWhite)
+                    .background(MaterialTheme.colorScheme.surface)
             ) {
                 Row(
                     modifier = Modifier
@@ -93,7 +93,7 @@ fun HistoryScreen(
                         value = searchQuery,
                         onValueChange = onUpdateSearchQuery,
                         textStyle = TextStyle(
-                            color = PureBlack,
+                            color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Normal
                         ),
@@ -145,7 +145,7 @@ fun HistoryScreen(
                     Text(
                         text = "No History Yet",
                         style = MaterialTheme.typography.headlineMedium,
-                        color = PureBlack,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontWeight = FontWeight.Bold
                     )
                     
@@ -193,7 +193,7 @@ fun HistoryItemCard(
                 color = Gray300,
                 shape = RoundedCornerShape(12.dp)
             )
-            .background(PureWhite)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp),
         verticalAlignment = Alignment.Top
     ) {

@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -36,6 +37,7 @@ import com.nutshell.ui.screens.loading.LoadingScreen
 import com.nutshell.ui.screens.output.OutputScreen
 import com.nutshell.ui.screens.output.StreamingOutputScreen
 import com.nutshell.presentation.viewmodel.*
+import com.nutshell.data.local.preferences.ThemeMode
 import com.nutshell.ui.theme.Cyan600
 import com.nutshell.ui.theme.Gray400
 import com.nutshell.ui.theme.Gray600
@@ -48,6 +50,7 @@ fun NutshellNavHost(
     modifier: Modifier = Modifier,
     homeUiState: com.nutshell.presentation.viewmodel.HomeUiState,
     isStreamingEnabled: Boolean,
+    themeMode: ThemeMode,
     outputUiState: com.nutshell.presentation.viewmodel.OutputUiState,
     historyUiState: com.nutshell.presentation.viewmodel.HistoryUiState,
     historySearchQuery: String,
@@ -96,6 +99,7 @@ fun NutshellNavHost(
                 navController = navController,
                 homeUiState = homeUiState,
                 isStreamingEnabled = isStreamingEnabled,
+                themeMode = themeMode,
                 outputUiState = outputUiState,
                 historyUiState = historyUiState,
                 historySearchQuery = historySearchQuery,
@@ -120,6 +124,7 @@ fun MainScreenWithBottomNavigation(
     navController: NavHostController,
     homeUiState: HomeUiState,
     isStreamingEnabled: Boolean,
+    themeMode: ThemeMode,
     outputUiState: OutputUiState,
     historyUiState: HistoryUiState,
     historySearchQuery: String,
@@ -162,8 +167,8 @@ fun MainScreenWithBottomNavigation(
     Scaffold(
         bottomBar = {
             NavigationBar(
-                containerColor = White,
-                contentColor = Gray600
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface
             ) {
                 val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
@@ -174,13 +179,19 @@ fun MainScreenWithBottomNavigation(
                             Icon(
                                 imageVector = item.icon,
                                 contentDescription = item.label,
-                                tint = if (currentDestination?.hierarchy?.any { it.route == item.route } == true) Cyan600 else Gray400
+                                tint = if (currentDestination?.hierarchy?.any { it.route == item.route } == true) 
+                                    MaterialTheme.colorScheme.primary 
+                                else 
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             )
                         },
                         label = { 
                             Text(
                                 text = item.label,
-                                color = if (currentDestination?.hierarchy?.any { it.route == item.route } == true) Cyan600 else Gray400
+                                color = if (currentDestination?.hierarchy?.any { it.route == item.route } == true) 
+                                    MaterialTheme.colorScheme.primary 
+                                else 
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             ) 
                         },
                         selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
@@ -265,7 +276,9 @@ fun MainScreenWithBottomNavigation(
             composable(Screen.Settings.route) {
                 SettingsScreen(
                     isStreamingEnabled = isStreamingEnabled,
-                    onSetStreamingEnabled = settingsViewModel::setStreamingEnabled
+                    themeMode = themeMode,
+                    onSetStreamingEnabled = settingsViewModel::setStreamingEnabled,
+                    onSetThemeMode = settingsViewModel::setThemeMode
                 )
             }
             

@@ -86,7 +86,7 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(PureWhite)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()  // Add padding for transparent status bar
     ) {
         // Content - Flat Minimalist Design
@@ -104,7 +104,7 @@ fun HomeScreen(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 0.sp
                 ),
-                color = PureBlack,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(top = 8.dp, bottom = 12.dp)
             )
             // Text Input Area - Flat with Border
@@ -114,21 +114,21 @@ fun HomeScreen(
                     .weight(1f)
                     .border(
                         width = 2.dp,
-                        color = PureBlack,
+                        color = MaterialTheme.colorScheme.outline,
                         shape = RoundedCornerShape(12.dp)
                     )
-                    .background(PureWhite)
+                    .background(MaterialTheme.colorScheme.surface)
             ) {
                 BasicTextField(
                     value = uiState.textInput,
                     onValueChange = onUpdateTextInput,
                     textStyle = TextStyle(
-                        color = PureBlack,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 16.sp,
                         lineHeight = 24.sp,
                         fontWeight = FontWeight.Normal
                     ),
-                    cursorBrush = SolidColor(ElectricLime),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(20.dp)
@@ -141,7 +141,7 @@ fun HomeScreen(
                             Text(
                                 text = "Paste or upload your text here...",
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = Gray400
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             )
                         }
                         innerTextField()
@@ -156,10 +156,10 @@ fun HomeScreen(
                     .height(56.dp)
                     .border(
                         width = 2.dp,
-                        color = Gray300,
+                        color = MaterialTheme.colorScheme.outline,
                         shape = RoundedCornerShape(12.dp)
                     )
-                    .background(PureWhite)
+                    .background(MaterialTheme.colorScheme.surface)
                     .clickable { filePicker() }
                     .padding(horizontal = 20.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -168,14 +168,14 @@ fun HomeScreen(
                 Icon(
                     imageVector = Icons.Default.Upload,
                     contentDescription = "Upload",
-                    tint = Gray800,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = "Upload PDF or DOC",
                     style = MaterialTheme.typography.labelMedium,
-                    color = Gray800
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
             
@@ -186,16 +186,16 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .border(
                             width = 2.dp,
-                            color = ErrorRed,
+                            color = MaterialTheme.colorScheme.error,
                             shape = RoundedCornerShape(8.dp)
                         )
-                        .background(PureWhite)
+                        .background(MaterialTheme.colorScheme.surface)
                         .padding(16.dp)
                 ) {
                     Text(
                         text = "Error: ${uiState.error}",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = ErrorRed
+                        color = MaterialTheme.colorScheme.error
                     )
                 }
             }
@@ -210,7 +210,7 @@ fun HomeScreen(
                             color = WarningOrange,
                             shape = RoundedCornerShape(8.dp)
                         )
-                        .background(PureWhite)
+                        .background(MaterialTheme.colorScheme.surface)
                         .padding(16.dp)
                 ) {
                     Column {
@@ -230,7 +230,7 @@ fun HomeScreen(
                         Text(
                             text = "💡 Tip: You can copy the article text and paste it in the text area above to summarize it manually.",
                             style = MaterialTheme.typography.bodySmall,
-                            color = Gray700
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -242,7 +242,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp)
-                        .background(ErrorRed)
+                        .background(MaterialTheme.colorScheme.error)
                         .clickable {
                             onUpdateTextInput("Test API connection")
                             onSummarizeText()
@@ -254,18 +254,21 @@ fun HomeScreen(
                         style = MaterialTheme.typography.labelMedium.copy(
                             fontWeight = FontWeight.Bold
                         ),
-                        color = PureWhite
+                        color = MaterialTheme.colorScheme.onError
                     )
                 }
             }
             
-            // Summarize Button - Electric Lime CTA (Flat)
+            // Summarize Button - Primary CTA (Flat)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(60.dp)
                     .background(
-                        color = if (uiState.isSummarizeEnabled && !uiState.isLoading) ElectricLime else ElectricLimeLight,
+                        color = if (uiState.isSummarizeEnabled && !uiState.isLoading) 
+                            MaterialTheme.colorScheme.primary 
+                        else 
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
                         shape = RoundedCornerShape(12.dp)
                     )
                     .clickable(enabled = uiState.isSummarizeEnabled && !uiState.isLoading) {
@@ -282,7 +285,7 @@ fun HomeScreen(
                     ) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(20.dp),
-                            color = PureBlack,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             strokeWidth = 2.dp
                         )
                         Spacer(modifier = Modifier.width(12.dp))
@@ -292,7 +295,7 @@ fun HomeScreen(
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 1.sp
                             ),
-                            color = PureBlack
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 } else {
@@ -303,7 +306,7 @@ fun HomeScreen(
                             fontSize = 18.sp,
                             letterSpacing = 1.sp
                         ),
-                        color = PureBlack
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }

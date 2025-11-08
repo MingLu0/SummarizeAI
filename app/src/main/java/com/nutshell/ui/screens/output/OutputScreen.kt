@@ -52,7 +52,7 @@ fun OutputScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(PureWhite)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
     ) {
         // Content - Flat Minimalist Design

@@ -11,6 +11,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.nutshell.data.local.preferences.ThemeMode
 import com.nutshell.ui.navigation.AppScaffold
 import com.nutshell.ui.navigation.Screen
 import com.nutshell.ui.theme.NutshellTheme
@@ -33,20 +34,6 @@ class MainActivity : ComponentActivity() {
         _intentFlow.value = intent
         
         setContent {
-            NutshellTheme {
-                // Enable transparent status bar with dark icons
-                val systemUiController = rememberSystemUiController()
-                SideEffect {
-                    systemUiController.setStatusBarColor(
-                        color = Color.Transparent,
-                        darkIcons = true  // Dark icons for white background
-                    )
-                    systemUiController.setNavigationBarColor(
-                        color = Color.Transparent,
-                        darkIcons = true
-                    )
-                }
-                
                 val navController = rememberNavController()
                 
                 // OBSERVE ALL VIEWMODELS AT TOP LEVEL
@@ -61,6 +48,7 @@ class MainActivity : ComponentActivity() {
                 // COLLECT ALL STATE FLOWS
                 val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
                 val isStreamingEnabled by settingsViewModel.isStreamingEnabled.collectAsStateWithLifecycle(initialValue = true)
+                val themeMode by settingsViewModel.themeMode.collectAsStateWithLifecycle(initialValue = ThemeMode.SYSTEM)
                 val outputUiState by outputViewModel.uiState.collectAsStateWithLifecycle()
                 val historyUiState by historyViewModel.uiState.collectAsStateWithLifecycle()
                 val historySearchQuery by historyViewModel.searchQuery.collectAsStateWithLifecycle()
@@ -90,10 +78,12 @@ class MainActivity : ComponentActivity() {
                 
                 
                 // PASS ALL STATE AND CALLBACKS DOWN
+                NutshellTheme(themeMode = themeMode) {
                 AppScaffold(
                     navController = navController,
                     homeUiState = homeUiState,
                     isStreamingEnabled = isStreamingEnabled,
+                    themeMode = themeMode,
                     outputUiState = outputUiState,
                     historyUiState = historyUiState,
                     historySearchQuery = historySearchQuery,
@@ -108,7 +98,7 @@ class MainActivity : ComponentActivity() {
                     savedViewModel = savedViewModel,
                     webContentViewModel = webContentViewModel
                 )
-            }
+                }
         }
     }
     

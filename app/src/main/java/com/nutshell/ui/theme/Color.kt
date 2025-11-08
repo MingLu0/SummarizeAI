@@ -86,33 +86,33 @@ val LightOnSurfaceVariant = Gray700
 val LightOutline = Gray200
 val LightOutlineVariant = Gray300
 
-// Future: Dark theme colors (for future enhancement)
-val DarkPrimary = Cyan600
-val DarkOnPrimary = Gray900
-val DarkPrimaryContainer = Cyan700
-val DarkOnPrimaryContainer = Cyan50
+// Dark Theme Colors - True Black with Royal Purple Accent
+val DarkPrimary = RoyalPurple              // Royal Purple - prominent in dark mode
+val DarkOnPrimary = PureBlack              // Black text on purple buttons
+val DarkPrimaryContainer = RoyalPurpleDark // Darker purple for containers
+val DarkOnPrimaryContainer = Gray100       // Light text on purple containers
 
-val DarkSecondary = Blue600
-val DarkOnSecondary = Gray900
-val DarkSecondaryContainer = Blue700
-val DarkOnSecondaryContainer = Blue50
+val DarkSecondary = HotPink                // Hot pink secondary
+val DarkOnSecondary = PureBlack            // Black text on pink
+val DarkSecondaryContainer = HotPinkDark   // Darker pink
+val DarkOnSecondaryContainer = Gray100     // Light text on pink containers
 
-val DarkTertiary = Purple600
-val DarkOnTertiary = Gray900
-val DarkTertiaryContainer = Purple600
-val DarkOnTertiaryContainer = Purple50
+val DarkTertiary = RoyalPurpleLight        // Lighter purple tertiary
+val DarkOnTertiary = PureBlack             // Black text on light purple
+val DarkTertiaryContainer = RoyalPurple    // Standard purple
+val DarkOnTertiaryContainer = Gray100      // Light text
 
-val DarkError = Red600
-val DarkOnError = Gray900
-val DarkErrorContainer = Red600
-val DarkOnErrorContainer = Red50
+val DarkError = ErrorRed                   // Red for errors
+val DarkOnError = PureWhite                // White text on red
+val DarkErrorContainer = Color(0xFF5F1A1A) // Dark red container
+val DarkOnErrorContainer = Color(0xFFFFB4AB) // Light red text
 
-val DarkBackground = Gray900
-val DarkOnBackground = Gray50
-val DarkSurface = Gray800
-val DarkOnSurface = Gray50
-val DarkSurfaceVariant = Gray700
-val DarkOnSurfaceVariant = Gray300
+val DarkBackground = PureBlack             // True black background (OLED-friendly)
+val DarkOnBackground = Gray100             // Light gray text on black
+val DarkSurface = Color(0xFF121212)        // Slightly elevated black for cards
+val DarkOnSurface = Gray100                // Light gray text on surfaces
+val DarkSurfaceVariant = Gray900           // Dark gray for variants
+val DarkOnSurfaceVariant = Gray300         // Medium gray text
 
-val DarkOutline = Gray600
-val DarkOutlineVariant = Gray700
+val DarkOutline = Gray700                  // Gray borders
+val DarkOutlineVariant = Gray800           // Darker borders

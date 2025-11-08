@@ -1,5 +1,6 @@
 package com.nutshell.ui.screens.settings
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -21,23 +22,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nutshell.data.local.preferences.ThemeMode
 import com.nutshell.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     isStreamingEnabled: Boolean,
-    onSetStreamingEnabled: (Boolean) -> Unit
+    themeMode: ThemeMode,
+    onSetStreamingEnabled: (Boolean) -> Unit,
+    onSetThemeMode: (ThemeMode) -> Unit
 ) {
     var selectedLanguage by remember { mutableStateOf("English") }
     var summaryLength by remember { mutableStateOf(50f) }
-    var darkModeEnabled by remember { mutableStateOf(false) }
-    
     
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(PureWhite)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
     ) {
         // Content - Flat Minimalist Design
@@ -55,7 +57,7 @@ fun SettingsScreen(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 0.sp
                 ),
-                color = PureBlack,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             // Language Card
@@ -137,34 +139,35 @@ fun SettingsScreen(
                 }
             }
             
-            // Dark Mode Card
+            // Theme Mode Card
             SettingsCard(
                 icon = Icons.Default.Nightlight,
                 iconBackground = Purple50,
                 iconTint = Purple600,
-                title = "Dark Mode",
-                description = "Toggle dark theme"
+                title = "Theme",
+                description = "Choose your app theme preference"
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Column(
+                    ThemeModeOption(
+                        text = "System",
+                        isSelected = themeMode == ThemeMode.SYSTEM,
+                        onClick = { onSetThemeMode(ThemeMode.SYSTEM) },
                         modifier = Modifier.weight(1f)
-                    ) {
-                        // Content is handled by the card
-                    }
-                    
-                    Switch(
-                        checked = darkModeEnabled,
-                        onCheckedChange = { darkModeEnabled = it },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = PureBlack,
-                            checkedTrackColor = ElectricLime,
-                            uncheckedThumbColor = Gray400,
-                            uncheckedTrackColor = Gray300
-                        )
+                    )
+                    ThemeModeOption(
+                        text = "Light",
+                        isSelected = themeMode == ThemeMode.LIGHT,
+                        onClick = { onSetThemeMode(ThemeMode.LIGHT) },
+                        modifier = Modifier.weight(1f)
+                    )
+                    ThemeModeOption(
+                        text = "Dark",
+                        isSelected = themeMode == ThemeMode.DARK,
+                        onClick = { onSetThemeMode(ThemeMode.DARK) },
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }
@@ -202,16 +205,16 @@ fun SettingsScreen(
                 }
             }
             
-            // About Card - Flat with Electric Lime Accent
+            // About Card - Flat with Primary Accent
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .border(
                         width = 2.dp,
-                        color = ElectricLime,
+                        color = MaterialTheme.colorScheme.primary,
                         shape = RoundedCornerShape(12.dp)
                     )
-                    .background(PureWhite)
+                    .background(MaterialTheme.colorScheme.surface)
                     .padding(24.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -225,13 +228,13 @@ fun SettingsScreen(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.sp
                         ),
-                        color = PureBlack
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     
                     Text(
                         text = "Version 1.0.0",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Gray700,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Bold
                     )
                     
@@ -240,7 +243,7 @@ fun SettingsScreen(
                     Text(
                         text = "Turn long text into key insights instantly",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Gray700,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -264,10 +267,10 @@ fun SettingsCard(
             .fillMaxWidth()
             .border(
                 width = 2.dp,
-                color = Gray300,
+                color = MaterialTheme.colorScheme.outline,
                 shape = RoundedCornerShape(12.dp)
             )
-            .background(PureWhite)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(20.dp),
         verticalAlignment = Alignment.Top
     ) {
@@ -276,7 +279,7 @@ fun SettingsCard(
             modifier = Modifier
                 .size(48.dp)
                 .background(
-                    color = ElectricLime.copy(alpha = 0.2f),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
                     shape = RoundedCornerShape(8.dp)
                 ),
             contentAlignment = Alignment.Center
@@ -284,7 +287,7 @@ fun SettingsCard(
             Icon(
                 imageVector = icon,
                 contentDescription = title,
-                tint = PureBlack,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -300,18 +303,44 @@ fun SettingsCard(
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = FontWeight.Bold
                 ),
-                color = PureBlack
+                color = MaterialTheme.colorScheme.onSurface
             )
             
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = Gray700
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             
             Spacer(modifier = Modifier.height(16.dp))
             
             content()
         }
+    }
+}
+
+@Composable
+fun ThemeModeOption(
+    text: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.height(48.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+            contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+        ),
+        shape = RoundedCornerShape(12.dp),
+        border = if (!isSelected) BorderStroke(2.dp, MaterialTheme.colorScheme.outline) else null
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+            )
+        )
     }
 }

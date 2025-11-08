@@ -5,6 +5,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import com.nutshell.data.local.preferences.ThemeMode
 import com.nutshell.presentation.viewmodel.*
 
 @Composable
@@ -12,6 +13,7 @@ fun AppScaffold(
     navController: NavHostController,
     homeUiState: HomeUiState,
     isStreamingEnabled: Boolean,
+    themeMode: ThemeMode,
     outputUiState: OutputUiState,
     historyUiState: HistoryUiState,
     historySearchQuery: String,
@@ -34,6 +36,7 @@ fun AppScaffold(
             modifier = Modifier.fillMaxSize(),
             homeUiState = homeUiState,
             isStreamingEnabled = isStreamingEnabled,
+            themeMode = themeMode,
             outputUiState = outputUiState,
             historyUiState = historyUiState,
             historySearchQuery = historySearchQuery,
