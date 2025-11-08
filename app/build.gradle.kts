@@ -1,3 +1,7 @@
+import java.util.Base64
+import java.util.Properties
+import java.io.File
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -7,11 +11,11 @@ plugins {
 }
 
 android {
-    namespace = "com.summarizeai"
+    namespace = "com.nutshell"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.summarizeai"
+        applicationId = "com.nutshell"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -20,6 +24,48 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            // Try to get signing config from environment variables (for CI/CD)
+            val keystoreFile = System.getenv("KEYSTORE_FILE")
+            val keystorePassword = System.getenv("KEYSTORE_PASSWORD")
+            val keyAlias = System.getenv("KEY_ALIAS")
+            val keyPassword = System.getenv("KEY_PASSWORD")
+
+            if (keystoreFile != null && keystorePassword != null && keyAlias != null && keyPassword != null) {
+                // CI/CD path: Use environment variables
+                // Keystore is base64 encoded in GitHub Secrets, decode it to a temp file
+                val keystoreDir = File(rootProject.layout.buildDirectory.get().asFile, "keystore")
+                keystoreDir.mkdirs()
+                val tempKeystoreFile = File(keystoreDir, "release.jks")
+                tempKeystoreFile.writeBytes(Base64.getDecoder().decode(keystoreFile))
+
+                storeFile = tempKeystoreFile
+                storePassword = keystorePassword
+                this.keyAlias = keyAlias
+                this.keyPassword = keyPassword
+            } else {
+                // Local development: Try gradle.properties
+                val properties = Properties()
+                val propertiesFile = rootProject.file("gradle.properties")
+                if (propertiesFile.exists()) {
+                    properties.load(propertiesFile.inputStream())
+                }
+
+                val localKeystorePath = properties.getProperty("KEYSTORE_FILE")
+                if (localKeystorePath != null && File(localKeystorePath).exists()) {
+                    storeFile = File(localKeystorePath)
+                    storePassword = properties.getProperty("KEYSTORE_PASSWORD")
+                    this.keyAlias = properties.getProperty("KEY_ALIAS")
+                    this.keyPassword = properties.getProperty("KEY_PASSWORD")
+                } else {
+                    // Fallback to debug for local builds without keystore
+                    println("Warning: No release keystore found, falling back to debug signing")
+                }
+            }
         }
     }
 
@@ -37,7 +83,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug") // For demo purposes
+            // Use release signing config if available, fall back to debug for local development
+            signingConfig = if (signingConfigs.getByName("release").storeFile != null) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
     
