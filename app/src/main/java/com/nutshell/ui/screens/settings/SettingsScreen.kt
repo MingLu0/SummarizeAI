@@ -47,7 +47,7 @@ fun SettingsScreen(
         // Content - Flat Minimalist Design
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
@@ -235,7 +235,7 @@ fun SettingsScreen(
                     )
                     
                     Text(
-                        text = "Version 1.0.7",
+                        text = "Version 1.0.8",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Bold
