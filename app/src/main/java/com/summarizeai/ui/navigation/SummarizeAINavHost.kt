@@ -69,14 +69,17 @@ fun SummarizeAINavHost(
     ) {
         composable(Screen.Splash.route) {
             SplashScreen(
-                onNavigateToWelcome = {
-                    navController.navigate(Screen.Welcome.route) {
+                onNavigateToMain = {
+                    navController.navigate(Screen.Main.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 }
             )
         }
-        
+
+        // Welcome screen bypassed - app goes directly to Main screen from Splash
+        // Uncomment to re-enable welcome screen for first-time users
+        /*
         composable(Screen.Welcome.route) {
             WelcomeScreen(
                 onGetStarted = {
@@ -86,7 +89,8 @@ fun SummarizeAINavHost(
                 }
             )
         }
-        
+        */
+
         composable(Screen.Main.route) {
             MainScreenWithBottomNavigation(
                 navController = navController,
