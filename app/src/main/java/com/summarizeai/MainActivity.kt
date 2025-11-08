@@ -6,9 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.summarizeai.ui.navigation.AppScaffold
 import com.summarizeai.ui.navigation.Screen
 import com.summarizeai.ui.theme.SummarizeAITheme
@@ -32,6 +34,19 @@ class MainActivity : ComponentActivity() {
         
         setContent {
             SummarizeAITheme {
+                // Enable transparent status bar with dark icons
+                val systemUiController = rememberSystemUiController()
+                SideEffect {
+                    systemUiController.setStatusBarColor(
+                        color = Color.Transparent,
+                        darkIcons = true  // Dark icons for white background
+                    )
+                    systemUiController.setNavigationBarColor(
+                        color = Color.Transparent,
+                        darkIcons = true
+                    )
+                }
+                
                 val navController = rememberNavController()
                 
                 // OBSERVE ALL VIEWMODELS AT TOP LEVEL

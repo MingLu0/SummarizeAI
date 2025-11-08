@@ -95,6 +95,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
     
+    // Accompanist - System UI Controller for transparent status bar
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
+    
     // Hilt
     implementation("com.google.dagger:hilt-android:2.48")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")

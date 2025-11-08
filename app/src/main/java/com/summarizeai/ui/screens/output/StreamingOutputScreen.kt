@@ -2,6 +2,7 @@ package com.summarizeai.ui.screens.output
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -12,12 +13,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.summarizeai.presentation.viewmodel.StreamingOutputUiState
 import com.summarizeai.ui.theme.*
 import kotlinx.coroutines.launch
@@ -76,133 +75,118 @@ fun StreamingOutputScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Gray50)
+            .background(PureWhite)
+            .statusBarsPadding()
     ) {
-        // Top App Bar
-        TopAppBar(
-            title = {
-                Text(
-                    text = "Generating Summary...",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Gray900
-                )
-            },
-            navigationIcon = {
+        // Content - Flat Minimalist Design
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Custom Header with Back Button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 IconButton(
                     onClick = onNavigateBack,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(RoundedCornerShape(CornerRadius.md))
+                    modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = Gray600,
+                        tint = PureBlack,
                         modifier = Modifier.size(24.dp)
                     )
                 }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = White
-            )
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = Spacing.xl)
-                .padding(top = Spacing.xs, bottom = Spacing.xl),
-            verticalArrangement = Arrangement.spacedBy(Spacing.sm)
-        ) {
-            // Status Card
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(
-                        elevation = Elevation.sm,
-                        shape = RoundedCornerShape(CornerRadius.lg),
-                        ambientColor = ShadowColor,
-                        spotColor = ShadowColor
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "GENERATING...",
+                    style = MaterialTheme.typography.displayMedium.copy(
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.sp
                     ),
-                colors = CardDefaults.cardColors(containerColor = White),
-                shape = RoundedCornerShape(CornerRadius.lg)
-            ) {
-                if (uiState.isStreaming) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth() 
-                            .padding(Spacing.lg),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Animated typing indicator
-                        TypingIndicator()
-                        
-                        Spacer(modifier = Modifier.width(Spacing.md))
-                        
-                        Text(
-                            text = "AI is generating your summary...",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Gray700
+                    color = PureBlack
+                )
+            }
+            // Status Indicator - Flat
+            if (uiState.isStreaming) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(
+                            width = 2.dp,
+                            color = ElectricLime,
+                            shape = RoundedCornerShape(12.dp)
                         )
-                    }
-                } else if (uiState.summaryData != null) {
-//                    Row(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(Spacing.lg),
-//                        verticalAlignment = Alignment.CenterVertically,
-//                        horizontalArrangement = Arrangement.SpaceBetween
-//                    ) {
-//                        Text(
-//                            text = "Summary completed!",
-//                            style = MaterialTheme.typography.bodyMedium,
-//                            color = Gray700
-//                        )
-//
-//                        Row(
-//                            horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
-//                        ) {
-//                            TextButton(onClick = onCopyToClipboard) {
-//                                Text("Copy")
-//                            }
-//                            TextButton(onClick = onShareSummary) {
-//                                Text("Share")
-//                            }
-//                            TextButton(onClick = onToggleSaveStatus) {
-//                                Text(if (uiState.summaryData.isSaved) "Unsave" else "Save")
-//                            }
-//                        }
-//                    }
+                        .background(PureWhite)
+                        .padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Animated typing indicator
+                    TypingIndicator()
+                    
+                    Spacer(modifier = Modifier.width(16.dp))
+                    
+                    Text(
+                        text = "AI is generating your summary...",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Medium
+                        ),
+                        color = Gray800
+                    )
+                }
+            } else if (uiState.summaryData != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(
+                            width = 2.dp,
+                            color = SuccessGreen,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .background(PureWhite)
+                        .padding(20.dp)
+                ) {
+                    Text(
+                        text = "✓ Summary completed!",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = SuccessGreen
+                    )
                 }
             }
 
-            // Streaming Summary Card
-            Card(
+            // Streaming Summary Content - Flat with Border
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .shadow(
-                        elevation = Elevation.sm,
-                        shape = RoundedCornerShape(CornerRadius.lg),
-                        ambientColor = ShadowColor,
-                        spotColor = ShadowColor
-                    ),
-                colors = CardDefaults.cardColors(containerColor = White),
-                shape = RoundedCornerShape(CornerRadius.lg)
+                    .border(
+                        width = 2.dp,
+                        color = PureBlack,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .background(PureWhite)
             ) {
                 LazyColumn(
                     state = listState,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(Spacing.md),
-                    verticalArrangement = Arrangement.spacedBy(Spacing.sm)
+                        .padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     item {
                         Text(
                             text = currentSummaryText.ifEmpty { "Starting to generate summary..." },
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Gray700,
-                            lineHeight = MaterialTheme.typography.bodyLarge.lineHeight
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                lineHeight = 28.sp
+                            ),
+                            color = Gray800
                         )
                     }
                     
@@ -250,8 +234,10 @@ fun TypingIndicator() {
             Box(
                 modifier = Modifier
                     .size(8.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(Cyan600.copy(alpha = dotAlpha))
+                    .background(
+                        color = ElectricLime.copy(alpha = dotAlpha),
+                        shape = RoundedCornerShape(4.dp)
+                    )
             )
         }
     }
@@ -273,7 +259,7 @@ fun TypingCursor() {
     Text(
         text = "|",
         style = MaterialTheme.typography.bodyLarge,
-        color = Cyan600.copy(alpha = 0.5f),
+        color = ElectricLime,
         fontWeight = FontWeight.Bold
     )
 }

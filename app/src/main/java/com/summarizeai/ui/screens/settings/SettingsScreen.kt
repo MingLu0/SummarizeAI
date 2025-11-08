@@ -1,6 +1,7 @@
 package com.summarizeai.ui.screens.settings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -14,14 +15,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.summarizeai.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,29 +37,27 @@ fun SettingsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Gray50)
+            .background(PureWhite)
+            .statusBarsPadding()
     ) {
-        // Top Bar
-        TopAppBar(
-            title = {
-                Text(
-                    text = "Settings",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Gray900
-                )
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = White
-            )
-        )
-        
-        // Content Area
+        // Content - Flat Minimalist Design
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(Spacing.xl),
-            verticalArrangement = Arrangement.spacedBy(Spacing.lg)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+            // Title
+            Text(
+                text = "SETTINGS",
+                style = MaterialTheme.typography.displayLarge.copy(
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.sp
+                ),
+                color = PureBlack,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
             // Language Card
             SettingsCard(
                 icon = Icons.Default.Public,
@@ -109,9 +106,9 @@ fun SettingsScreen(
                         valueRange = 10f..100f,
                         steps = 8,
                         colors = SliderDefaults.colors(
-                            thumbColor = White,
-                            activeTrackColor = Cyan600,
-                            inactiveTrackColor = Gray200
+                            thumbColor = ElectricLime,
+                            activeTrackColor = ElectricLime,
+                            inactiveTrackColor = Gray300
                         ),
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -128,8 +125,8 @@ fun SettingsScreen(
                         Text(
                             text = "${summaryLength.toInt()}%",
                             style = MaterialTheme.typography.bodySmall,
-                            color = Cyan600,
-                            fontWeight = FontWeight.Medium
+                            color = PureBlack,
+                            fontWeight = FontWeight.Bold
                         )
                         Text(
                             text = "Detailed",
@@ -163,10 +160,10 @@ fun SettingsScreen(
                         checked = darkModeEnabled,
                         onCheckedChange = { darkModeEnabled = it },
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = White,
-                            checkedTrackColor = Cyan600,
-                            uncheckedThumbColor = White,
-                            uncheckedTrackColor = Gray200
+                            checkedThumbColor = PureBlack,
+                            checkedTrackColor = ElectricLime,
+                            uncheckedThumbColor = Gray400,
+                            uncheckedTrackColor = Gray300
                         )
                     )
                 }
@@ -195,68 +192,57 @@ fun SettingsScreen(
                         checked = isStreamingEnabled,
                         onCheckedChange = onSetStreamingEnabled,
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = White,
-                            checkedTrackColor = Cyan600,
-                            uncheckedThumbColor = White,
-                            uncheckedTrackColor = Gray200
+                            checkedThumbColor = PureBlack,
+                            checkedTrackColor = ElectricLime,
+                            uncheckedThumbColor = Gray400,
+                            uncheckedTrackColor = Gray300
                         ),
                         modifier = Modifier.testTag("streaming_toggle")
                     )
                 }
             }
             
-            // About Card
-            Card(
+            // About Card - Flat with Electric Lime Accent
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(
-                        elevation = Elevation.sm,
-                        shape = RoundedCornerShape(CornerRadius.lg),
-                        ambientColor = ShadowColor,
-                        spotColor = ShadowColor
-                    ),
-                colors = CardDefaults.cardColors(
-                    containerColor = White
-                ),
-                shape = RoundedCornerShape(CornerRadius.lg)
+                    .border(
+                        width = 2.dp,
+                        color = ElectricLime,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .background(PureWhite)
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(Cyan50, Blue50)
-                            )
-                        )
-                        .padding(Spacing.xl),
-                    contentAlignment = Alignment.Center
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(Spacing.sm)
-                    ) {
-                        Text(
-                            text = "Summarize AI",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = Gray900,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        
-                        Text(
-                            text = "Version 1.0.0",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Gray600
-                        )
-                        
-                        Spacer(modifier = Modifier.height(Spacing.sm))
-                        
-                        Text(
-                            text = "Turn long text into key insights instantly",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Gray500,
-                            textAlign = TextAlign.Center
-                        )
-                    }
+                    Text(
+                        text = "SUMMARIZE AI",
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 1.sp
+                        ),
+                        color = PureBlack
+                    )
+                    
+                    Text(
+                        text = "Version 1.0.0",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Gray700,
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    Spacer(modifier = Modifier.height(4.dp))
+                    
+                    Text(
+                        text = "Turn long text into key insights instantly",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Gray700,
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }
@@ -272,63 +258,60 @@ fun SettingsCard(
     description: String,
     content: @Composable () -> Unit
 ) {
-    Card(
+    // Flat Card with Border
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(
-                elevation = Elevation.sm,
-                shape = RoundedCornerShape(CornerRadius.lg),
-                ambientColor = ShadowColor,
-                spotColor = ShadowColor
-            ),
-        colors = CardDefaults.cardColors(containerColor = White),
-        shape = RoundedCornerShape(CornerRadius.lg)
+            .border(
+                width = 2.dp,
+                color = Gray300,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .background(PureWhite)
+            .padding(20.dp),
+        verticalAlignment = Alignment.Top
     ) {
-        Row(
+        // Icon Container
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(Spacing.xl),
-            verticalAlignment = Alignment.Top
+                .size(48.dp)
+                .background(
+                    color = ElectricLime.copy(alpha = 0.2f),
+                    shape = RoundedCornerShape(8.dp)
+                ),
+            contentAlignment = Alignment.Center
         ) {
-            // Icon Container
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(CornerRadius.md))
-                    .background(iconBackground),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = title,
-                    tint = iconTint,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                tint = PureBlack,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        
+        Spacer(modifier = Modifier.width(16.dp))
+        
+        // Content Area
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                color = PureBlack
+            )
             
-            Spacer(modifier = Modifier.width(Spacing.lg))
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = Gray700
+            )
             
-            // Content Area
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Gray900,
-                    fontWeight = FontWeight.Medium
-                )
-                
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Gray500
-                )
-                
-                Spacer(modifier = Modifier.height(Spacing.md))
-                
-                content()
-            }
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            content()
         }
     }
 }

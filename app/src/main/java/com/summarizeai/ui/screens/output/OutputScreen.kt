@@ -1,6 +1,7 @@
 package com.summarizeai.ui.screens.output
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -17,12 +18,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.summarizeai.presentation.viewmodel.OutputUiState
 import com.summarizeai.ui.theme.*
 
@@ -53,111 +52,103 @@ fun OutputScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Gray50)
+            .background(PureWhite)
+            .statusBarsPadding()
     ) {
-        // Top App Bar
-        TopAppBar(
-            title = {
-                Text(
-                    text = "Summary",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Gray900
-                )
-            },
-            navigationIcon = {
+        // Content - Flat Minimalist Design
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Custom Header with Back Button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 IconButton(
                     onClick = onNavigateBack,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(RoundedCornerShape(CornerRadius.md))
+                    modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = Gray600,
+                        tint = PureBlack,
                         modifier = Modifier.size(24.dp)
                     )
                 }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = White
-            )
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = Spacing.xl)
-                .padding(top = Spacing.xs, bottom = Spacing.xl),
-            verticalArrangement = Arrangement.spacedBy(Spacing.sm)
-        ) {
-            // Tab Selector
-            Card(
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "SUMMARY",
+                    style = MaterialTheme.typography.displayMedium.copy(
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.sp
+                    ),
+                    color = PureBlack
+                )
+            }
+            // Tab Selector - Flat Design
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(
-                        elevation = Elevation.sm,
-                        shape = RoundedCornerShape(CornerRadius.lg),
-                        ambientColor = ShadowColor,
-                        spotColor = ShadowColor
-                    ),
-                colors = CardDefaults.cardColors(containerColor = White),
-                shape = RoundedCornerShape(CornerRadius.lg)
+                    .border(
+                        width = 2.dp,
+                        color = PureBlack,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .padding(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(Spacing.xs)
-                ) {
-                    tabs.forEachIndexed { index, tab ->
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(40.dp)
-                                .clip(RoundedCornerShape(CornerRadius.md))
-                                .background(
-                                    if (uiState.selectedTabIndex == index) Gray900 else androidx.compose.ui.graphics.Color.Transparent
-                                )
-                                .padding(horizontal = Spacing.md),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = tab,
-                                style = MaterialTheme.typography.labelMedium,
-                                color = if (uiState.selectedTabIndex == index) White else Gray600,
-                                fontWeight = if (uiState.selectedTabIndex == index) FontWeight.Medium else FontWeight.Normal,
-                                modifier = Modifier.clickable { onSelectTab(index) }
+                tabs.forEachIndexed { index, tab ->
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(44.dp)
+                            .background(
+                                color = if (uiState.selectedTabIndex == index) ElectricLime else PureWhite,
+                                shape = RoundedCornerShape(8.dp)
                             )
-                        }
+                            .clickable { onSelectTab(index) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = tab.uppercase(),
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 0.5.sp
+                            ),
+                            color = PureBlack
+                        )
                     }
                 }
             }
 
-            // Summary Card
-            Card(
+            // Summary Content - Flat with Border
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .shadow(
-                        elevation = Elevation.sm,
-                        shape = RoundedCornerShape(CornerRadius.lg),
-                        ambientColor = ShadowColor,
-                        spotColor = ShadowColor
-                    ),
-                colors = CardDefaults.cardColors(containerColor = White),
-                shape = RoundedCornerShape(CornerRadius.lg)
+                    .border(
+                        width = 2.dp,
+                        color = PureBlack,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .background(PureWhite)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
-                        .padding(Spacing.md)
+                        .padding(20.dp)
                 ) {
                     Text(
                         text = currentSummaryText.ifEmpty { "No summary available" },
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Gray700,
-                        lineHeight = MaterialTheme.typography.bodyLarge.lineHeight
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            lineHeight = 28.sp
+                        ),
+                        color = Gray800
                     )
                 }
             }

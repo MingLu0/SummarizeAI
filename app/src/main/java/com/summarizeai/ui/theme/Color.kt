@@ -2,40 +2,58 @@ package com.summarizeai.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Primary Colors
-val Cyan600 = Color(0xFF0891B2)      // Primary accent
-val Blue600 = Color(0xFF2563EB)      // Secondary accent
-val Cyan700 = Color(0xFF0E7490)      // Hover states
-val Blue700 = Color(0xFF1D4ED8)      // Hover states
+// Flat Minimalist - Monochrome Base
+val PureBlack = Color(0xFF000000)    // Primary text, borders
+val PureWhite = Color(0xFFFFFFFF)    // Backgrounds, cards
+val Gray900 = Color(0xFF1A1A1A)      // Headings, emphasis
+val Gray800 = Color(0xFF2D2D2D)      // Body text
+val Gray700 = Color(0xFF4A4A4A)      // Secondary text
+val Gray600 = Color(0xFF6B7280)      // Icons (active), borders
+val Gray500 = Color(0xFF9CA3AF)      // Placeholder text
+val Gray400 = Color(0xFF9CA3AF)      // Disabled text
+val Gray300 = Color(0xFFD1D5DB)      // Borders (light)
+val Gray200 = Color(0xFFE5E7EB)      // Dividers
+val Gray100 = Color(0xFFF5F5F5)      // Subtle backgrounds
+val Gray50 = Color(0xFFFAFAFA)       // Off-white background
 
-// Neutral Colors
-val Gray50 = Color(0xFFF9FAFB)       // Background
-val Gray100 = Color(0xFFF3F4F6)      // Muted backgrounds
-val Gray200 = Color(0xFFE5E7EB)      // Borders
-val Gray300 = Color(0xFFD1D5DB)      // Disabled states
-val Gray400 = Color(0xFF9CA3AF)      // Icons (inactive)
-val Gray500 = Color(0xFF6B7280)      // Secondary text
-val Gray600 = Color(0xFF4B5563)      // Icons (active)
-val Gray700 = Color(0xFF374151)      // Body text
-val Gray800 = Color(0xFF1F2937)      // Emphasis text
-val Gray900 = Color(0xFF111827)      // Headings
-val White = Color(0xFFFFFFFF)        // Cards, inputs
+// Bold Accent Colors - Royal Purple (Bold & Creative)
+val RoyalPurple = Color(0xFF8B5CF6)       // Primary CTA - Sophisticated & innovative
+val RoyalPurpleDark = Color(0xFF7C3AED)   // CTA hover/pressed (deeper purple)
+val RoyalPurpleLight = Color(0xFFA78BFA)  // CTA disabled (lighter purple)
 
-// Accent Colors (for variety)
-val Cyan50 = Color(0xFFECFEFF)       // Light backgrounds
-val Blue50 = Color(0xFFEFF6FF)       // Light backgrounds
-val Purple50 = Color(0xFFFAF5FF)     // Settings icon bg
-val Purple600 = Color(0xFF9333EA)    // Settings icon
-val Green50 = Color(0xFFF0FDF4)      // Streaming icon bg
+// Legacy names for backward compatibility
+val ElectricLime = RoyalPurple
+val ElectricLimeDark = RoyalPurpleDark
+val ElectricLimeLight = RoyalPurpleLight
+val SoftMint = RoyalPurple
+val SoftMintDark = RoyalPurpleDark
+val SoftMintLight = RoyalPurpleLight
 
-// Semantic Colors
-val Green600 = Color(0xFF16A34A)     // Success states
-val Red50 = Color(0xFFFEF2F2)        // Error backgrounds
-val Red600 = Color(0xFFDC2626)       // Error states
+// Secondary Accent (for variety)
+val HotPink = Color(0xFFFF006E)           // Secondary actions
+val HotPinkDark = Color(0xFFE6006B)       // Secondary hover
 
-// Custom shadow colors
-val ShadowColor = Color(0x0F000000)  // Black with 6% opacity
-val AccentShadow = Color(0x4D06B6D4) // Cyan shadow for primary buttons (30% opacity)
+// Semantic Colors (Flat)
+val SuccessGreen = Color(0xFF10B981)      // Success states
+val ErrorRed = Color(0xFFEF4444)          // Error states
+val WarningOrange = Color(0xFFF59E0B)     // Warning states
+
+// Legacy color mappings (for backward compatibility during transition)
+val Cyan600 = RoyalPurple
+val Blue600 = HotPink
+val Cyan700 = ElectricLimeDark
+val Blue700 = HotPinkDark
+val White = PureWhite
+val Cyan50 = Gray50
+val Blue50 = Gray50
+val Purple50 = Gray100
+val Purple600 = HotPink
+val Green50 = Gray50
+val Green600 = SuccessGreen
+val Red50 = Gray100
+val Red600 = ErrorRed
+val ShadowColor = Color(0x00000000)       // Transparent (no shadows in flat design)
+val AccentShadow = Color(0x00000000)      // Transparent (no shadows in flat design)
 
 // Light Theme Colors
 val LightPrimary = Cyan600

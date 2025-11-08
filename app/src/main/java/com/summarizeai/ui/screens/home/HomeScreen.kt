@@ -13,16 +13,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.summarizeai.presentation.viewmodel.HomeUiState
 import com.summarizeai.utils.FilePickerUtils
 import com.summarizeai.ui.theme.*
@@ -89,56 +86,52 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Gray50)
+            .background(PureWhite)
+            .statusBarsPadding()  // Add padding for transparent status bar
     ) {
-        // Top App Bar
-        TopAppBar(
-            title = {
-                Text(
-                    text = "Summarize AI",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Gray900
-                )
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = White
-            )
-        )
-        
-        // Content
+        // Content - Flat Minimalist Design
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = Spacing.xl)
-                .padding(top = Spacing.xl),
-            verticalArrangement = Arrangement.spacedBy(Spacing.lg)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // Text Input Area
-            Card(
+            // Custom Header - Large Bold Title
+            Text(
+                text = "SUMMARIZE AI",
+                style = MaterialTheme.typography.displayLarge.copy(
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.sp
+                ),
+                color = PureBlack,
+                modifier = Modifier.padding(top = 8.dp, bottom = 12.dp)
+            )
+            // Text Input Area - Flat with Border
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .shadow(
-                        elevation = Elevation.sm,
-                        shape = RoundedCornerShape(CornerRadius.lg),
-                        ambientColor = ShadowColor,
-                        spotColor = ShadowColor
-                    ),
-                colors = CardDefaults.cardColors(containerColor = White),
-                shape = RoundedCornerShape(CornerRadius.lg)
+                    .border(
+                        width = 2.dp,
+                        color = PureBlack,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .background(PureWhite)
             ) {
                 BasicTextField(
                     value = uiState.textInput,
                     onValueChange = onUpdateTextInput,
                     textStyle = TextStyle(
-                        color = Gray900,
-                        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-                        lineHeight = MaterialTheme.typography.bodyLarge.lineHeight
+                        color = PureBlack,
+                        fontSize = 16.sp,
+                        lineHeight = 24.sp,
+                        fontWeight = FontWeight.Normal
                     ),
-                    cursorBrush = SolidColor(Cyan600),
+                    cursorBrush = SolidColor(ElectricLime),
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(Spacing.xl)
+                        .padding(20.dp)
                 ) { innerTextField ->
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -156,182 +149,248 @@ fun HomeScreen(
                 }
             }
             
-            // Upload Button
-            Card(
+            // Upload Button - Flat Outlined
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
-                colors = CardDefaults.cardColors(containerColor = White),
-                shape = RoundedCornerShape(CornerRadius.lg)
+                    .height(56.dp)
+                    .border(
+                        width = 2.dp,
+                        color = Gray300,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .background(PureWhite)
+                    .clickable { filePicker() }
+                    .padding(horizontal = 20.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .border(
-                            width = 2.dp,
-                            color = Gray300,
-                            shape = RoundedCornerShape(CornerRadius.lg)
-                        )
-                        .padding(horizontal = Spacing.lg)
-                        .clickable { filePicker() },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Upload,
-                        contentDescription = "Upload",
-                        tint = Gray700,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(Spacing.sm))
-                    Text(
-                        text = "Upload PDF or DOC",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = Gray700
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.Upload,
+                    contentDescription = "Upload",
+                    tint = Gray800,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "Upload PDF or DOC",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Gray800
+                )
             }
             
-            // Error Display
+            // Error Display - Flat
             if (uiState.error != null) {
-                Card(
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.1f)),
-                    shape = RoundedCornerShape(CornerRadius.md)
+                        .fillMaxWidth()
+                        .border(
+                            width = 2.dp,
+                            color = ErrorRed,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .background(PureWhite)
+                        .padding(16.dp)
                 ) {
                     Text(
                         text = "Error: ${uiState.error}",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Red,
-                        modifier = Modifier.padding(Spacing.md)
+                        color = ErrorRed
                     )
                 }
             }
             
-            // Web Content Extraction Error Display
+            // Web Content Extraction Error Display - Flat
             if (webContentError != null) {
-                Card(
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFF9800).copy(alpha = 0.1f)),
-                    shape = RoundedCornerShape(CornerRadius.md)
+                        .fillMaxWidth()
+                        .border(
+                            width = 2.dp,
+                            color = WarningOrange,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .background(PureWhite)
+                        .padding(16.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(Spacing.md)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Column(
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text(
-                                    text = "Failed to extract web content",
-                                    style = MaterialTheme.typography.labelLarge,
-                                    color = Color(0xFFFF9800),
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = webContentError,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = Color(0xFFFF9800)
-                                )
-                            }
-                        }
-                        
-                        Spacer(modifier = Modifier.height(Spacing.md))
-                        
+                    Column {
+                        Text(
+                            text = "Failed to extract web content",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = WarningOrange,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = webContentError,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = WarningOrange
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
                         Text(
                             text = "💡 Tip: You can copy the article text and paste it in the text area above to summarize it manually.",
                             style = MaterialTheme.typography.bodySmall,
-                            color = Gray700,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(
-                                    color = Color(0xFFFF9800).copy(alpha = 0.05f),
-                                    shape = RoundedCornerShape(CornerRadius.sm)
-                                )
-                                .padding(Spacing.sm)
+                            color = Gray700
                         )
                     }
                 }
             }
             
-            // Test API Button (for debugging)
+            // Test API Button (for debugging) - Flat
             if (uiState.error != null) {
-                Button(
-                    onClick = {
-                        // Test with a simple text to verify API connection
-                        onUpdateTextInput("Test API connection")
-                        onSummarizeText()
-                    },
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red
-                    ),
-                    shape = RoundedCornerShape(CornerRadius.md)
+                        .height(48.dp)
+                        .background(ErrorRed)
+                        .clickable {
+                            onUpdateTextInput("Test API connection")
+                            onSummarizeText()
+                        },
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Test API Connection",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = White
+                        text = "TEST API CONNECTION",
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = PureWhite
                     )
                 }
             }
             
-            // Summarize Button
-            Button(
-                onClick = {
-                    if (uiState.textInput.isNotBlank()) {
-                        onSummarizeText()
-                    }
-                },
+            // Summarize Button - Electric Lime CTA (Flat)
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
-                    .shadow(
-                        elevation = Elevation.lg,
-                        shape = RoundedCornerShape(CornerRadius.xxl),
-                        ambientColor = AccentShadow,
-                        spotColor = AccentShadow
-                    ),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Cyan600
-                ),
-                shape = RoundedCornerShape(CornerRadius.xxl),
-                enabled = uiState.isSummarizeEnabled && !uiState.isLoading
+                    .height(60.dp)
+                    .background(
+                        color = if (uiState.isSummarizeEnabled && !uiState.isLoading) ElectricLime else ElectricLimeLight,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .clickable(enabled = uiState.isSummarizeEnabled && !uiState.isLoading) {
+                        if (uiState.textInput.isNotBlank()) {
+                            onSummarizeText()
+                        }
+                    },
+                contentAlignment = Alignment.Center
             ) {
                 if (uiState.isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        color = White,
-                        strokeWidth = 2.dp
-                    )
-                    Spacer(modifier = Modifier.width(Spacing.sm))
-                    Text(
-                        text = "Summarizing...",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = White,
-                        fontWeight = FontWeight.Medium
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = PureBlack,
+                            strokeWidth = 2.dp
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = "SUMMARIZING...",
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.sp
+                            ),
+                            color = PureBlack
+                        )
+                    }
                 } else {
                     Text(
-                        text = "Summarize",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = White,
-                        fontWeight = FontWeight.Medium
+                        text = "SUMMARIZE →",
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            letterSpacing = 1.sp
+                        ),
+                        color = PureBlack
                     )
                 }
             }
             
-            Spacer(modifier = Modifier.height(Spacing.xl))
+            Spacer(modifier = Modifier.height(20.dp))
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun HomeScreenFlatMinimalistPreview() {
+    SummarizeAITheme {
+        HomeScreen(
+            uiState = HomeUiState(
+                textInput = "",
+                isLoading = false,
+                isSummarizeEnabled = true,
+                error = null,
+                shouldNavigateToOutput = false,
+                shouldNavigateToStreaming = false
+            ),
+            extractedContent = null,
+            webContentError = null,
+            onUpdateTextInput = {},
+            onSummarizeText = {},
+            onClearError = {},
+            onUploadFile = {},
+            onNavigateToStreaming = {},
+            onNavigateToOutput = {},
+            onClearNavigationFlags = {},
+            onClearExtractedContent = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun HomeScreenWithContentPreview() {
+    SummarizeAITheme {
+        HomeScreen(
+            uiState = HomeUiState(
+                textInput = "This is a sample text that demonstrates how the new flat minimalist design looks with actual content in the text input field.",
+                isLoading = false,
+                isSummarizeEnabled = true,
+                error = null,
+                shouldNavigateToOutput = false,
+                shouldNavigateToStreaming = false
+            ),
+            extractedContent = null,
+            webContentError = null,
+            onUpdateTextInput = {},
+            onSummarizeText = {},
+            onClearError = {},
+            onUploadFile = {},
+            onNavigateToStreaming = {},
+            onNavigateToOutput = {},
+            onClearNavigationFlags = {},
+            onClearExtractedContent = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun HomeScreenLoadingPreview() {
+    SummarizeAITheme {
+        HomeScreen(
+            uiState = HomeUiState(
+                textInput = "Sample text being summarized...",
+                isLoading = true,
+                isSummarizeEnabled = false,
+                error = null,
+                shouldNavigateToOutput = false,
+                shouldNavigateToStreaming = false
+            ),
+            extractedContent = null,
+            webContentError = null,
+            onUpdateTextInput = {},
+            onSummarizeText = {},
+            onClearError = {},
+            onUploadFile = {},
+            onNavigateToStreaming = {},
+            onNavigateToOutput = {},
+            onClearNavigationFlags = {},
+            onClearExtractedContent = {}
+        )
     }
 }
 

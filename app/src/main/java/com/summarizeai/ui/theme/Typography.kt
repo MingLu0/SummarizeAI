@@ -9,25 +9,25 @@ import androidx.compose.ui.unit.sp
 // Font Family
 val fontFamily = FontFamily.Default  // System font (Roboto on Android)
 
-// Text Styles
+// Flat Minimalist Text Styles - Larger, bolder for impact
 val Heading1 = TextStyle(
-    fontSize = 28.sp,
+    fontSize = 32.sp,
     fontWeight = FontWeight.Bold,
-    lineHeight = 36.sp,
-    color = Gray900
+    lineHeight = 40.sp,
+    color = PureBlack
 )
 
 val Heading2 = TextStyle(
-    fontSize = 20.sp,
-    fontWeight = FontWeight.SemiBold,
-    lineHeight = 28.sp,
-    color = Gray900
+    fontSize = 24.sp,
+    fontWeight = FontWeight.Bold,
+    lineHeight = 32.sp,
+    color = PureBlack
 )
 
 val Heading3 = TextStyle(
-    fontSize = 18.sp,
-    fontWeight = FontWeight.SemiBold,
-    lineHeight = 24.sp,
+    fontSize = 20.sp,
+    fontWeight = FontWeight.Bold,
+    lineHeight = 28.sp,
     color = Gray900
 )
 
@@ -35,99 +35,99 @@ val BodyLarge = TextStyle(
     fontSize = 16.sp,
     fontWeight = FontWeight.Normal,
     lineHeight = 24.sp,
-    color = Gray700
+    color = Gray800
 )
 
 val BodyMedium = TextStyle(
     fontSize = 14.sp,
     fontWeight = FontWeight.Normal,
     lineHeight = 20.sp,
-    color = Gray600
+    color = Gray700
 )
 
 val BodySmall = TextStyle(
     fontSize = 12.sp,
     fontWeight = FontWeight.Normal,
     lineHeight = 16.sp,
-    color = Gray500
+    color = Gray700
 )
 
 val ButtonText = TextStyle(
     fontSize = 16.sp,
-    fontWeight = FontWeight.Medium,
+    fontWeight = FontWeight.Bold,
     lineHeight = 24.sp,
-    color = White
+    color = PureBlack
 )
 
 val TabLabel = TextStyle(
     fontSize = 12.sp,
-    fontWeight = FontWeight.Medium,
+    fontWeight = FontWeight.Bold,
     lineHeight = 16.sp
 )
 
-// Material 3 Typography
+// Material 3 Typography - Flat Minimalist (Larger, Bolder)
 val SummarizeAITypography = Typography(
     displayLarge = TextStyle(
         fontFamily = fontFamily,
         fontWeight = FontWeight.Bold,
-        fontSize = 28.sp,
-        lineHeight = 36.sp,
-        color = Gray900
+        fontSize = 32.sp,
+        lineHeight = 40.sp,
+        color = PureBlack
     ),
     displayMedium = TextStyle(
         fontFamily = fontFamily,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 20.sp,
-        lineHeight = 28.sp,
-        color = Gray900
+        fontWeight = FontWeight.Bold,
+        fontSize = 24.sp,
+        lineHeight = 32.sp,
+        color = PureBlack
     ),
     displaySmall = TextStyle(
         fontFamily = fontFamily,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 18.sp,
-        lineHeight = 24.sp,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        lineHeight = 28.sp,
         color = Gray900
     ),
     headlineLarge = TextStyle(
         fontFamily = fontFamily,
         fontWeight = FontWeight.Bold,
-        fontSize = 28.sp,
-        lineHeight = 36.sp,
-        color = Gray900
+        fontSize = 32.sp,
+        lineHeight = 40.sp,
+        color = PureBlack
     ),
     headlineMedium = TextStyle(
         fontFamily = fontFamily,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Bold,
+        fontSize = 24.sp,
+        lineHeight = 32.sp,
+        color = PureBlack
+    ),
+    headlineSmall = TextStyle(
+        fontFamily = fontFamily,
+        fontWeight = FontWeight.Bold,
         fontSize = 20.sp,
         lineHeight = 28.sp,
         color = Gray900
     ),
-    headlineSmall = TextStyle(
-        fontFamily = fontFamily,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 18.sp,
-        lineHeight = 24.sp,
-        color = Gray900
-    ),
     titleLarge = TextStyle(
         fontFamily = fontFamily,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 18.sp,
-        lineHeight = 24.sp,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        lineHeight = 28.sp,
         color = Gray900
     ),
     titleMedium = TextStyle(
         fontFamily = fontFamily,
-        fontWeight = FontWeight.Medium,
-        fontSize = 16.sp,
+        fontWeight = FontWeight.Bold,
+        fontSize = 18.sp,
         lineHeight = 24.sp,
         color = Gray900
     ),
     titleSmall = TextStyle(
         fontFamily = fontFamily,
-        fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
+        fontWeight = FontWeight.Bold,
+        fontSize = 16.sp,
+        lineHeight = 22.sp,
         color = Gray900
     ),
     bodyLarge = TextStyle(
@@ -135,41 +135,41 @@ val SummarizeAITypography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
-        color = Gray700
+        color = Gray800
     ),
     bodyMedium = TextStyle(
         fontFamily = fontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 20.sp,
-        color = Gray600
+        color = Gray700
     ),
     bodySmall = TextStyle(
         fontFamily = fontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         lineHeight = 16.sp,
-        color = Gray500
+        color = Gray700
     ),
     labelLarge = TextStyle(
         fontFamily = fontFamily,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.Bold,
         fontSize = 16.sp,
         lineHeight = 24.sp,
-        color = White
+        color = PureBlack
     ),
     labelMedium = TextStyle(
         fontFamily = fontFamily,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.Bold,
         fontSize = 14.sp,
         lineHeight = 20.sp,
-        color = Gray700
+        color = Gray800
     ),
     labelSmall = TextStyle(
         fontFamily = fontFamily,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.Bold,
         fontSize = 12.sp,
         lineHeight = 16.sp,
-        color = Gray600
+        color = Gray800
     )
 )

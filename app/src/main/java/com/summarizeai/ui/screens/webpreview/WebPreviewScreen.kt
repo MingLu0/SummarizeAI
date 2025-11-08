@@ -1,6 +1,8 @@
 package com.summarizeai.ui.screens.webpreview
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,12 +14,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.summarizeai.presentation.viewmodel.WebPreviewViewModel
@@ -43,261 +43,237 @@ fun WebPreviewScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Gray50)
+            .background(PureWhite)
+            .statusBarsPadding()
     ) {
-        // Top App Bar
-        TopAppBar(
-            title = {
-                Text(
-                    text = "Web Content Preview",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Gray900
-                )
-            },
-            navigationIcon = {
+        // Content - Flat Minimalist Design
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            // Custom Header with Back Button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 IconButton(
                     onClick = onNavigateBack,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(RoundedCornerShape(CornerRadius.md))
+                    modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = Gray600,
+                        tint = PureBlack,
                         modifier = Modifier.size(24.dp)
                     )
                 }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = White
-            )
-        )
-        
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = Spacing.xl)
-                .padding(top = Spacing.xl),
-            verticalArrangement = Arrangement.spacedBy(Spacing.xl)
-        ) {
-            // URL Card
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(
-                        elevation = Elevation.sm,
-                        shape = RoundedCornerShape(CornerRadius.lg),
-                        ambientColor = ShadowColor,
-                        spotColor = ShadowColor
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "WEB PREVIEW",
+                    style = MaterialTheme.typography.displayMedium.copy(
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.sp
                     ),
-                colors = CardDefaults.cardColors(containerColor = White),
-                shape = RoundedCornerShape(CornerRadius.lg)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(Spacing.xl),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Link,
-                        contentDescription = "URL",
-                        tint = Cyan600,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(Spacing.md))
-                    Text(
-                        text = uiState.url,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Gray700,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
+                    color = PureBlack
+                )
             }
             
-            // Content Card
-            Card(
+            // URL Box - Flat
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = 2.dp,
+                        color = Gray300,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .background(PureWhite)
+                    .padding(20.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Link,
+                    contentDescription = "URL",
+                    tint = PureBlack,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = uiState.url,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Gray800,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            
+            // Content Box - Flat
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .shadow(
-                        elevation = Elevation.sm,
-                        shape = RoundedCornerShape(CornerRadius.lg),
-                        ambientColor = ShadowColor,
-                        spotColor = ShadowColor
-                    ),
-                colors = CardDefaults.cardColors(containerColor = White),
-                shape = RoundedCornerShape(CornerRadius.lg)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(Spacing.xl)
-                ) {
-                    Text(
-                        text = "Content Preview",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Gray900,
-                        fontWeight = FontWeight.Medium
+                    .border(
+                        width = 2.dp,
+                        color = PureBlack,
+                        shape = RoundedCornerShape(12.dp)
                     )
-                    Spacer(modifier = Modifier.height(Spacing.md))
-                    
-                    when {
-                        uiState.isLoading -> {
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(Spacing.md)
-                                ) {
-                                    CircularProgressIndicator(
-                                        color = Cyan600,
-                                        strokeWidth = 3.dp
-                                    )
-                                    Text(
-                                        text = "Extracting content...",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = Gray600
-                                    )
-                                }
-                            }
-                        }
-                        
-                        uiState.error != null -> {
-                            val errorMessage = uiState.error
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(Spacing.md)
-                                ) {
-                                    Text(
-                                        text = "⚠️",
-                                        style = MaterialTheme.typography.headlineLarge
-                                    )
-                                    Text(
-                                        text = errorMessage ?: "Unknown error",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = Gray700
-                                    )
-                                    Button(
-                                        onClick = { viewModel.extractContent() },
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = Cyan600
-                                        ),
-                                        shape = RoundedCornerShape(CornerRadius.lg)
-                                    ) {
-                                        Text("Retry")
-                                    }
-                                }
-                            }
-                        }
-                        
-                        uiState.content != null -> {
-                            val content = uiState.content
+                    .background(PureWhite)
+                    .padding(20.dp)
+            ) {
+                Text(
+                    text = "CONTENT PREVIEW",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = PureBlack
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                when {
+                    uiState.isLoading -> {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
                             Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .verticalScroll(rememberScrollState())
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
-                                Text(
-                                    text = content?.title ?: "Untitled",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = Gray900,
-                                    fontWeight = FontWeight.Bold
+                                CircularProgressIndicator(
+                                    color = ElectricLime,
+                                    strokeWidth = 3.dp
                                 )
-                                Spacer(modifier = Modifier.height(Spacing.md))
                                 Text(
-                                    text = content?.content ?: "",
+                                    text = "Extracting content...",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = Gray700,
-                                    lineHeight = MaterialTheme.typography.bodyMedium.lineHeight
+                                    color = Gray700
                                 )
                             }
+                        }
+                    }
+                    
+                    uiState.error != null -> {
+                        val errorMessage = uiState.error
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                Text(
+                                    text = "⚠️",
+                                    style = MaterialTheme.typography.headlineLarge
+                                )
+                                Text(
+                                    text = errorMessage ?: "Unknown error",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Gray700
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .background(
+                                            color = ElectricLime,
+                                            shape = RoundedCornerShape(12.dp)
+                                        )
+                                        .clickable { viewModel.extractContent() }
+                                        .padding(horizontal = 24.dp, vertical = 12.dp)
+                                ) {
+                                    Text(
+                                        text = "RETRY",
+                                        style = MaterialTheme.typography.labelMedium.copy(
+                                            fontWeight = FontWeight.Bold
+                                        ),
+                                        color = PureBlack
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    
+                    uiState.content != null -> {
+                        val content = uiState.content
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            Text(
+                                text = content?.title ?: "Untitled",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = PureBlack
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = content?.content ?: "",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Gray800,
+                                lineHeight = 22.sp
+                            )
                         }
                     }
                 }
             }
             
-            // Action Buttons
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(
-                        elevation = Elevation.sm,
-                        shape = RoundedCornerShape(
-                            topStart = CornerRadius.lg,
-                            topEnd = CornerRadius.lg
-                        ),
-                        ambientColor = ShadowColor,
-                        spotColor = ShadowColor
-                    ),
-                colors = CardDefaults.cardColors(containerColor = White),
-                shape = RoundedCornerShape(
-                    topStart = CornerRadius.lg,
-                    topEnd = CornerRadius.lg
-                )
+            // Action Buttons - Flat
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Row(
+                // Cancel Button
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(Spacing.xl),
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.md)
+                        .weight(1f)
+                        .height(56.dp)
+                        .border(
+                            width = 2.dp,
+                            color = Gray300,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .background(PureWhite)
+                        .clickable(onClick = onNavigateBack),
+                    contentAlignment = Alignment.Center
                 ) {
-                    // Cancel Button
-                    OutlinedButton(
-                        onClick = onNavigateBack,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Gray900
+                    Text(
+                        text = "CANCEL",
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.Bold
                         ),
-                        border = ButtonDefaults.outlinedButtonBorder.copy(
-                            brush = Brush.linearGradient(listOf(Gray200, Gray200))
-                        ),
-                        shape = RoundedCornerShape(CornerRadius.lg)
-                    ) {
-                        Text("Cancel")
-                    }
-                    
-                    // Summarize Button
-                    Button(
-                        onClick = {
+                        color = PureBlack
+                    )
+                }
+                
+                // Summarize Button
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp)
+                        .background(
+                            color = if (uiState.content != null && !uiState.isLoading) ElectricLime else ElectricLimeLight,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .clickable(enabled = uiState.content != null && !uiState.isLoading) {
                             uiState.content?.let { content ->
                                 onProceedToSummarize(content.title, content.content)
                             }
                         },
-                        enabled = uiState.content != null && !uiState.isLoading,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp)
-                            .shadow(
-                                elevation = Elevation.lg,
-                                shape = RoundedCornerShape(CornerRadius.lg),
-                                ambientColor = AccentShadow,
-                                spotColor = AccentShadow
-                            ),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Cyan600
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "SUMMARIZE →",
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 1.sp
                         ),
-                        shape = RoundedCornerShape(CornerRadius.lg)
-                    ) {
-                        Text(
-                            text = "Summarize",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = White,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
+                        color = PureBlack
+                    )
                 }
             }
         }
     }
 }
-

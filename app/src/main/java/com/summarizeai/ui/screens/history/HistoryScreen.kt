@@ -1,12 +1,14 @@
 package com.summarizeai.ui.screens.history
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.History
@@ -16,13 +18,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.summarizeai.data.model.SummaryData
 import com.summarizeai.presentation.viewmodel.HistoryUiState
 import com.summarizeai.ui.theme.*
@@ -41,90 +43,93 @@ fun HistoryScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Gray50)
+            .background(PureWhite)
+            .statusBarsPadding()
     ) {
-        // Top Bar
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .shadow(
-                    elevation = Elevation.sm,
-                    shape = RoundedCornerShape(
-                        bottomStart = CornerRadius.lg,
-                        bottomEnd = CornerRadius.lg
-                    ),
-                    ambientColor = ShadowColor,
-                    spotColor = ShadowColor
-                ),
-            colors = CardDefaults.cardColors(containerColor = White),
-            shape = RoundedCornerShape(
-                bottomStart = CornerRadius.lg,
-                bottomEnd = CornerRadius.lg
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(horizontal = Spacing.xl, vertical = Spacing.lg)
-            ) {
-                // Title
-                Text(
-                    text = "History",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Gray900,
-                    fontWeight = FontWeight.SemiBold
-                )
-                
-                Spacer(modifier = Modifier.height(Spacing.lg))
-                
-                // Search Input
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = onUpdateSearchQuery,
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = {
-                        Text(
-                            text = "Search history...",
-                            color = Gray400
-                        )
-                    },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search",
-                            tint = Gray400,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Cyan600,
-                        unfocusedBorderColor = Gray200,
-                        focusedContainerColor = Gray50,
-                        unfocusedContainerColor = Gray50
-                    ),
-                    shape = RoundedCornerShape(CornerRadius.md),
-                    singleLine = true
-                )
-            }
-        }
-        
-        // Content Area
-        Box(
+        // Content - Flat Minimalist Design
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Gray50)
-                .padding(Spacing.xl)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+            // Title
+            Text(
+                text = "HISTORY",
+                style = MaterialTheme.typography.displayLarge.copy(
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.sp
+                ),
+                color = PureBlack
+            )
+            
+            // Search Input - Flat with Border
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .border(
+                        width = 2.dp,
+                        color = Gray300,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .background(PureWhite)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                        tint = Gray400,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    BasicTextField(
+                        value = searchQuery,
+                        onValueChange = onUpdateSearchQuery,
+                        textStyle = TextStyle(
+                            color = PureBlack,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal
+                        ),
+                        cursorBrush = SolidColor(ElectricLime),
+                        modifier = Modifier.weight(1f),
+                        singleLine = true
+                    ) { innerTextField ->
+                        if (searchQuery.isEmpty()) {
+                            Text(
+                                text = "Search history...",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Gray400
+                            )
+                        }
+                        innerTextField()
+                    }
+                }
+            }
+        
+            // Content Area
             if (uiState.filteredSummaries.isEmpty()) {
                 // Empty State
                 Column(
-                    modifier = Modifier.align(Alignment.Center),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(Spacing.lg)
+                    verticalArrangement = Arrangement.Center
                 ) {
                     Box(
                         modifier = Modifier
                             .size(96.dp)
-                            .clip(CircleShape)
-                            .background(Gray100),
+                            .background(
+                                color = Gray100,
+                                shape = CircleShape
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -135,24 +140,29 @@ fun HistoryScreen(
                         )
                     }
                     
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
                     Text(
                         text = "No History Yet",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = Gray900,
-                        fontWeight = FontWeight.SemiBold
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = PureBlack,
+                        fontWeight = FontWeight.Bold
                     )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
                     
                     Text(
                         text = "Your summarized texts will appear here",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Gray500,
+                        color = Gray700,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                 }
             } else {
                 // History Items List
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(Spacing.md)
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(
                         items = uiState.filteredSummaries,
@@ -174,82 +184,75 @@ fun HistoryItemCard(
     item: SummaryData,
     onDelete: (SummaryData) -> Unit
 ) {
-    Card(
+    // Flat Item Card with Border
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(
-                elevation = Elevation.sm,
-                shape = RoundedCornerShape(CornerRadius.lg),
-                ambientColor = ShadowColor,
-                spotColor = ShadowColor
-            ),
-        colors = CardDefaults.cardColors(containerColor = White),
-        shape = RoundedCornerShape(CornerRadius.lg)
+            .border(
+                width = 2.dp,
+                color = Gray300,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .background(PureWhite)
+            .padding(16.dp),
+        verticalAlignment = Alignment.Top
     ) {
-        Row(
+        // Icon Container
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(Spacing.lg),
-            verticalAlignment = Alignment.Top
+                .size(44.dp)
+                .background(
+                    color = ElectricLime.copy(alpha = 0.2f),
+                    shape = RoundedCornerShape(8.dp)
+                ),
+            contentAlignment = Alignment.Center
         ) {
-            // Icon Container
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(RoundedCornerShape(CornerRadius.md))
-                    .background(Cyan50),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Description,
-                    contentDescription = "History Item",
-                    tint = Cyan600,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
+            Icon(
+                imageVector = Icons.Default.Description,
+                contentDescription = "History Item",
+                tint = PureBlack,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        
+        Spacer(modifier = Modifier.width(16.dp))
+        
+        // Content Area
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = item.mediumSummary,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Gray800,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                lineHeight = 22.sp
+            )
             
-            Spacer(modifier = Modifier.width(Spacing.md))
+            Spacer(modifier = Modifier.height(8.dp))
             
-            // Content Area
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = Spacing.xs)
-            ) {
-                Text(
-                    text = item.mediumSummary,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Gray800,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    lineHeight = MaterialTheme.typography.bodyMedium.lineHeight
-                )
-                
-                Spacer(modifier = Modifier.height(Spacing.sm))
-                
-                Text(
-                    text = formatDate(item.createdAt),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Gray500
-                )
-            }
-            
-            Spacer(modifier = Modifier.width(Spacing.sm))
-            
-            // Delete Button
-            IconButton(
-                onClick = { onDelete(item) },
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(RoundedCornerShape(CornerRadius.sm))
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = Gray400,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
+            Text(
+                text = formatDate(item.createdAt),
+                style = MaterialTheme.typography.bodySmall,
+                color = Gray700,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        
+        Spacer(modifier = Modifier.width(8.dp))
+        
+        // Delete Button
+        IconButton(
+            onClick = { onDelete(item) },
+            modifier = Modifier.size(32.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Delete",
+                tint = ErrorRed,
+                modifier = Modifier.size(20.dp)
+            )
         }
     }
 }
