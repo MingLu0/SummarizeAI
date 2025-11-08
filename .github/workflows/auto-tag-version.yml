@@ -1,0 +1,77 @@
+name: Auto Tag Version
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'app/build.gradle.kts'
+
+jobs:
+  check-and-tag:
+    name: Check Version and Create Tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for accurate tagging
+      
+      - name: Extract current version
+        id: current-version
+        run: |
+          VERSION_NAME=$(grep "versionName = " app/build.gradle.kts | sed 's/.*versionName = "//' | sed 's/".*//')
+          VERSION_CODE=$(grep "versionCode = " app/build.gradle.kts | sed 's/.*versionCode = //' | sed 's/[^0-9]//g')
+          echo "version-name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "version-code=$VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "Current version: $VERSION_NAME (code: $VERSION_CODE)"
+      
+      - name: Check if tag exists
+        id: check-tag
+        run: |
+          TAG_NAME="v${{ steps.current-version.outputs.version-name }}"
+          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Tag $TAG_NAME already exists"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Tag $TAG_NAME does not exist"
+          fi
+          echo "tag-name=$TAG_NAME" >> $GITHUB_OUTPUT
+      
+      - name: Get latest commit message
+        id: commit-message
+        if: steps.check-tag.outputs.exists == 'false'
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "message<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMIT_MSG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: Create and push tag
+        if: steps.check-tag.outputs.exists == 'false'
+        env:
+          TAG_NAME: ${{ steps.check-tag.outputs.tag-name }}
+          VERSION_NAME: ${{ steps.current-version.outputs.version-name }}
+          VERSION_CODE: ${{ steps.current-version.outputs.version-code }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Create annotated tag with version info
+          git tag -a "$TAG_NAME" -m "Release $VERSION_NAME (Build $VERSION_CODE)" -m "" -m "Auto-generated tag for version $VERSION_NAME"
+          
+          # Push the tag
+          git push origin "$TAG_NAME"
+          
+          echo "✅ Created and pushed tag: $TAG_NAME"
+      
+      - name: Tag already exists
+        if: steps.check-tag.outputs.exists == 'true'
+        run: |
+          echo "ℹ️ Tag ${{ steps.check-tag.outputs.tag-name }} already exists. Skipping tag creation."
+          echo "To create a new release, update the versionName in app/build.gradle.kts to a new version."
+

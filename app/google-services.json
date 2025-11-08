@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "24213371767",
+    "project_id": "nutshell-f7ca3",
+    "storage_bucket": "nutshell-f7ca3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:24213371767:android:947cc16334f6b7bee3bf72",
+        "android_client_info": {
+          "package_name": "com.nutshell"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqSRYbjuSR-IZ6v9FO279eR1tme8HL2vc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:24213371767:android:947cc16334f6b7bee3bf72",
+        "android_client_info": {
+          "package_name": "com.nutshell.debug"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqSRYbjuSR-IZ6v9FO279eR1tme8HL2vc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

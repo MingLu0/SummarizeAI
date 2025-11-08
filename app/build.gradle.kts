@@ -211,3 +211,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
+
+// Apply Google Services plugin only if google-services.json exists
+// This prevents build failures for debug builds that don't need Firebase
+apply(plugin = "com.google.gms.google-services")
