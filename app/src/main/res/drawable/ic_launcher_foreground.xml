@@ -4,16 +4,67 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    
+    <!-- Brain Icon - Left Hemisphere -->
     <path
-        android:fillColor="#0891B2"
-        android:pathData="M54,54m-50,0a50,50 0,1 1,100 0a50,50 0,1 1,-100 0" />
+        android:fillColor="#00000000"
+        android:strokeColor="#9333EA"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M54,30 C54,30 48,28 42,30 C36,32 32,36 30,42 C28,48 28,54 30,60 C32,66 36,70 38,72 C40,74 44,76 48,77 C50,77.5 52,78 54,78" />
+    
+    <!-- Left Hemisphere - Inner Curve 1 -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M30,40h48v8h-48z" />
+        android:fillColor="#00000000"
+        android:strokeColor="#9333EA"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M38,40 C36,44 35,48 35,52 C35,56 36,60 38,64" />
+    
+    <!-- Left Hemisphere - Inner Curve 2 -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M30,52h48v8h-48z" />
+        android:fillColor="#00000000"
+        android:strokeColor="#9333EA"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M44,36 C42,42 41,48 41,54 C41,58 42,62 44,66" />
+    
+    <!-- Brain Icon - Right Hemisphere -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M30,64h32v8h-32z" />
+        android:fillColor="#00000000"
+        android:strokeColor="#9333EA"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M54,30 C54,30 60,28 66,30 C72,32 76,36 78,42 C80,48 80,54 78,60 C76,66 72,70 70,72 C68,74 64,76 60,77 C58,77.5 56,78 54,78" />
+    
+    <!-- Right Hemisphere - Inner Curve 1 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#9333EA"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M70,40 C72,44 73,48 73,52 C73,56 72,60 70,64" />
+    
+    <!-- Right Hemisphere - Inner Curve 2 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#9333EA"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M64,36 C66,42 67,48 67,54 C67,58 66,62 64,66" />
+    
+    <!-- Center Division Line -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#9333EA"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M54,30 L54,78" />
 </vector>
