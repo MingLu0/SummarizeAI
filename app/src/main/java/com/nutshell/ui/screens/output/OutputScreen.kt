@@ -3,6 +3,7 @@ package com.nutshell.ui.screens.output
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -74,7 +75,7 @@ fun OutputScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = PureBlack,
+                        tint = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -86,7 +87,7 @@ fun OutputScreen(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.sp
                     ),
-                    color = PureBlack
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
             // Tab Selector - Flat Design
@@ -95,19 +96,20 @@ fun OutputScreen(
                     .fillMaxWidth()
                     .border(
                         width = 2.dp,
-                        color = PureBlack,
+                        color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
                         shape = RoundedCornerShape(12.dp)
                     )
                     .padding(6.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 tabs.forEachIndexed { index, tab ->
+                    val isSelected = uiState.selectedTabIndex == index
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .height(44.dp)
                             .background(
-                                color = if (uiState.selectedTabIndex == index) ElectricLime else PureWhite,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
                                 shape = RoundedCornerShape(8.dp)
                             )
                             .clickable { onSelectTab(index) },
@@ -119,7 +121,7 @@ fun OutputScreen(
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 0.5.sp
                             ),
-                            color = PureBlack
+                            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
@@ -132,10 +134,10 @@ fun OutputScreen(
                     .weight(1f)
                     .border(
                         width = 2.dp,
-                        color = PureBlack,
+                        color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
                         shape = RoundedCornerShape(12.dp)
                     )
-                    .background(PureWhite)
+                    .background(MaterialTheme.colorScheme.surface)
             ) {
                 Column(
                     modifier = Modifier
@@ -148,7 +150,7 @@ fun OutputScreen(
                         style = MaterialTheme.typography.bodyLarge.copy(
                             lineHeight = 28.sp
                         ),
-                        color = Gray800
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }

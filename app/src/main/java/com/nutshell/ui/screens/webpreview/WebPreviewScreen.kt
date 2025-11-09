@@ -3,6 +3,7 @@ package com.nutshell.ui.screens.webpreview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -87,7 +88,7 @@ fun WebPreviewScreen(
                     .fillMaxWidth()
                     .border(
                         width = 2.dp,
-                        color = Gray300,
+                        color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
                         shape = RoundedCornerShape(12.dp)
                     )
                     .background(PureWhite)
@@ -116,7 +117,7 @@ fun WebPreviewScreen(
                     .weight(1f)
                     .border(
                         width = 2.dp,
-                        color = PureBlack,
+                        color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
                         shape = RoundedCornerShape(12.dp)
                     )
                     .background(PureWhite)
@@ -232,7 +233,7 @@ fun WebPreviewScreen(
                         .height(56.dp)
                         .border(
                             width = 2.dp,
-                            color = Gray300,
+                            color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
                             shape = RoundedCornerShape(12.dp)
                         )
                         .background(PureWhite)

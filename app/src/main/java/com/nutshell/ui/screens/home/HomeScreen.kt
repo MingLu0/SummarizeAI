@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -114,7 +115,7 @@ fun HomeScreen(
                     .weight(1f)
                     .border(
                         width = 2.dp,
-                        color = MaterialTheme.colorScheme.outline,
+                        color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
                         shape = RoundedCornerShape(12.dp)
                     )
                     .background(MaterialTheme.colorScheme.surface)
@@ -156,7 +157,7 @@ fun HomeScreen(
                     .height(56.dp)
                     .border(
                         width = 2.dp,
-                        color = MaterialTheme.colorScheme.outline,
+                        color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
                         shape = RoundedCornerShape(12.dp)
                     )
                     .background(MaterialTheme.colorScheme.surface)

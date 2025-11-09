@@ -3,6 +3,7 @@ package com.nutshell.ui.screens.settings
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -270,7 +271,7 @@ fun SettingsCard(
             .fillMaxWidth()
             .border(
                 width = 2.dp,
-                color = MaterialTheme.colorScheme.outline,
+                color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
                 shape = RoundedCornerShape(12.dp)
             )
             .background(MaterialTheme.colorScheme.surface)

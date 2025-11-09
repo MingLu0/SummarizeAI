@@ -1,6 +1,14 @@
 package com.nutshell.ui.navigation
 
 import android.net.Uri
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
@@ -13,9 +21,11 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -44,6 +54,30 @@ import com.nutshell.ui.theme.Gray600
 import com.nutshell.ui.theme.NutshellTheme
 import com.nutshell.ui.theme.White
 
+// Animation specs for screen transitions
+private val fadeInTransition = fadeIn(animationSpec = tween(300))
+private val fadeOutTransition = fadeOut(animationSpec = tween(300))
+private val slideInTransition = slideInHorizontally(
+    initialOffsetX = { it },
+    animationSpec = tween(300)
+)
+private val slideOutTransition = slideOutHorizontally(
+    targetOffsetX = { -it },
+    animationSpec = tween(300)
+)
+private val popEnterTransition = slideInHorizontally(
+    initialOffsetX = { -it },
+    animationSpec = tween(300)
+) + fadeIn(animationSpec = tween(300))
+private val popExitTransition = slideOutHorizontally(
+    targetOffsetX = { it },
+    animationSpec = tween(300)
+) + fadeOut(animationSpec = tween(300))
+
+// Fast animations for bottom nav tab switches
+private val fastFadeIn = fadeIn(animationSpec = tween(150))
+private val fastFadeOut = fadeOut(animationSpec = tween(150))
+
 @Composable
 fun NutshellNavHost(
     navController: NavHostController,
@@ -70,7 +104,11 @@ fun NutshellNavHost(
         startDestination = Screen.Splash.route,
         modifier = modifier
     ) {
-        composable(Screen.Splash.route) {
+        composable(
+            route = Screen.Splash.route,
+            enterTransition = { fadeInTransition },
+            exitTransition = { fadeOutTransition }
+        ) {
             SplashScreen(
                 onNavigateToMain = {
                     navController.navigate(Screen.Main.route) {
@@ -94,7 +132,11 @@ fun NutshellNavHost(
         }
         */
 
-        composable(Screen.Main.route) {
+        composable(
+            route = Screen.Main.route,
+            enterTransition = { fadeInTransition + slideInTransition },
+            exitTransition = { fadeOutTransition + slideOutTransition }
+        ) {
             MainScreenWithBottomNavigation(
                 navController = navController,
                 homeUiState = homeUiState,
@@ -166,9 +208,15 @@ fun MainScreenWithBottomNavigation(
     
     Scaffold(
         bottomBar = {
+            val isDarkTheme = isSystemInDarkTheme()
             NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.onSurface
+                containerColor = if (isDarkTheme) {
+                    MaterialTheme.colorScheme.surface
+                } else {
+                    MaterialTheme.colorScheme.surfaceColorAtElevation(0.dp).copy(alpha = 0.95f)
+                },
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                tonalElevation = 0.dp
             ) {
                 val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
@@ -232,10 +280,14 @@ fun MainScreenWithBottomNavigation(
             startDestination = Screen.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screen.Home.route) {
+            composable(
+                route = Screen.Home.route,
+                enterTransition = { fastFadeIn },
+                exitTransition = { fastFadeOut }
+            ) {
                 // Collect webContentUiState to get error state
                 val webContentUiState by webContentViewModel.uiState.collectAsStateWithLifecycle()
-                
+
                 HomeScreen(
                     uiState = homeUiState,
                     extractedContent = extractedContent,
@@ -255,7 +307,11 @@ fun MainScreenWithBottomNavigation(
                 )
             }
             
-            composable(Screen.History.route) {
+            composable(
+                route = Screen.History.route,
+                enterTransition = { fastFadeIn },
+                exitTransition = { fastFadeOut }
+            ) {
                 HistoryScreen(
                     uiState = historyUiState,
                     searchQuery = historySearchQuery,
@@ -263,8 +319,12 @@ fun MainScreenWithBottomNavigation(
                     onDeleteSummary = historyViewModel::deleteSummary
                 )
             }
-            
-            composable(Screen.Saved.route) {
+
+            composable(
+                route = Screen.Saved.route,
+                enterTransition = { fastFadeIn },
+                exitTransition = { fastFadeOut }
+            ) {
                 SavedScreen(
                     uiState = savedUiState,
                     searchQuery = savedSearchQuery,
@@ -272,8 +332,12 @@ fun MainScreenWithBottomNavigation(
                     onUnsaveSummary = savedViewModel::unsaveSummary
                 )
             }
-            
-            composable(Screen.Settings.route) {
+
+            composable(
+                route = Screen.Settings.route,
+                enterTransition = { fastFadeIn },
+                exitTransition = { fastFadeOut }
+            ) {
                 SettingsScreen(
                     isStreamingEnabled = isStreamingEnabled,
                     themeMode = themeMode,
@@ -282,7 +346,13 @@ fun MainScreenWithBottomNavigation(
                 )
             }
             
-            composable(Screen.Loading.route) {
+            composable(
+                route = Screen.Loading.route,
+                enterTransition = { fadeInTransition + slideInTransition },
+                exitTransition = { fadeOutTransition + slideOutTransition },
+                popEnterTransition = { popEnterTransition },
+                popExitTransition = { popExitTransition }
+            ) {
                 LoadingScreen(
                     onNavigateToOutput = {
                         bottomNavController.navigate(Screen.Output.route)
@@ -292,8 +362,14 @@ fun MainScreenWithBottomNavigation(
                     }
                 )
             }
-            
-            composable(Screen.Output.route) {
+
+            composable(
+                route = Screen.Output.route,
+                enterTransition = { fadeInTransition + slideInTransition },
+                exitTransition = { fadeOutTransition + slideOutTransition },
+                popEnterTransition = { popEnterTransition },
+                popExitTransition = { popExitTransition }
+            ) {
                 OutputScreen(
                     uiState = outputUiState,
                     onNavigateBack = {
@@ -327,7 +403,11 @@ fun MainScreenWithBottomNavigation(
                 route = Screen.StreamingOutput.route,
                 arguments = listOf(
                     navArgument("inputText") { type = NavType.StringType }
-                )
+                ),
+                enterTransition = { fadeInTransition + slideInTransition },
+                exitTransition = { fadeOutTransition + slideOutTransition },
+                popEnterTransition = { popEnterTransition },
+                popExitTransition = { popExitTransition }
             ) { backStackEntry ->
                 val inputText = backStackEntry.arguments?.getString("inputText")?.let { 
                     Uri.decode(it) 

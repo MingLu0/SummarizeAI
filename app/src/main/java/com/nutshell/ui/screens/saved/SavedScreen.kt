@@ -3,6 +3,7 @@ package com.nutshell.ui.screens.saved
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -70,7 +71,7 @@ fun SavedScreen(
                     .height(56.dp)
                     .border(
                         width = 2.dp,
-                        color = Gray300,
+                        color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
                         shape = RoundedCornerShape(12.dp)
                     )
                     .background(MaterialTheme.colorScheme.surface)
@@ -84,7 +85,7 @@ fun SavedScreen(
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search",
-                        tint = Gray400,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
@@ -96,7 +97,7 @@ fun SavedScreen(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Normal
                         ),
-                        cursorBrush = SolidColor(ElectricLime),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                         modifier = Modifier.weight(1f),
                         singleLine = true
                     ) { innerTextField ->
@@ -104,7 +105,7 @@ fun SavedScreen(
                             Text(
                                 text = "Search saved items...",
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = Gray400
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         innerTextField()
@@ -153,7 +154,7 @@ fun SavedScreen(
                     Text(
                         text = "Bookmark summaries to save them here",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Gray700,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                 }
@@ -189,7 +190,7 @@ fun SavedItemCard(
             .fillMaxWidth()
             .border(
                 width = 2.dp,
-                color = ElectricLime,
+                color = MaterialTheme.colorScheme.primary,
                 shape = RoundedCornerShape(12.dp)
             )
             .background(MaterialTheme.colorScheme.surface)
@@ -201,7 +202,7 @@ fun SavedItemCard(
             modifier = Modifier
                 .size(44.dp)
                 .background(
-                    color = ElectricLime.copy(alpha = 0.3f),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
                     shape = RoundedCornerShape(8.dp)
                 ),
             contentAlignment = Alignment.Center
@@ -209,13 +210,13 @@ fun SavedItemCard(
             Icon(
                 imageVector = Icons.Default.Bookmark,
                 contentDescription = "Saved Item",
-                tint = PureBlack,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(20.dp)
             )
         }
-        
+
         Spacer(modifier = Modifier.width(16.dp))
-        
+
         // Content Area
         Column(
             modifier = Modifier.weight(1f)
@@ -223,24 +224,24 @@ fun SavedItemCard(
             Text(
                 text = item.mediumSummary,
                 style = MaterialTheme.typography.bodyMedium,
-                color = Gray800,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 lineHeight = 22.sp
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Text(
                 text = formatDate(item.createdAt),
                 style = MaterialTheme.typography.bodySmall,
-                color = Gray700,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Bold
             )
         }
-        
+
         Spacer(modifier = Modifier.width(8.dp))
-        
+
         // Unsave Button
         IconButton(
             onClick = { onUnsave(item) },

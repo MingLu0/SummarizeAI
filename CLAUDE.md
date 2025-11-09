@@ -30,22 +30,22 @@ This is a modern Android application that uses AI to summarize text content. It 
 
 ### Core Principle: Centralized State Management
 
-**CRITICAL**: All 8 ViewModels are instantiated and observed at the MainActivity level. Screen composables are pure functions that receive state and callbacks as parameters. This is not standard Compose architecture - do not inject ViewModels into screen composables.
+**CRITICAL**: All 7 ViewModels are instantiated and observed at the MainActivity level. Screen composables are pure functions that receive state and callbacks as parameters. This is not standard Compose architecture - do not inject ViewModels into screen composables.
 
 ### Architecture Flow
 
 ```
 MainActivity (Entry Point)
-├── Instantiate ALL 8 ViewModels with hiltViewModel()
+├── Instantiate ALL 7 ViewModels with hiltViewModel()
 ├── Collect ALL StateFlows with collectAsStateWithLifecycle()
 ├── Handle ALL navigation logic in LaunchedEffect blocks
 └── AppScaffold
-    └── SummarizeAINavHost
+    └── NutshellNavHost
         └── MainScreenWithBottomNavigation (Inner Scaffold)
             └── Screen Composables (pure functions, no ViewModels)
 ```
 
-### The 8 ViewModels
+### The 7 ViewModels
 
 All instantiated in MainActivity, never in screen composables:
 
@@ -56,7 +56,6 @@ All instantiated in MainActivity, never in screen composables:
 5. **SavedViewModel** - Bookmarked summaries
 6. **SettingsViewModel** - App preferences (streaming toggle, etc.)
 7. **WebContentViewModel** - Web content extraction from shared URLs
-8. **WebPreviewViewModel** - Web content preview functionality
 
 ### Data Flow Pattern
 
@@ -79,19 +78,22 @@ StreamingOutputScreen (letter-by-letter typing effect, 30ms delay)
 **Web Content Extraction:**
 ```
 Share Intent → WebContentViewModel → WebContentRepository → WebContentExtractor
-                                                            (Jsoup + Readability4j)
+                                                            (Three-tier fallback:
+                                                             1. Jina AI (fast, handles JS)
+                                                             2. Readability4j (Mozilla algorithm)
+                                                             3. Jsoup (basic extraction))
 HomeScreen (extractedContent pre-filled) → Summarize
 ```
 
 ### Layer Structure
 
 ```
-app/src/main/java/com/summarizeai/
+app/src/main/java/com/nutshell/
 ├── MainActivity.kt                    # SINGLE SOURCE OF TRUTH - all ViewModels here
 ├── ui/
 │   ├── navigation/
 │   │   ├── AppScaffold.kt            # Outer Material3 scaffold
-│   │   ├── SummarizeAINavHost.kt     # Top-level navigation
+│   │   ├── NutshellNavHost.kt        # Top-level navigation
 │   │   └── Screen.kt                 # Route definitions
 │   └── screens/                      # PURE COMPOSABLES - no hiltViewModel() calls
 │       ├── home/HomeScreen.kt
@@ -100,12 +102,12 @@ app/src/main/java/com/summarizeai/
 │       ├── saved/SavedScreen.kt
 │       ├── settings/SettingsScreen.kt
 │       └── webpreview/WebPreviewScreen.kt
-├── presentation/viewmodel/           # State management (8 ViewModels)
+├── presentation/viewmodel/           # State management (7 ViewModels)
 ├── domain/repository/                # Repository interfaces
 ├── data/
 │   ├── repository/                   # Repository implementations
 │   ├── local/                        # Room database, DataStore
-│   │   ├── database/SummarizeDatabase.kt, SummaryDao.kt, SummaryEntity.kt
+│   │   ├── database/NutshellDatabase.kt, SummaryDao.kt, SummaryEntity.kt
 │   │   └── preferences/UserPreferences.kt
 │   ├── remote/                       # Retrofit + Ktor
 │   │   ├── api/SummarizerApi.kt, StreamingSummarizerService.kt
@@ -145,7 +147,7 @@ class MainActivity : ComponentActivity() {
             // ✅ INSTANTIATE ALL VIEWMODELS HERE
             val homeViewModel: HomeViewModel = hiltViewModel()
             val settingsViewModel: SettingsViewModel = hiltViewModel()
-            // ... all 8 ViewModels
+            // ... all 7 ViewModels
 
             // ✅ COLLECT ALL STATE FLOWS HERE
             val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
@@ -258,10 +260,11 @@ Both save results to Room database for offline access.
 When a URL is shared to the app:
 
 1. **Validation** - Check HTTP/HTTPS only, verify network connectivity
-2. **Extraction** - Use hybrid approach:
-   - Primary: Readability4j (Mozilla algorithm)
-   - Fallback: Jsoup text extraction
-   - Combine both for best results
+2. **Extraction** - Use three-tier fallback approach:
+   - **Tier 1: Jina AI** - Fast, handles JavaScript-rendered content, most reliable (20s timeout)
+   - **Tier 2: Readability4j** - Mozilla Readability algorithm for better article parsing (30s timeout)
+   - **Tier 3: Jsoup** - Basic HTML extraction with enhanced meta tags and content selectors (30s timeout)
+   - System tries each method in order until successful extraction
 3. **Pre-fill** - Extracted content auto-populates HomeScreen input
 4. **Summarize** - User can trigger summarization on extracted content
 
@@ -365,7 +368,7 @@ The app handles URL sharing via:
 4. Instantiate ViewModel in MainActivity with `hiltViewModel()`
 5. Collect state in MainActivity with `collectAsStateWithLifecycle()`
 6. Add navigation logic in MainActivity LaunchedEffect
-7. Add screen to NavHost in `SummarizeAINavHost.kt`
+7. Add screen to NavHost in `NutshellNavHost.kt`
 8. Pass state and callbacks to screen composable
 9. Write @Preview for the screen
 10. Write unit tests after completing the flow
@@ -384,7 +387,7 @@ The app handles URL sharing via:
 
 1. Create entity in `data/local/database/SummaryEntity.kt`
 2. Add DAO methods to `data/local/database/SummaryDao.kt`
-3. Update Room database version in `SummarizeDatabase.kt`
+3. Update Room database version in `NutshellDatabase.kt`
 4. Add migration if needed
 5. Create mapper in `data/local/mapper/` for Entity ↔ Model conversion
 6. Use in repository implementation
@@ -399,9 +402,10 @@ The app handles URL sharing via:
 - Saves to Room database on completion
 
 ### Web Content Extraction
-- Hybrid approach: Readability4j + Jsoup
+- Three-tier fallback approach: Jina AI (tier 1, fast & handles JS) → Readability4j (tier 2, Mozilla algorithm) → Jsoup (tier 3, basic extraction)
 - Network connectivity check before extraction
 - Handles paywall detection and content validation
+- Different timeout strategies per tier (20s for Jina AI, 30s for others)
 - User-friendly error messages
 
 ### Optimistic UI Updates
@@ -425,7 +429,7 @@ The app handles URL sharing via:
 
 Based on README documentation:
 - Repository tests with Room database testing
-- ViewModel tests for all 8 ViewModels (currently partial coverage)
+- ViewModel tests for all 7 ViewModels (currently partial coverage)
 - AI Service integration tests
 - Performance tests for large datasets
 - Accessibility tests (screen reader compliance)

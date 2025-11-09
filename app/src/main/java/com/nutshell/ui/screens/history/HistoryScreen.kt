@@ -3,6 +3,7 @@ package com.nutshell.ui.screens.history
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -71,7 +72,7 @@ fun HistoryScreen(
                     .height(56.dp)
                     .border(
                         width = 2.dp,
-                        color = Gray300,
+                        color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
                         shape = RoundedCornerShape(12.dp)
                     )
                     .background(MaterialTheme.colorScheme.surface)
@@ -85,7 +86,7 @@ fun HistoryScreen(
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search",
-                        tint = Gray400,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
@@ -97,7 +98,7 @@ fun HistoryScreen(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Normal
                         ),
-                        cursorBrush = SolidColor(ElectricLime),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                         modifier = Modifier.weight(1f),
                         singleLine = true
                     ) { innerTextField ->
@@ -105,7 +106,7 @@ fun HistoryScreen(
                             Text(
                                 text = "Search history...",
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = Gray400
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         innerTextField()
@@ -154,7 +155,7 @@ fun HistoryScreen(
                     Text(
                         text = "Your summarized texts will appear here",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Gray700,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                 }
@@ -190,7 +191,7 @@ fun HistoryItemCard(
             .fillMaxWidth()
             .border(
                 width = 2.dp,
-                color = Gray300,
+                color = MaterialTheme.colorScheme.outline,
                 shape = RoundedCornerShape(12.dp)
             )
             .background(MaterialTheme.colorScheme.surface)
@@ -202,7 +203,7 @@ fun HistoryItemCard(
             modifier = Modifier
                 .size(44.dp)
                 .background(
-                    color = ElectricLime.copy(alpha = 0.2f),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
                     shape = RoundedCornerShape(8.dp)
                 ),
             contentAlignment = Alignment.Center
@@ -210,13 +211,13 @@ fun HistoryItemCard(
             Icon(
                 imageVector = Icons.Default.Description,
                 contentDescription = "History Item",
-                tint = PureBlack,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(20.dp)
             )
         }
-        
+
         Spacer(modifier = Modifier.width(16.dp))
-        
+
         // Content Area
         Column(
             modifier = Modifier.weight(1f)
@@ -224,24 +225,24 @@ fun HistoryItemCard(
             Text(
                 text = item.mediumSummary,
                 style = MaterialTheme.typography.bodyMedium,
-                color = Gray800,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 lineHeight = 22.sp
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Text(
                 text = formatDate(item.createdAt),
                 style = MaterialTheme.typography.bodySmall,
-                color = Gray700,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Bold
             )
         }
-        
+
         Spacer(modifier = Modifier.width(8.dp))
-        
+
         // Delete Button
         IconButton(
             onClick = { onDelete(item) },

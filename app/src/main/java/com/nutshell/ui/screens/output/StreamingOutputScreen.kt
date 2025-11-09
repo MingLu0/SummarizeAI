@@ -3,6 +3,7 @@ package com.nutshell.ui.screens.output
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -97,7 +98,7 @@ fun StreamingOutputScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = PureBlack,
+                        tint = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -109,7 +110,7 @@ fun StreamingOutputScreen(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.sp
                     ),
-                    color = PureBlack
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
             // Status Indicator - Flat
@@ -119,24 +120,24 @@ fun StreamingOutputScreen(
                         .fillMaxWidth()
                         .border(
                             width = 2.dp,
-                            color = ElectricLime,
+                            color = MaterialTheme.colorScheme.primary,
                             shape = RoundedCornerShape(12.dp)
                         )
-                        .background(PureWhite)
+                        .background(MaterialTheme.colorScheme.surface)
                         .padding(20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Animated typing indicator
                     TypingIndicator()
-                    
+
                     Spacer(modifier = Modifier.width(16.dp))
-                    
+
                     Text(
                         text = "AI is generating your summary...",
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.Medium
                         ),
-                        color = Gray800
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             } else if (uiState.summaryData != null) {
@@ -148,7 +149,7 @@ fun StreamingOutputScreen(
                             color = SuccessGreen,
                             shape = RoundedCornerShape(12.dp)
                         )
-                        .background(PureWhite)
+                        .background(MaterialTheme.colorScheme.surface)
                         .padding(20.dp)
                 ) {
                     Text(
@@ -168,10 +169,10 @@ fun StreamingOutputScreen(
                     .weight(1f)
                     .border(
                         width = 2.dp,
-                        color = PureBlack,
+                        color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
                         shape = RoundedCornerShape(12.dp)
                     )
-                    .background(PureWhite)
+                    .background(MaterialTheme.colorScheme.surface)
             ) {
                 LazyColumn(
                     state = listState,
@@ -186,7 +187,7 @@ fun StreamingOutputScreen(
                             style = MaterialTheme.typography.bodyLarge.copy(
                                 lineHeight = 28.sp
                             ),
-                            color = Gray800
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                     
@@ -214,7 +215,7 @@ fun TypingIndicator() {
         ),
         label = "typing_alpha"
     )
-    
+
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -230,12 +231,12 @@ fun TypingIndicator() {
                 ),
                 label = "dot_alpha_$index"
             )
-            
+
             Box(
                 modifier = Modifier
                     .size(8.dp)
                     .background(
-                        color = ElectricLime.copy(alpha = dotAlpha),
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = dotAlpha),
                         shape = RoundedCornerShape(4.dp)
                     )
             )
@@ -255,11 +256,11 @@ fun TypingCursor() {
         ),
         label = "cursor_alpha"
     )
-    
+
     Text(
         text = "|",
         style = MaterialTheme.typography.bodyLarge,
-        color = ElectricLime,
+        color = MaterialTheme.colorScheme.primary,
         fontWeight = FontWeight.Bold
     )
 }
