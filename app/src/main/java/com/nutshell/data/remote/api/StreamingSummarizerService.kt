@@ -41,12 +41,12 @@ class StreamingSummarizerService @Inject constructor(
             Log.d(TAG, "streamSummary: Input text length: ${text.length} characters")
             
             val requestBody = mapOf(
-                "text" to text,
-                "max_tokens" to 1024,
+                "url" to text,
+                "max_tokens" to 256,
                 "prompt" to "Summarize the following text concisely:"
             )
             
-            client.preparePost("$baseUrl/api/v2/summarize/stream") {
+            client.preparePost("$baseUrl/api/v3/scrape-and-summarize/stream") {
                 contentType(ContentType.Application.Json)
                 setBody(requestBody)
             }.execute { response ->

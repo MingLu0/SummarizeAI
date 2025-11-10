@@ -27,7 +27,12 @@ class WebContentViewModel @Inject constructor(
                     sharedText?.let { text ->
                         val url = extractUrlFromText(text)
                         if (url != null) {
-                            handleSharedUrl(url)
+//                            handleSharedUrl(url)
+                            _uiState.value = _uiState.value.copy(
+                                extractedContent = url,
+                                isExtracting = false,
+                                shouldNavigateToMain = true
+                            )
                         }
                     }
                 }
