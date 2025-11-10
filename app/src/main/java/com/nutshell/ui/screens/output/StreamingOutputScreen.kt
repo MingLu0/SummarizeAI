@@ -140,7 +140,7 @@ fun StreamingOutputScreen(
                     Spacer(modifier = Modifier.width(16.dp))
 
                     Text(
-                        text = "AI is generating your summary...",
+                        text = "Nutshell is generating your summary...",
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.Medium
                         ),
@@ -148,48 +148,181 @@ fun StreamingOutputScreen(
                     )
                 }
             } else if (uiState.summaryData != null) {
-                // Success state with bounce animation
-                val scale = remember { Animatable(0.8f) }
-                val alpha = remember { Animatable(0f) }
 
-                LaunchedEffect(Unit) {
-                    launch {
-                        scale.animateTo(
-                            targetValue = 1f,
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessMedium
-                            )
-                        )
-                    }
-                    launch {
-                        alpha.animateTo(
-                            targetValue = 1f,
-                            animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing)
-                        )
-                    }
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .scale(scale.value)
-                        .border(
-                            width = 2.dp,
-                            color = SuccessGreen.copy(alpha = alpha.value),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = alpha.value))
-                        .padding(20.dp)
+                // Top Row: Copy, Save, Home Buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text(
-                        text = "✓ Summary completed!",
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = SuccessGreen.copy(alpha = alpha.value)
-                    )
+                    // Copy Button
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(52.dp)
+                            .border(
+                                width = 2.dp,
+                                color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .background(MaterialTheme.colorScheme.surface)
+                            .clickable { onCopyToClipboard() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ContentCopy,
+                                contentDescription = "Copy",
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "COPY",
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 0.5.sp
+                                ),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+
+                    // Save Button (with saved state)
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(52.dp)
+                            .border(
+                                width = 2.dp,
+                                color = if (uiState.summaryData?.isSaved == true)
+                                    MaterialTheme.colorScheme.primary
+                                else if (isSystemInDarkTheme())
+                                    MaterialTheme.colorScheme.outline
+                                else
+                                    PureBlack,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .background(
+                                if (uiState.summaryData?.isSaved == true)
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                                else
+                                    MaterialTheme.colorScheme.surface
+                            )
+                            .clickable { onToggleSaveStatus() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = if (uiState.summaryData?.isSaved == true)
+                                    Icons.Default.Bookmark
+                                else
+                                    Icons.Default.BookmarkBorder,
+                                contentDescription = "Save",
+                                tint = if (uiState.summaryData?.isSaved == true)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "SAVE",
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 0.5.sp
+                                ),
+                                color = if (uiState.summaryData?.isSaved == true)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+
+                    // Home Button
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(52.dp)
+                            .border(
+                                width = 2.dp,
+                                color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .background(MaterialTheme.colorScheme.surface)
+                            .clickable { onNavigateToHome() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Home,
+                                contentDescription = "Home",
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "HOME",
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 0.5.sp
+                                ),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
                 }
+//                // Success state with bounce animation
+//                val scale = remember { Animatable(0.8f) }
+//                val alpha = remember { Animatable(0f) }
+//
+//                LaunchedEffect(Unit) {
+//                    launch {
+//                        scale.animateTo(
+//                            targetValue = 1f,
+//                            animationSpec = spring(
+//                                dampingRatio = Spring.DampingRatioMediumBouncy,
+//                                stiffness = Spring.StiffnessMedium
+//                            )
+//                        )
+//                    }
+//                    launch {
+//                        alpha.animateTo(
+//                            targetValue = 1f,
+//                            animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing)
+//                        )
+//                    }
+//                }
+//
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .scale(scale.value)
+//                        .border(
+//                            width = 2.dp,
+//                            color = SuccessGreen.copy(alpha = alpha.value),
+//                            shape = RoundedCornerShape(12.dp)
+//                        )
+//                        .background(MaterialTheme.colorScheme.surface.copy(alpha = alpha.value))
+//                        .padding(20.dp)
+//                ) {
+//                    Text(
+//                        text = "✓ Summary completed!",
+//                        style = MaterialTheme.typography.bodyMedium.copy(
+//                            fontWeight = FontWeight.Bold
+//                        ),
+//                        color = SuccessGreen.copy(alpha = alpha.value)
+//                    )
+//                }
             }
 
             // Streaming Summary Content - Flat with Border
@@ -222,11 +355,11 @@ fun StreamingOutputScreen(
                     }
                     
                     // Add typing cursor at the end
-                    if (currentSummaryText.isNotEmpty()) {
-                        item {
-                            TypingCursor()
-                        }
-                    }
+//                    if (currentSummaryText.isNotEmpty()) {
+//                        item {
+//                            TypingCursor()
+//                        }
+//                    }
                 }
             }
 
@@ -236,138 +369,7 @@ fun StreamingOutputScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Top Row: Copy, Save, Home Buttons
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        // Copy Button
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(52.dp)
-                                .border(
-                                    width = 2.dp,
-                                    color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
-                                    shape = RoundedCornerShape(12.dp)
-                                )
-                                .background(MaterialTheme.colorScheme.surface)
-                                .clickable { onCopyToClipboard() },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Row(
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.ContentCopy,
-                                    contentDescription = "Copy",
-                                    tint = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "COPY",
-                                    style = MaterialTheme.typography.labelMedium.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        letterSpacing = 0.5.sp
-                                    ),
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                        }
 
-                        // Save Button (with saved state)
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(52.dp)
-                                .border(
-                                    width = 2.dp,
-                                    color = if (uiState.summaryData?.isSaved == true)
-                                        MaterialTheme.colorScheme.primary
-                                    else if (isSystemInDarkTheme())
-                                        MaterialTheme.colorScheme.outline
-                                    else
-                                        PureBlack,
-                                    shape = RoundedCornerShape(12.dp)
-                                )
-                                .background(
-                                    if (uiState.summaryData?.isSaved == true)
-                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                                    else
-                                        MaterialTheme.colorScheme.surface
-                                )
-                                .clickable { onToggleSaveStatus() },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Row(
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = if (uiState.summaryData?.isSaved == true)
-                                        Icons.Default.Bookmark
-                                    else
-                                        Icons.Default.BookmarkBorder,
-                                    contentDescription = "Save",
-                                    tint = if (uiState.summaryData?.isSaved == true)
-                                        MaterialTheme.colorScheme.primary
-                                    else
-                                        MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "SAVE",
-                                    style = MaterialTheme.typography.labelMedium.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        letterSpacing = 0.5.sp
-                                    ),
-                                    color = if (uiState.summaryData?.isSaved == true)
-                                        MaterialTheme.colorScheme.primary
-                                    else
-                                        MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                        }
-
-                        // Home Button
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(52.dp)
-                                .border(
-                                    width = 2.dp,
-                                    color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
-                                    shape = RoundedCornerShape(12.dp)
-                                )
-                                .background(MaterialTheme.colorScheme.surface)
-                                .clickable { onNavigateToHome() },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Row(
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Home,
-                                    contentDescription = "Home",
-                                    tint = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "HOME",
-                                    style = MaterialTheme.typography.labelMedium.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        letterSpacing = 0.5.sp
-                                    ),
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                        }
-                    }
 
                     // Share Button - Full Width Primary CTA
                     Box(
@@ -404,7 +406,7 @@ fun StreamingOutputScreen(
                         }
                     }
                 }
-            }
+            } //
         }
     }
 }
