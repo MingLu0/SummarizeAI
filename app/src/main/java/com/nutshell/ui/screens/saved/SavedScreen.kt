@@ -1,6 +1,7 @@
 package com.nutshell.ui.screens.saved
 
 import androidx.compose.foundation.background
+import com.nutshell.ui.components.EmptyStateContent
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -115,49 +116,15 @@ fun SavedScreen(
         
             // Content Area
             if (uiState.filteredSummaries.isEmpty()) {
-                // Empty State
-                Column(
+                // Empty State - Using reusable component
+                EmptyStateContent(
+                    icon = Icons.Default.Bookmark,
+                    title = "No Saved Items",
+                    description = "Bookmark summaries to save them here",
                     modifier = Modifier
                         .fillMaxSize()
-                        .weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(96.dp)
-                            .background(
-                                color = Gray100,
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Bookmark,
-                            contentDescription = "No Saved Items",
-                            tint = Gray400,
-                            modifier = Modifier.size(48.dp)
-                        )
-                    }
-                    
-                    Spacer(modifier = Modifier.height(24.dp))
-                    
-                    Text(
-                        text = "No Saved Items",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontWeight = FontWeight.Bold
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    Text(
-                        text = "Bookmark summaries to save them here",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                    )
-                }
+                        .weight(1f)
+                )
             } else {
                 // Saved Items List
                 LazyColumn(

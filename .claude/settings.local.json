@@ -3,7 +3,11 @@
     "allow": [
       "Bash(find:*)",
       "Bash(./gradlew build:*)",
-      "Bash(./gradlew test:*)"
+      "Bash(./gradlew test:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh run:*)"
     ],
     "deny": [],
     "ask": []

@@ -2,6 +2,7 @@ package com.nutshell.ui.theme
 
 import android.app.Activity
 import android.os.Build
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -46,6 +47,48 @@ object Elevation {
     val md = 4.dp      // Card shadow
     val lg = 8.dp      // Elevated elements
     val xl = 16.dp     // Modal/dialog shadow
+}
+
+// Animation Durations (in milliseconds)
+object AnimationDurations {
+    const val fast = 150        // Quick transitions (hover states, ripples)
+    const val medium = 300      // Standard transitions (tab changes, colors)
+    const val slow = 500        // Deliberate animations (modals, screens)
+    const val extraSlow = 800   // Emphasis animations (success states)
+}
+
+// Animation Specifications
+object AnimationSpecs {
+    // Standard easing functions
+    val fastEasing = FastOutSlowInEasing
+    val linearEasing = LinearEasing
+
+    // Color transitions
+    fun <T> colorTransition(durationMillis: Int = AnimationDurations.medium): TweenSpec<T> =
+        tween(durationMillis = durationMillis, easing = fastEasing)
+
+    // Spring animations for bouncy effects
+    val bouncySpring = spring<Float>(
+        dampingRatio = Spring.DampingRatioMediumBouncy,
+        stiffness = Spring.StiffnessMedium
+    )
+
+    val gentleSpring = spring<Float>(
+        dampingRatio = Spring.DampingRatioLowBouncy,
+        stiffness = Spring.StiffnessLow
+    )
+
+    val stiffSpring = spring<Float>(
+        dampingRatio = Spring.DampingRatioMediumBouncy,
+        stiffness = Spring.StiffnessHigh
+    )
+
+    // Fade animations
+    fun fadeIn(durationMillis: Int = AnimationDurations.medium): TweenSpec<Float> =
+        tween(durationMillis = durationMillis, easing = fastEasing)
+
+    fun fadeOut(durationMillis: Int = AnimationDurations.fast): TweenSpec<Float> =
+        tween(durationMillis = durationMillis, easing = fastEasing)
 }
 
 private val DarkColorScheme = darkColorScheme(

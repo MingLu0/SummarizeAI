@@ -10,11 +10,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Nightlight
-import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,6 +23,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nutshell.data.local.preferences.SummaryLanguage
+import com.nutshell.data.local.preferences.SummaryLength
 import com.nutshell.data.local.preferences.ThemeMode
 import com.nutshell.ui.theme.*
 
@@ -33,12 +33,14 @@ import com.nutshell.ui.theme.*
 fun SettingsScreen(
     isStreamingEnabled: Boolean,
     themeMode: ThemeMode,
+    summaryLanguage: SummaryLanguage,
+    summaryLength: SummaryLength,
+    appVersion: String,
     onSetStreamingEnabled: (Boolean) -> Unit,
-    onSetThemeMode: (ThemeMode) -> Unit
+    onSetThemeMode: (ThemeMode) -> Unit,
+    onSetSummaryLanguage: (SummaryLanguage) -> Unit,
+    onSetSummaryLength: (SummaryLength) -> Unit
 ) {
-    var selectedLanguage by remember { mutableStateOf("English") }
-    var summaryLength by remember { mutableStateOf(50f) }
-    
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -64,85 +66,7 @@ fun SettingsScreen(
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-            // Language Card
-            SettingsCard(
-                icon = Icons.Default.Public,
-                iconBackground = Cyan50,
-                iconTint = Cyan600,
-                title = "Language",
-                description = "Choose your preferred language"
-            ) {
-                ExposedDropdownMenuBox(
-                    expanded = false,
-                    onExpandedChange = { }
-                ) {
-                    OutlinedTextField(
-                        value = selectedLanguage,
-                        onValueChange = { },
-                        readOnly = true,
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = false)
-                        },
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Cyan600,
-                            unfocusedBorderColor = Gray200,
-                            focusedContainerColor = White,
-                            unfocusedContainerColor = White
-                        ),
-                        shape = RoundedCornerShape(CornerRadius.md)
-                    )
-                }
-            }
-            
-            // Summary Length Card
-            SettingsCard(
-                icon = Icons.Default.Description,
-                iconBackground = Blue50,
-                iconTint = Blue600,
-                title = "Summary Length",
-                description = "Adjust the default summary length"
-            ) {
-                Column {
-                    Slider(
-                        value = summaryLength,
-                        onValueChange = { summaryLength = it },
-                        valueRange = 10f..100f,
-                        steps = 8,
-                        colors = SliderDefaults.colors(
-                            thumbColor = ElectricLime,
-                            activeTrackColor = ElectricLime,
-                            inactiveTrackColor = Gray300
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Short",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Gray600
-                        )
-                        Text(
-                            text = "${summaryLength.toInt()}%",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = PureBlack,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Detailed",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Gray600
-                        )
-                    }
-                }
-            }
-            
+
             // Theme Mode Card
             SettingsCard(
                 icon = Icons.Default.Nightlight,
@@ -151,28 +75,61 @@ fun SettingsScreen(
                 title = "Theme",
                 description = "Choose your app theme preference"
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                var themeExpanded by remember { mutableStateOf(false) }
+
+                ExposedDropdownMenuBox(
+                    expanded = themeExpanded,
+                    onExpandedChange = { themeExpanded = it }
                 ) {
-                    ThemeModeOption(
-                        text = "System",
-                        isSelected = themeMode == ThemeMode.SYSTEM,
-                        onClick = { onSetThemeMode(ThemeMode.SYSTEM) },
-                        modifier = Modifier.weight(1f)
+                    OutlinedTextField(
+                        value = when (themeMode) {
+                            ThemeMode.SYSTEM -> "System"
+                            ThemeMode.LIGHT -> "Light"
+                            ThemeMode.DARK -> "Dark"
+                        },
+                        onValueChange = { },
+                        readOnly = true,
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = themeExpanded)
+                        },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        shape = RoundedCornerShape(12.dp)
                     )
-                    ThemeModeOption(
-                        text = "Light",
-                        isSelected = themeMode == ThemeMode.LIGHT,
-                        onClick = { onSetThemeMode(ThemeMode.LIGHT) },
-                        modifier = Modifier.weight(1f)
-                    )
-                    ThemeModeOption(
-                        text = "Dark",
-                        isSelected = themeMode == ThemeMode.DARK,
-                        onClick = { onSetThemeMode(ThemeMode.DARK) },
-                        modifier = Modifier.weight(1f)
-                    )
+
+                    ExposedDropdownMenu(
+                        expanded = themeExpanded,
+                        onDismissRequest = { themeExpanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("System") },
+                            onClick = {
+                                onSetThemeMode(ThemeMode.SYSTEM)
+                                themeExpanded = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Light") },
+                            onClick = {
+                                onSetThemeMode(ThemeMode.LIGHT)
+                                themeExpanded = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Dark") },
+                            onClick = {
+                                onSetThemeMode(ThemeMode.DARK)
+                                themeExpanded = false
+                            }
+                        )
+                    }
                 }
             }
             
@@ -199,8 +156,8 @@ fun SettingsScreen(
                         checked = isStreamingEnabled,
                         onCheckedChange = onSetStreamingEnabled,
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = PureBlack,
-                            checkedTrackColor = ElectricLime,
+                            checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                            checkedTrackColor = MaterialTheme.colorScheme.primary,
                             uncheckedThumbColor = Gray400,
                             uncheckedTrackColor = Gray300
                         ),
@@ -208,7 +165,107 @@ fun SettingsScreen(
                     )
                 }
             }
-            
+
+            // Language Card
+            SettingsCard(
+                icon = Icons.Default.Language,
+                iconBackground = Blue50,
+                iconTint = Blue600,
+                title = "Language",
+                description = "Choose summary output language"
+            ) {
+                var languageExpanded by remember { mutableStateOf(false) }
+
+                ExposedDropdownMenuBox(
+                    expanded = languageExpanded,
+                    onExpandedChange = { languageExpanded = it }
+                ) {
+                    OutlinedTextField(
+                        value = summaryLanguage.displayName,
+                        onValueChange = { },
+                        readOnly = true,
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded)
+                        },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = languageExpanded,
+                        onDismissRequest = { languageExpanded = false }
+                    ) {
+                        SummaryLanguage.values().forEach { language ->
+                            DropdownMenuItem(
+                                text = { Text(language.displayName) },
+                                onClick = {
+                                    onSetSummaryLanguage(language)
+                                    languageExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Summary Length Card
+            SettingsCard(
+                icon = Icons.Default.TextFields,
+                iconBackground = Blue50,
+                iconTint = Blue600,
+                title = "Summary Length",
+                description = "Control the detail level of summaries"
+            ) {
+                var lengthExpanded by remember { mutableStateOf(false) }
+
+                ExposedDropdownMenuBox(
+                    expanded = lengthExpanded,
+                    onExpandedChange = { lengthExpanded = it }
+                ) {
+                    OutlinedTextField(
+                        value = summaryLength.displayName,
+                        onValueChange = { },
+                        readOnly = true,
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = lengthExpanded)
+                        },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = lengthExpanded,
+                        onDismissRequest = { lengthExpanded = false }
+                    ) {
+                        SummaryLength.values().forEach { length ->
+                            DropdownMenuItem(
+                                text = { Text(length.displayName) },
+                                onClick = {
+                                    onSetSummaryLength(length)
+                                    lengthExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
             // About Card - Flat with Primary Accent
             Box(
                 modifier = Modifier
@@ -236,7 +293,7 @@ fun SettingsScreen(
                     )
                     
                     Text(
-                        text = "Version 1.0.8",
+                        text = "Version $appVersion",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Bold

@@ -73,12 +73,11 @@ fun SplashScreen(
                     .padding(Spacing.lg),
                 contentAlignment = Alignment.Center
             ) {
-                // Simple AI icon representation
-                Text(
-                    text = "AI",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
+                // App icon
+                Image(
+                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    contentDescription = "App Icon",
+                    modifier = Modifier.size(80.dp)
                 )
             }
 
@@ -92,7 +91,7 @@ fun SplashScreen(
 
             // Tagline
             Text(
-                text = "Turn long text into key insights",
+                text = "Turn long text into key insights using Nutshell powered by AI",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )

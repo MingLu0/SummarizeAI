@@ -1,6 +1,8 @@
 package com.nutshell.ui.screens.home
 
 import android.net.Uri
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,7 +16,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -108,14 +115,32 @@ fun HomeScreen(
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(top = 8.dp, bottom = 12.dp)
             )
-            // Text Input Area - Flat with Border
+
+            // Text Input Area - Flat with Border and Animated Focus
+            var isTextFieldFocused by remember { mutableStateOf(false) }
+
+            val borderColor by animateColorAsState(
+                targetValue = if (isTextFieldFocused)
+                    MaterialTheme.colorScheme.primary
+                else
+                    if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
+                animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing),
+                label = "textFieldBorderColor"
+            )
+
+            val borderWidth by animateDpAsState(
+                targetValue = if (isTextFieldFocused) 3.dp else 2.dp,
+                animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing),
+                label = "textFieldBorderWidth"
+            )
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .border(
-                        width = 2.dp,
-                        color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
+                        width = borderWidth,
+                        color = borderColor,
                         shape = RoundedCornerShape(12.dp)
                     )
                     .background(MaterialTheme.colorScheme.surface)
@@ -133,6 +158,9 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(20.dp)
+                        .onFocusChanged { focusState ->
+                            isTextFieldFocused = focusState.isFocused
+                        }
                 ) { innerTextField ->
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -180,8 +208,21 @@ fun HomeScreen(
                 )
             }
             
-            // Error Display - Flat
-            if (uiState.error != null) {
+            // Error Display - Flat with Slide-In Animation
+            AnimatedVisibility(
+                visible = uiState.error != null,
+                enter = slideInVertically(
+                    initialOffsetY = { -it / 2 },
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    )
+                ) + fadeIn(animationSpec = tween(300)),
+                exit = slideOutVertically(
+                    targetOffsetY = { -it / 2 },
+                    animationSpec = tween(250)
+                ) + fadeOut(animationSpec = tween(250))
+            ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -200,9 +241,22 @@ fun HomeScreen(
                     )
                 }
             }
-            
-            // Web Content Extraction Error Display - Flat
-            if (webContentError != null) {
+
+            // Web Content Extraction Error Display - Flat with Slide-In Animation
+            AnimatedVisibility(
+                visible = webContentError != null,
+                enter = slideInVertically(
+                    initialOffsetY = { -it / 2 },
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    )
+                ) + fadeIn(animationSpec = tween(300)),
+                exit = slideOutVertically(
+                    targetOffsetY = { -it / 2 },
+                    animationSpec = tween(250)
+                ) + fadeOut(animationSpec = tween(250))
+            ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -223,7 +277,7 @@ fun HomeScreen(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = webContentError,
+                            text = webContentError ?: "",
                             style = MaterialTheme.typography.bodyMedium,
                             color = WarningOrange
                         )
@@ -260,19 +314,36 @@ fun HomeScreen(
                 }
             }
             
-            // Summarize Button - Primary CTA (Flat)
+            // Summarize Button - Primary CTA (Flat) with Scale Animation
+            val buttonInteractionSource = remember { MutableInteractionSource() }
+            val isButtonPressed by buttonInteractionSource.collectIsPressedAsState()
+
+            val buttonScale by animateFloatAsState(
+                targetValue = if (isButtonPressed && uiState.isSummarizeEnabled && !uiState.isLoading) 0.97f else 1f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessHigh
+                ),
+                label = "buttonScale"
+            )
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(60.dp)
+                    .scale(buttonScale)
                     .background(
-                        color = if (uiState.isSummarizeEnabled && !uiState.isLoading) 
-                            MaterialTheme.colorScheme.primary 
-                        else 
+                        color = if (uiState.isSummarizeEnabled && !uiState.isLoading)
+                            MaterialTheme.colorScheme.primary
+                        else
                             MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
                         shape = RoundedCornerShape(12.dp)
                     )
-                    .clickable(enabled = uiState.isSummarizeEnabled && !uiState.isLoading) {
+                    .clickable(
+                        enabled = uiState.isSummarizeEnabled && !uiState.isLoading,
+                        interactionSource = buttonInteractionSource,
+                        indication = rememberRipple(color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f))
+                    ) {
                         if (uiState.textInput.isNotBlank()) {
                             onSummarizeText()
                         }

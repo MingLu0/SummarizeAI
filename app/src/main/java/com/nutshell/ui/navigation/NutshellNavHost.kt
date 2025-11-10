@@ -47,6 +47,8 @@ import com.nutshell.ui.screens.loading.LoadingScreen
 import com.nutshell.ui.screens.output.OutputScreen
 import com.nutshell.ui.screens.output.StreamingOutputScreen
 import com.nutshell.presentation.viewmodel.*
+import com.nutshell.data.local.preferences.SummaryLanguage
+import com.nutshell.data.local.preferences.SummaryLength
 import com.nutshell.data.local.preferences.ThemeMode
 import com.nutshell.ui.theme.Cyan600
 import com.nutshell.ui.theme.Gray400
@@ -85,6 +87,9 @@ fun NutshellNavHost(
     homeUiState: com.nutshell.presentation.viewmodel.HomeUiState,
     isStreamingEnabled: Boolean,
     themeMode: ThemeMode,
+    summaryLanguage: SummaryLanguage,
+    summaryLength: SummaryLength,
+    appVersion: String,
     outputUiState: com.nutshell.presentation.viewmodel.OutputUiState,
     historyUiState: com.nutshell.presentation.viewmodel.HistoryUiState,
     historySearchQuery: String,
@@ -154,7 +159,10 @@ fun NutshellNavHost(
                 streamingOutputViewModel = streamingOutputViewModel,
                 historyViewModel = historyViewModel,
                 savedViewModel = savedViewModel,
-                webContentViewModel = webContentViewModel
+                webContentViewModel = webContentViewModel,
+                summaryLanguage = summaryLanguage,
+                summaryLength = summaryLength,
+                appVersion = appVersion,
             )
         }
         
@@ -179,7 +187,10 @@ fun MainScreenWithBottomNavigation(
     streamingOutputViewModel: StreamingOutputViewModel,
     historyViewModel: HistoryViewModel,
     savedViewModel: SavedViewModel,
-    webContentViewModel: WebContentViewModel
+    webContentViewModel: WebContentViewModel,
+    summaryLanguage: SummaryLanguage,
+    summaryLength: SummaryLength,
+    appVersion: String,
 ) {
     val bottomNavController = rememberNavController()
     
@@ -341,8 +352,13 @@ fun MainScreenWithBottomNavigation(
                 SettingsScreen(
                     isStreamingEnabled = isStreamingEnabled,
                     themeMode = themeMode,
+                    summaryLanguage = summaryLanguage,
+                    summaryLength = summaryLength,
+                    appVersion = appVersion,
                     onSetStreamingEnabled = settingsViewModel::setStreamingEnabled,
-                    onSetThemeMode = settingsViewModel::setThemeMode
+                    onSetThemeMode = settingsViewModel::setThemeMode,
+                    onSetSummaryLanguage = settingsViewModel::setSummaryLanguage,
+                    onSetSummaryLength = settingsViewModel::setSummaryLength
                 )
             }
             

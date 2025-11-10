@@ -11,6 +11,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.nutshell.BuildConfig
+import com.nutshell.data.local.preferences.SummaryLanguage
+import com.nutshell.data.local.preferences.SummaryLength
 import com.nutshell.data.local.preferences.ThemeMode
 import com.nutshell.ui.navigation.AppScaffold
 import com.nutshell.ui.navigation.Screen
@@ -49,6 +52,8 @@ class MainActivity : ComponentActivity() {
                 val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
                 val isStreamingEnabled by settingsViewModel.isStreamingEnabled.collectAsStateWithLifecycle(initialValue = true)
                 val themeMode by settingsViewModel.themeMode.collectAsStateWithLifecycle(initialValue = ThemeMode.SYSTEM)
+                val summaryLanguage by settingsViewModel.summaryLanguage.collectAsStateWithLifecycle(initialValue = SummaryLanguage.ENGLISH)
+                val summaryLength by settingsViewModel.summaryLength.collectAsStateWithLifecycle(initialValue = SummaryLength.SHORT)
                 val outputUiState by outputViewModel.uiState.collectAsStateWithLifecycle()
                 val historyUiState by historyViewModel.uiState.collectAsStateWithLifecycle()
                 val historySearchQuery by historyViewModel.searchQuery.collectAsStateWithLifecycle()
@@ -84,6 +89,9 @@ class MainActivity : ComponentActivity() {
                     homeUiState = homeUiState,
                     isStreamingEnabled = isStreamingEnabled,
                     themeMode = themeMode,
+                    summaryLanguage = summaryLanguage,
+                    summaryLength = summaryLength,
+                    appVersion = BuildConfig.VERSION_NAME,
                     outputUiState = outputUiState,
                     historyUiState = historyUiState,
                     historySearchQuery = historySearchQuery,

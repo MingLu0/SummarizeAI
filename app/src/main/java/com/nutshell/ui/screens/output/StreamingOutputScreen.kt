@@ -8,12 +8,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -141,15 +148,38 @@ fun StreamingOutputScreen(
                     )
                 }
             } else if (uiState.summaryData != null) {
+                // Success state with bounce animation
+                val scale = remember { Animatable(0.8f) }
+                val alpha = remember { Animatable(0f) }
+
+                LaunchedEffect(Unit) {
+                    launch {
+                        scale.animateTo(
+                            targetValue = 1f,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessMedium
+                            )
+                        )
+                    }
+                    launch {
+                        alpha.animateTo(
+                            targetValue = 1f,
+                            animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing)
+                        )
+                    }
+                }
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .scale(scale.value)
                         .border(
                             width = 2.dp,
-                            color = SuccessGreen,
+                            color = SuccessGreen.copy(alpha = alpha.value),
                             shape = RoundedCornerShape(12.dp)
                         )
-                        .background(MaterialTheme.colorScheme.surface)
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = alpha.value))
                         .padding(20.dp)
                 ) {
                     Text(
@@ -157,7 +187,7 @@ fun StreamingOutputScreen(
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.Bold
                         ),
-                        color = SuccessGreen
+                        color = SuccessGreen.copy(alpha = alpha.value)
                     )
                 }
             }
@@ -195,6 +225,182 @@ fun StreamingOutputScreen(
                     if (currentSummaryText.isNotEmpty()) {
                         item {
                             TypingCursor()
+                        }
+                    }
+                }
+            }
+
+            // Action Buttons - Only show when streaming is complete
+            if (!uiState.isStreaming && uiState.summaryData != null) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Top Row: Copy, Save, Home Buttons
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        // Copy Button
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(52.dp)
+                                .border(
+                                    width = 2.dp,
+                                    color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .background(MaterialTheme.colorScheme.surface)
+                                .clickable { onCopyToClipboard() },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ContentCopy,
+                                    contentDescription = "Copy",
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "COPY",
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = 0.5.sp
+                                    ),
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+
+                        // Save Button (with saved state)
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(52.dp)
+                                .border(
+                                    width = 2.dp,
+                                    color = if (uiState.summaryData?.isSaved == true)
+                                        MaterialTheme.colorScheme.primary
+                                    else if (isSystemInDarkTheme())
+                                        MaterialTheme.colorScheme.outline
+                                    else
+                                        PureBlack,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .background(
+                                    if (uiState.summaryData?.isSaved == true)
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                                    else
+                                        MaterialTheme.colorScheme.surface
+                                )
+                                .clickable { onToggleSaveStatus() },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = if (uiState.summaryData?.isSaved == true)
+                                        Icons.Default.Bookmark
+                                    else
+                                        Icons.Default.BookmarkBorder,
+                                    contentDescription = "Save",
+                                    tint = if (uiState.summaryData?.isSaved == true)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "SAVE",
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = 0.5.sp
+                                    ),
+                                    color = if (uiState.summaryData?.isSaved == true)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+
+                        // Home Button
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(52.dp)
+                                .border(
+                                    width = 2.dp,
+                                    color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .background(MaterialTheme.colorScheme.surface)
+                                .clickable { onNavigateToHome() },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Home,
+                                    contentDescription = "Home",
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "HOME",
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = 0.5.sp
+                                    ),
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                    }
+
+                    // Share Button - Full Width Primary CTA
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp)
+                            .background(
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .clickable { onShareSummary() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Share,
+                                contentDescription = "Share",
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.size(22.dp)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                text = "SHARE SUMMARY",
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 0.5.sp,
+                                    fontSize = 16.sp
+                                ),
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
                         }
                     }
                 }
