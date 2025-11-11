@@ -27,7 +27,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nutshell.data.local.preferences.ThemeMode
 import com.nutshell.data.model.SummaryData
 import com.nutshell.presentation.viewmodel.HistoryUiState
 import com.nutshell.ui.theme.*
@@ -47,83 +46,101 @@ fun HistoryScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(start = 24.dp, top = 12.dp, end = 24.dp, bottom = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+            .statusBarsPadding()
     ) {
-        // Search Input - Flat with Border
-        Box(
+        // Content - Flat Minimalist Design
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .border(
-                    width = 2.dp,
-                    color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
-                    shape = RoundedCornerShape(12.dp)
-                )
-                .background(MaterialTheme.colorScheme.surface)
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            Row(
+            // Title
+            Text(
+                text = "HISTORY",
+                style = MaterialTheme.typography.displayLarge.copy(
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.sp
+                ),
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            
+            // Search Input - Flat with Border
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .border(
+                        width = 2.dp,
+                        color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .background(MaterialTheme.colorScheme.surface)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                BasicTextField(
-                    value = searchQuery,
-                    onValueChange = onUpdateSearchQuery,
-                    textStyle = TextStyle(
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Normal
-                    ),
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                    modifier = Modifier.weight(1f),
-                    singleLine = true
-                ) { innerTextField ->
-                    if (searchQuery.isEmpty()) {
-                        Text(
-                            text = "Search history...",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    BasicTextField(
+                        value = searchQuery,
+                        onValueChange = onUpdateSearchQuery,
+                        textStyle = TextStyle(
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal
+                        ),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                        modifier = Modifier.weight(1f),
+                        singleLine = true
+                    ) { innerTextField ->
+                        if (searchQuery.isEmpty()) {
+                            Text(
+                                text = "Search history...",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        innerTextField()
                     }
-                    innerTextField()
                 }
             }
-        }
-    
-        // Content Area
-        if (uiState.filteredSummaries.isEmpty()) {
-            // Empty State - Using reusable component
-            EmptyStateContent(
-                icon = Icons.Default.History,
-                title = "No History Yet",
-                description = "Your summarized texts will appear here",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f)
-            )
-        } else {
-            // History Items List
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(
-                    items = uiState.filteredSummaries,
-                    key = { it.id }
-                ) { item ->
-                    HistoryItemCard(
-                        item = item,
-                        onDelete = onDeleteSummary
-                    )
+        
+            // Content Area
+            if (uiState.filteredSummaries.isEmpty()) {
+                // Empty State - Using reusable component
+                EmptyStateContent(
+                    icon = Icons.Default.History,
+                    title = "No History Yet",
+                    description = "Your summarized texts will appear here",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f)
+                )
+            } else {
+                // History Items List
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(
+                        items = uiState.filteredSummaries,
+                        key = { it.id }
+                    ) { item ->
+                        HistoryItemCard(
+                            item = item,
+                            onDelete = onDeleteSummary
+                        )
+                    }
                 }
             }
         }
@@ -217,111 +234,5 @@ private fun formatDate(date: Date): String {
         diffInMinutes < 60 -> "${diffInMinutes}m ago"
         diffInMinutes < 1440 -> "${diffInMinutes / 60}h ago"
         else -> "${diffInMinutes / 1440}d ago"
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun HistoryScreenPreview() {
-    NutshellTheme {
-        HistoryScreen(
-            uiState = HistoryUiState(
-                summaries = listOf(
-                    SummaryData(
-                        id = "1",
-                        originalText = "Sample input text",
-                        shortSummary = "Short summary",
-                        mediumSummary = "This is a medium length summary of the content",
-                        detailedSummary = "Detailed summary",
-                        createdAt = Date(),
-                        isSaved = false
-                    ),
-                    SummaryData(
-                        id = "2",
-                        originalText = "Another input",
-                        shortSummary = "Another short",
-                        mediumSummary = "Another medium length summary for testing",
-                        detailedSummary = "Another detailed",
-                        createdAt = Date(System.currentTimeMillis() - 3600000),
-                        isSaved = false
-                    )
-                ),
-                filteredSummaries = listOf(
-                    SummaryData(
-                        id = "1",
-                        originalText = "Sample input text",
-                        shortSummary = "Short summary",
-                        mediumSummary = "This is a medium length summary of the content",
-                        detailedSummary = "Detailed summary",
-                        createdAt = Date(),
-                        isSaved = false
-                    ),
-                    SummaryData(
-                        id = "2",
-                        originalText = "Another input",
-                        shortSummary = "Another short",
-                        mediumSummary = "Another medium length summary for testing",
-                        detailedSummary = "Another detailed",
-                        createdAt = Date(System.currentTimeMillis() - 3600000),
-                        isSaved = false
-                    )
-                )
-            ),
-            searchQuery = "",
-            onUpdateSearchQuery = {},
-            onDeleteSummary = {}
-        )
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun HistoryScreenDarkPreview() {
-    NutshellTheme(themeMode = ThemeMode.DARK) {
-        HistoryScreen(
-            uiState = HistoryUiState(
-                summaries = listOf(
-                    SummaryData(
-                        id = "1",
-                        originalText = "Sample input text",
-                        shortSummary = "Short summary",
-                        mediumSummary = "This is a medium length summary of the content",
-                        detailedSummary = "Detailed summary",
-                        createdAt = Date(),
-                        isSaved = false
-                    )
-                ),
-                filteredSummaries = listOf(
-                    SummaryData(
-                        id = "1",
-                        originalText = "Sample input text",
-                        shortSummary = "Short summary",
-                        mediumSummary = "This is a medium length summary of the content",
-                        detailedSummary = "Detailed summary",
-                        createdAt = Date(),
-                        isSaved = false
-                    )
-                )
-            ),
-            searchQuery = "",
-            onUpdateSearchQuery = {},
-            onDeleteSummary = {}
-        )
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun HistoryScreenEmptyPreview() {
-    NutshellTheme {
-        HistoryScreen(
-            uiState = HistoryUiState(
-                summaries = emptyList(),
-                filteredSummaries = emptyList()
-            ),
-            searchQuery = "",
-            onUpdateSearchQuery = {},
-            onDeleteSummary = {}
-        )
     }
 }

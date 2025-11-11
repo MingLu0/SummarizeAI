@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.sp
 import com.nutshell.presentation.viewmodel.HomeUiState
 import com.nutshell.utils.FilePickerUtils
 import com.nutshell.ui.theme.*
-import com.nutshell.data.local.preferences.ThemeMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,9 +95,27 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(start = 24.dp, top = 12.dp, end = 24.dp, bottom = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+            .statusBarsPadding()  // Add padding for transparent status bar
     ) {
+        // Content - Flat Minimalist Design
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            // Custom Header - Large Bold Title
+            Text(
+                text = "SUMMARIZE AI",
+                style = MaterialTheme.typography.displayLarge.copy(
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.sp
+                ),
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(top = 8.dp, bottom = 12.dp)
+            )
+
             // Text Input Area - Flat with Border and Animated Focus
             var isTextFieldFocused by remember { mutableStateOf(false) }
 
@@ -369,6 +386,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(20.dp))
         }
     }
+}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -433,33 +451,6 @@ fun HomeScreenLoadingPreview() {
                 textInput = "Sample text being summarized...",
                 isLoading = true,
                 isSummarizeEnabled = false,
-                error = null,
-                shouldNavigateToOutput = false,
-                shouldNavigateToStreaming = false
-            ),
-            extractedContent = null,
-            webContentError = null,
-            onUpdateTextInput = {},
-            onSummarizeText = {},
-            onClearError = {},
-            onUploadFile = {},
-            onNavigateToStreaming = {},
-            onNavigateToOutput = {},
-            onClearNavigationFlags = {},
-            onClearExtractedContent = {}
-        )
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun HomeScreenDarkPreview() {
-    NutshellTheme(themeMode = ThemeMode.DARK) {
-        HomeScreen(
-            uiState = HomeUiState(
-                textInput = "",
-                isLoading = false,
-                isSummarizeEnabled = true,
                 error = null,
                 shouldNavigateToOutput = false,
                 shouldNavigateToStreaming = false

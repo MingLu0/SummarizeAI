@@ -9,7 +9,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
@@ -24,7 +23,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -104,23 +102,18 @@ fun NutshellNavHost(
     streamingOutputViewModel: com.nutshell.presentation.viewmodel.StreamingOutputViewModel,
     historyViewModel: com.nutshell.presentation.viewmodel.HistoryViewModel,
     savedViewModel: com.nutshell.presentation.viewmodel.SavedViewModel,
-    webContentViewModel: com.nutshell.presentation.viewmodel.WebContentViewModel,
-    contentPadding: PaddingValues = PaddingValues(),
-    onUpdateTopBar: (TopBarState) -> Unit = {}
+    webContentViewModel: com.nutshell.presentation.viewmodel.WebContentViewModel
 ) {
     NavHost(
         navController = navController,
         startDestination = Screen.Splash.route,
-        modifier = modifier.padding(contentPadding)
+        modifier = modifier
     ) {
         composable(
             route = Screen.Splash.route,
             enterTransition = { fadeInTransition },
             exitTransition = { fadeOutTransition }
         ) {
-            LaunchedEffect(Unit) {
-                onUpdateTopBar(TopBarState())
-            }
             SplashScreen(
                 onNavigateToMain = {
                     navController.navigate(Screen.Main.route) {
@@ -170,7 +163,6 @@ fun NutshellNavHost(
                 summaryLanguage = summaryLanguage,
                 summaryLength = summaryLength,
                 appVersion = appVersion,
-                onUpdateTopBar = onUpdateTopBar
             )
         }
         
@@ -199,7 +191,6 @@ fun MainScreenWithBottomNavigation(
     summaryLanguage: SummaryLanguage,
     summaryLength: SummaryLength,
     appVersion: String,
-    onUpdateTopBar: (TopBarState) -> Unit
 ) {
     val bottomNavController = rememberNavController()
     
@@ -240,15 +231,6 @@ fun MainScreenWithBottomNavigation(
             ) {
                 val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
-                
-                LaunchedEffect(currentDestination?.route) {
-                    when (currentDestination?.route) {
-                        Screen.Home.route -> onUpdateTopBar(TopBarState(title = "Nutshell"))
-                        Screen.History.route -> onUpdateTopBar(TopBarState(title = "History"))
-                        Screen.Saved.route -> onUpdateTopBar(TopBarState(title = "Saved"))
-                        Screen.Settings.route -> onUpdateTopBar(TopBarState(title = "Settings"))
-                    }
-                }
                 
                 bottomNavItems.forEach { item ->
                     NavigationBarItem(
@@ -387,9 +369,6 @@ fun MainScreenWithBottomNavigation(
                 popEnterTransition = { popEnterTransition },
                 popExitTransition = { popExitTransition }
             ) {
-                LaunchedEffect(Unit) {
-                    onUpdateTopBar(TopBarState(title = "Nutshell"))
-                }
                 LoadingScreen(
                     onNavigateToOutput = {
                         bottomNavController.navigate(Screen.Output.route)
@@ -407,30 +386,18 @@ fun MainScreenWithBottomNavigation(
                 popEnterTransition = { popEnterTransition },
                 popExitTransition = { popExitTransition }
             ) {
-                val handleBack: () -> Unit = {
-                    println("Back button clicked from Output screen")
-                    homeViewModel.resetState()
-                    bottomNavController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Home.route) {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
-                    }
-                }
-
-                LaunchedEffect(Unit) {
-                    onUpdateTopBar(
-                        TopBarState(
-                            title = "Summary",
-                            showBackButton = true,
-                            onBackClick = handleBack
-                        )
-                    )
-                }
-
                 OutputScreen(
                     uiState = outputUiState,
-                    onNavigateBack = handleBack,
+                    onNavigateBack = {
+                        println("Back button clicked from Output screen")
+                        homeViewModel.resetState()
+                        bottomNavController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Home.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    },
                     onNavigateToHome = {
                         println("Home button clicked from Output screen")
                         homeViewModel.resetState()
@@ -464,28 +431,15 @@ fun MainScreenWithBottomNavigation(
                 
                 // Collect state INSIDE the composable lambda (maintains Single Source of Truth)
                 val streamingOutputUiState by streamingOutputViewModel.uiState.collectAsStateWithLifecycle()
-
-                val handleBack: () -> Unit = {
-                    println("Back button clicked from StreamingOutput screen")
-                    homeViewModel.resetState()
-                    bottomNavController.popBackStack()
-                }
-
-                LaunchedEffect(streamingOutputUiState.isStreaming) {
-                    val title = if (streamingOutputUiState.isStreaming) "In a nutshell" else "Summary"
-                    onUpdateTopBar(
-                        TopBarState(
-                            title = title,
-                            showBackButton = true,
-                            onBackClick = handleBack
-                        )
-                    )
-                }
                 
                 StreamingOutputScreen(
                     uiState = streamingOutputUiState,
                     inputText = inputText,
-                    onNavigateBack = handleBack,
+                    onNavigateBack = {
+                        println("Back button clicked from StreamingOutput screen")
+                        homeViewModel.resetState()
+                        bottomNavController.popBackStack()
+                    },
                     onNavigateToHome = {
                         println("Home button clicked from StreamingOutput screen")
                         homeViewModel.resetState()
@@ -514,3 +468,4 @@ data class BottomNavItem(
     val icon: androidx.compose.ui.graphics.vector.ImageVector,
     val label: String
 )
+

@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.ContentCopy
@@ -24,11 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nutshell.data.local.preferences.ThemeMode
-import com.nutshell.data.model.SummaryData
 import com.nutshell.presentation.viewmodel.OutputUiState
 import com.nutshell.ui.theme.*
-import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,9 +56,42 @@ fun OutputScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(start = 24.dp, top = 12.dp, end = 24.dp, bottom = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .statusBarsPadding()
     ) {
+        // Content - Flat Minimalist Design
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Custom Header with Back Button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = onNavigateBack,
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "SUMMARY",
+                    style = MaterialTheme.typography.displayMedium.copy(
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
             // Tab Selector - Flat Design with Animated Transitions
             Row(
                 modifier = Modifier
@@ -322,58 +353,5 @@ fun OutputScreen(
                 }
             }
         }
-    }
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun OutputScreenPreview() {
-    NutshellTheme {
-        OutputScreen(
-            uiState = OutputUiState(
-                summaryData = SummaryData(
-                    id = "1",
-                    originalText = "Sample input text",
-                    shortSummary = "This is a short summary for preview.",
-                    mediumSummary = "This is a medium length summary that provides more detail about the content. It includes additional information that helps understand the main points of the original text.",
-                    detailedSummary = "This is a detailed summary that provides comprehensive information about the content. It covers all the main points and includes extensive details to give a complete understanding of the original text. This version is the longest and most thorough.",
-                    createdAt = Date(),
-                    isSaved = false
-                ),
-                selectedTabIndex = 1
-            ),
-            onNavigateBack = {},
-            onNavigateToHome = {},
-            onSelectTab = {},
-            onCopyToClipboard = {},
-            onShareSummary = {},
-            onToggleSaveStatus = {}
-        )
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun OutputScreenDarkPreview() {
-    NutshellTheme(themeMode = ThemeMode.DARK) {
-        OutputScreen(
-            uiState = OutputUiState(
-                summaryData = SummaryData(
-                    id = "1",
-                    originalText = "Sample input text",
-                    shortSummary = "This is a short summary for preview.",
-                    mediumSummary = "This is a medium length summary that provides more detail about the content. It includes additional information that helps understand the main points of the original text.",
-                    detailedSummary = "This is a detailed summary that provides comprehensive information about the content.",
-                    createdAt = Date(),
-                    isSaved = true
-                ),
-                selectedTabIndex = 0
-            ),
-            onNavigateBack = {},
-            onNavigateToHome = {},
-            onSelectTab = {},
-            onCopyToClipboard = {},
-            onShareSummary = {},
-            onToggleSaveStatus = {}
-        )
     }
 }
