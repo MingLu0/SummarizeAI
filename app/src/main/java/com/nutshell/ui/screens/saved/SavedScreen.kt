@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nutshell.data.local.preferences.ThemeMode
 import com.nutshell.data.model.SummaryData
 import com.nutshell.presentation.viewmodel.SavedUiState
 import com.nutshell.ui.theme.*
@@ -45,101 +46,83 @@ fun SavedScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .statusBarsPadding()
+            .padding(start = 24.dp, top = 12.dp, end = 24.dp, bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        // Content - Flat Minimalist Design
-        Column(
+        // Search Input - Flat with Border
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            // Title
-            Text(
-                text = "SAVED",
-                style = MaterialTheme.typography.displayLarge.copy(
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.sp
-                ),
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            
-            // Search Input - Flat with Border
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .border(
-                        width = 2.dp,
-                        color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    .background(MaterialTheme.colorScheme.surface)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    BasicTextField(
-                        value = searchQuery,
-                        onValueChange = onUpdateSearchQuery,
-                        textStyle = TextStyle(
-                            color = MaterialTheme.colorScheme.onBackground,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Normal
-                        ),
-                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                        modifier = Modifier.weight(1f),
-                        singleLine = true
-                    ) { innerTextField ->
-                        if (searchQuery.isEmpty()) {
-                            Text(
-                                text = "Search saved items...",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        innerTextField()
-                    }
-                }
-            }
-        
-            // Content Area
-            if (uiState.filteredSummaries.isEmpty()) {
-                // Empty State - Using reusable component
-                EmptyStateContent(
-                    icon = Icons.Default.Bookmark,
-                    title = "No Saved Items",
-                    description = "Bookmark summaries to save them here",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f)
+                .fillMaxWidth()
+                .height(56.dp)
+                .border(
+                    width = 2.dp,
+                    color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
+                    shape = RoundedCornerShape(12.dp)
                 )
-            } else {
-                // Saved Items List
-                LazyColumn(
+                .background(MaterialTheme.colorScheme.surface)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                BasicTextField(
+                    value = searchQuery,
+                    onValueChange = onUpdateSearchQuery,
+                    textStyle = TextStyle(
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal
+                    ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(
-                        items = uiState.filteredSummaries,
-                        key = { it.id }
-                    ) { item ->
-                        SavedItemCard(
-                            item = item,
-                            onUnsave = onUnsaveSummary
+                    singleLine = true
+                ) { innerTextField ->
+                    if (searchQuery.isEmpty()) {
+                        Text(
+                            text = "Search saved items...",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+                    innerTextField()
+                }
+            }
+        }
+    
+        // Content Area
+        if (uiState.filteredSummaries.isEmpty()) {
+            // Empty State - Using reusable component
+            EmptyStateContent(
+                icon = Icons.Default.Bookmark,
+                title = "No Saved Items",
+                description = "Bookmark summaries to save them here",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f)
+            )
+        } else {
+            // Saved Items List
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(
+                    items = uiState.filteredSummaries,
+                    key = { it.id }
+                ) { item ->
+                    SavedItemCard(
+                        item = item,
+                        onUnsave = onUnsaveSummary
+                    )
                 }
             }
         }
@@ -233,5 +216,111 @@ private fun formatDate(date: Date): String {
         diffInMinutes < 60 -> "${diffInMinutes}m ago"
         diffInMinutes < 1440 -> "${diffInMinutes / 60}h ago"
         else -> "${diffInMinutes / 1440}d ago"
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun SavedScreenPreview() {
+    NutshellTheme {
+        SavedScreen(
+            uiState = SavedUiState(
+                savedSummaries = listOf(
+                    SummaryData(
+                        id = "1",
+                        originalText = "Sample input text",
+                        shortSummary = "Short summary",
+                        mediumSummary = "This is a saved medium length summary of the content",
+                        detailedSummary = "Detailed summary",
+                        createdAt = Date(),
+                        isSaved = true
+                    ),
+                    SummaryData(
+                        id = "2",
+                        originalText = "Another input",
+                        shortSummary = "Another short",
+                        mediumSummary = "Another saved summary for testing purposes",
+                        detailedSummary = "Another detailed",
+                        createdAt = Date(System.currentTimeMillis() - 3600000),
+                        isSaved = true
+                    )
+                ),
+                filteredSummaries = listOf(
+                    SummaryData(
+                        id = "1",
+                        originalText = "Sample input text",
+                        shortSummary = "Short summary",
+                        mediumSummary = "This is a saved medium length summary of the content",
+                        detailedSummary = "Detailed summary",
+                        createdAt = Date(),
+                        isSaved = true
+                    ),
+                    SummaryData(
+                        id = "2",
+                        originalText = "Another input",
+                        shortSummary = "Another short",
+                        mediumSummary = "Another saved summary for testing purposes",
+                        detailedSummary = "Another detailed",
+                        createdAt = Date(System.currentTimeMillis() - 3600000),
+                        isSaved = true
+                    )
+                )
+            ),
+            searchQuery = "",
+            onUpdateSearchQuery = {},
+            onUnsaveSummary = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun SavedScreenDarkPreview() {
+    NutshellTheme(themeMode = ThemeMode.DARK) {
+        SavedScreen(
+            uiState = SavedUiState(
+                savedSummaries = listOf(
+                    SummaryData(
+                        id = "1",
+                        originalText = "Sample input text",
+                        shortSummary = "Short summary",
+                        mediumSummary = "This is a saved medium length summary of the content",
+                        detailedSummary = "Detailed summary",
+                        createdAt = Date(),
+                        isSaved = true
+                    )
+                ),
+                filteredSummaries = listOf(
+                    SummaryData(
+                        id = "1",
+                        originalText = "Sample input text",
+                        shortSummary = "Short summary",
+                        mediumSummary = "This is a saved medium length summary of the content",
+                        detailedSummary = "Detailed summary",
+                        createdAt = Date(),
+                        isSaved = true
+                    )
+                )
+            ),
+            searchQuery = "",
+            onUpdateSearchQuery = {},
+            onUnsaveSummary = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun SavedScreenEmptyPreview() {
+    NutshellTheme(themeMode = ThemeMode.LIGHT) {
+        SavedScreen(
+            uiState = SavedUiState(
+                savedSummaries = emptyList(),
+                filteredSummaries = emptyList()
+            ),
+            searchQuery = "",
+            onUpdateSearchQuery = {},
+            onUnsaveSummary = {}
+        )
     }
 }

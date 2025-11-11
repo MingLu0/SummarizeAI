@@ -45,269 +45,241 @@ fun SettingsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .statusBarsPadding()
+            .verticalScroll(rememberScrollState())
+            .padding(start = 24.dp, top = 12.dp, end = 24.dp, bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        // Content - Flat Minimalist Design
-        Column(
+        SettingsCard(
+            icon = Icons.Default.Nightlight,
+            iconBackground = Purple50,
+            iconTint = Purple600,
+            title = "Theme",
+            description = "Choose your app theme preference"
+        ) {
+            var themeExpanded by remember { mutableStateOf(false) }
+
+            ExposedDropdownMenuBox(
+                expanded = themeExpanded,
+                onExpandedChange = { themeExpanded = it }
+            ) {
+                OutlinedTextField(
+                    value = when (themeMode) {
+                        ThemeMode.SYSTEM -> "System"
+                        ThemeMode.LIGHT -> "Light"
+                        ThemeMode.DARK -> "Dark"
+                    },
+                    onValueChange = { },
+                    readOnly = true,
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = themeExpanded)
+                    },
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                ExposedDropdownMenu(
+                    expanded = themeExpanded,
+                    onDismissRequest = { themeExpanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("System") },
+                        onClick = {
+                            onSetThemeMode(ThemeMode.SYSTEM)
+                            themeExpanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Light") },
+                        onClick = {
+                            onSetThemeMode(ThemeMode.LIGHT)
+                            themeExpanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Dark") },
+                        onClick = {
+                            onSetThemeMode(ThemeMode.DARK)
+                            themeExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+
+        SettingsCard(
+            icon = Icons.Default.Speed,
+            iconBackground = Green50,
+            iconTint = Green600,
+            title = "Text Streaming",
+            description = "Show summaries as they're being generated"
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {}
+
+                Switch(
+                    checked = isStreamingEnabled,
+                    onCheckedChange = onSetStreamingEnabled,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                        checkedTrackColor = MaterialTheme.colorScheme.primary,
+                        uncheckedThumbColor = Gray400,
+                        uncheckedTrackColor = Gray300
+                    ),
+                    modifier = Modifier.testTag("streaming_toggle")
+                )
+            }
+        }
+
+        SettingsCard(
+            icon = Icons.Default.Language,
+            iconBackground = Blue50,
+            iconTint = Blue600,
+            title = "Language",
+            description = "Choose summary output language"
+        ) {
+            var languageExpanded by remember { mutableStateOf(false) }
+
+            ExposedDropdownMenuBox(
+                expanded = languageExpanded,
+                onExpandedChange = { languageExpanded = it }
+            ) {
+                OutlinedTextField(
+                    value = summaryLanguage.displayName,
+                    onValueChange = { },
+                    readOnly = true,
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded)
+                    },
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                ExposedDropdownMenu(
+                    expanded = languageExpanded,
+                    onDismissRequest = { languageExpanded = false }
+                ) {
+                    SummaryLanguage.values().forEach { language ->
+                        DropdownMenuItem(
+                            text = { Text(language.displayName) },
+                            onClick = {
+                                onSetSummaryLanguage(language)
+                                languageExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        SettingsCard(
+            icon = Icons.Default.TextFields,
+            iconBackground = Blue50,
+            iconTint = Blue600,
+            title = "Summary Length",
+            description = "Control the detail level of summaries"
+        ) {
+            var lengthExpanded by remember { mutableStateOf(false) }
+
+            ExposedDropdownMenuBox(
+                expanded = lengthExpanded,
+                onExpandedChange = { lengthExpanded = it }
+            ) {
+                OutlinedTextField(
+                    value = summaryLength.displayName,
+                    onValueChange = { },
+                    readOnly = true,
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = lengthExpanded)
+                    },
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                ExposedDropdownMenu(
+                    expanded = lengthExpanded,
+                    onDismissRequest = { lengthExpanded = false }
+                ) {
+                    SummaryLength.values().forEach { length ->
+                        DropdownMenuItem(
+                            text = { Text(length.displayName) },
+                            onClick = {
+                                onSetSummaryLength(length)
+                                lengthExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
+                .border(
+                    width = 2.dp,
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .background(MaterialTheme.colorScheme.surface)
                 .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            contentAlignment = Alignment.Center
         ) {
-            // Title
-            Text(
-                text = "SETTINGS",
-                style = MaterialTheme.typography.displayLarge.copy(
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.sp
-                ),
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            // Theme Mode Card
-            SettingsCard(
-                icon = Icons.Default.Nightlight,
-                iconBackground = Purple50,
-                iconTint = Purple600,
-                title = "Theme",
-                description = "Choose your app theme preference"
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                var themeExpanded by remember { mutableStateOf(false) }
+                Text(
+                    text = "Nutshell",
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
 
-                ExposedDropdownMenuBox(
-                    expanded = themeExpanded,
-                    onExpandedChange = { themeExpanded = it }
-                ) {
-                    OutlinedTextField(
-                        value = when (themeMode) {
-                            ThemeMode.SYSTEM -> "System"
-                            ThemeMode.LIGHT -> "Light"
-                            ThemeMode.DARK -> "Dark"
-                        },
-                        onValueChange = { },
-                        readOnly = true,
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = themeExpanded)
-                        },
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    )
+                Text(
+                    text = "Version $appVersion",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Bold
+                )
 
-                    ExposedDropdownMenu(
-                        expanded = themeExpanded,
-                        onDismissRequest = { themeExpanded = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text("System") },
-                            onClick = {
-                                onSetThemeMode(ThemeMode.SYSTEM)
-                                themeExpanded = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Light") },
-                            onClick = {
-                                onSetThemeMode(ThemeMode.LIGHT)
-                                themeExpanded = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Dark") },
-                            onClick = {
-                                onSetThemeMode(ThemeMode.DARK)
-                                themeExpanded = false
-                            }
-                        )
-                    }
-                }
-            }
-            
-            // Text Streaming Card
-            SettingsCard(
-                icon = Icons.Default.Speed,
-                iconBackground = Green50,
-                iconTint = Green600,
-                title = "Text Streaming",
-                description = "Show summaries as they're being generated"
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        // Content is handled by the card
-                    }
-                    
-                    Switch(
-                        checked = isStreamingEnabled,
-                        onCheckedChange = onSetStreamingEnabled,
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                            checkedTrackColor = MaterialTheme.colorScheme.primary,
-                            uncheckedThumbColor = Gray400,
-                            uncheckedTrackColor = Gray300
-                        ),
-                        modifier = Modifier.testTag("streaming_toggle")
-                    )
-                }
-            }
+                Spacer(modifier = Modifier.height(4.dp))
 
-            // Language Card
-            SettingsCard(
-                icon = Icons.Default.Language,
-                iconBackground = Blue50,
-                iconTint = Blue600,
-                title = "Language",
-                description = "Choose summary output language"
-            ) {
-                var languageExpanded by remember { mutableStateOf(false) }
-
-                ExposedDropdownMenuBox(
-                    expanded = languageExpanded,
-                    onExpandedChange = { languageExpanded = it }
-                ) {
-                    OutlinedTextField(
-                        value = summaryLanguage.displayName,
-                        onValueChange = { },
-                        readOnly = true,
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded)
-                        },
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-
-                    ExposedDropdownMenu(
-                        expanded = languageExpanded,
-                        onDismissRequest = { languageExpanded = false }
-                    ) {
-                        SummaryLanguage.values().forEach { language ->
-                            DropdownMenuItem(
-                                text = { Text(language.displayName) },
-                                onClick = {
-                                    onSetSummaryLanguage(language)
-                                    languageExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Summary Length Card
-            SettingsCard(
-                icon = Icons.Default.TextFields,
-                iconBackground = Blue50,
-                iconTint = Blue600,
-                title = "Summary Length",
-                description = "Control the detail level of summaries"
-            ) {
-                var lengthExpanded by remember { mutableStateOf(false) }
-
-                ExposedDropdownMenuBox(
-                    expanded = lengthExpanded,
-                    onExpandedChange = { lengthExpanded = it }
-                ) {
-                    OutlinedTextField(
-                        value = summaryLength.displayName,
-                        onValueChange = { },
-                        readOnly = true,
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = lengthExpanded)
-                        },
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-
-                    ExposedDropdownMenu(
-                        expanded = lengthExpanded,
-                        onDismissRequest = { lengthExpanded = false }
-                    ) {
-                        SummaryLength.values().forEach { length ->
-                            DropdownMenuItem(
-                                text = { Text(length.displayName) },
-                                onClick = {
-                                    onSetSummaryLength(length)
-                                    lengthExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-
-            // About Card - Flat with Primary Accent
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(24.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "SUMMARIZE AI",
-                        style = MaterialTheme.typography.headlineSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp
-                        ),
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    
-                    Text(
-                        text = "Version $appVersion",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.Bold
-                    )
-                    
-                    Spacer(modifier = Modifier.height(4.dp))
-                    
-                    Text(
-                        text = "Turn long text into key insights instantly",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
-                    )
-                }
+                Text(
+                    text = "Turn long text into key insights instantly",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
@@ -322,7 +294,6 @@ fun SettingsCard(
     description: String,
     content: @Composable () -> Unit
 ) {
-    // Flat Card with Border
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -335,7 +306,6 @@ fun SettingsCard(
             .padding(20.dp),
         verticalAlignment = Alignment.Top
     ) {
-        // Icon Container
         Box(
             modifier = Modifier
                 .size(48.dp)
@@ -352,10 +322,9 @@ fun SettingsCard(
                 modifier = Modifier.size(24.dp)
             )
         }
-        
+
         Spacer(modifier = Modifier.width(16.dp))
-        
-        // Content Area
+
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -366,15 +335,15 @@ fun SettingsCard(
                 ),
                 color = MaterialTheme.colorScheme.onSurface
             )
-            
+
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             content()
         }
     }
@@ -402,6 +371,42 @@ fun ThemeModeOption(
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
             )
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun SettingsScreenPreview() {
+    NutshellTheme(themeMode = ThemeMode.LIGHT) {
+        SettingsScreen(
+            isStreamingEnabled = true,
+            themeMode = ThemeMode.SYSTEM,
+            summaryLanguage = SummaryLanguage.ENGLISH,
+            summaryLength = SummaryLength.MEDIUM,
+            appVersion = "1.0.0",
+            onSetStreamingEnabled = {},
+            onSetThemeMode = {},
+            onSetSummaryLanguage = {},
+            onSetSummaryLength = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun SettingsScreenDarkPreview() {
+    NutshellTheme(themeMode = ThemeMode.DARK) {
+        SettingsScreen(
+            isStreamingEnabled = false,
+            themeMode = ThemeMode.DARK,
+            summaryLanguage = SummaryLanguage.ENGLISH,
+            summaryLength = SummaryLength.SHORT,
+            appVersion = "1.0.0",
+            onSetStreamingEnabled = {},
+            onSetThemeMode = {},
+            onSetSummaryLanguage = {},
+            onSetSummaryLength = {}
         )
     }
 }
