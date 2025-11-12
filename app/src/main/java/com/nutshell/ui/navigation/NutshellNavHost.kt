@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
@@ -23,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -84,6 +86,7 @@ private val fastFadeOut = fadeOut(animationSpec = tween(150))
 fun NutshellNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
+    innerPadding: PaddingValues,
     homeUiState: com.nutshell.presentation.viewmodel.HomeUiState,
     isStreamingEnabled: Boolean,
     themeMode: ThemeMode,
@@ -102,17 +105,18 @@ fun NutshellNavHost(
     streamingOutputViewModel: com.nutshell.presentation.viewmodel.StreamingOutputViewModel,
     historyViewModel: com.nutshell.presentation.viewmodel.HistoryViewModel,
     savedViewModel: com.nutshell.presentation.viewmodel.SavedViewModel,
-    webContentViewModel: com.nutshell.presentation.viewmodel.WebContentViewModel
+    webContentViewModel: com.nutshell.presentation.viewmodel.WebContentViewModel,
+    onBottomNavRouteChange: (String?) -> Unit = {}
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Splash.route,
-        modifier = modifier
+        startDestination = Screen.Main.route,
+        modifier = modifier.padding(innerPadding)
     ) {
         composable(
             route = Screen.Splash.route,
             enterTransition = { fadeInTransition },
-            exitTransition = { fadeOutTransition }
+        exitTransition = { fadeOutTransition }
         ) {
             SplashScreen(
                 onNavigateToMain = {
@@ -163,6 +167,7 @@ fun NutshellNavHost(
                 summaryLanguage = summaryLanguage,
                 summaryLength = summaryLength,
                 appVersion = appVersion,
+                onBottomNavRouteChange = onBottomNavRouteChange
             )
         }
         
@@ -191,8 +196,17 @@ fun MainScreenWithBottomNavigation(
     summaryLanguage: SummaryLanguage,
     summaryLength: SummaryLength,
     appVersion: String,
+    onBottomNavRouteChange: (String?) -> Unit = {}
 ) {
     val bottomNavController = rememberNavController()
+
+    // Report bottom nav route changes
+    val bottomNavBackStackEntry by bottomNavController.currentBackStackEntryAsState()
+    val bottomNavRoute = bottomNavBackStackEntry?.destination?.route
+
+    LaunchedEffect(bottomNavRoute) {
+        onBottomNavRouteChange(bottomNavRoute)
+    }
     
     val bottomNavItems = listOf(
         BottomNavItem(
@@ -289,7 +303,8 @@ fun MainScreenWithBottomNavigation(
         NavHost(
             navController = bottomNavController,
             startDestination = Screen.Home.route,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(bottom = innerPadding.calculateBottomPadding())
         ) {
             composable(
                 route = Screen.Home.route,
