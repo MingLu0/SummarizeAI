@@ -51,7 +51,7 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 24.dp),
+                .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             // Theme Mode Card

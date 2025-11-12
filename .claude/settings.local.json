@@ -10,7 +10,8 @@
       "Bash(gh run:*)",
       "Bash(git revert:*)",
       "Bash(./gradlew assembleDebug:*)",
-      "WebSearch"
+      "WebSearch",
+      "WebFetch(domain:stackoverflow.com)"
     ],
     "deny": [],
     "ask": []

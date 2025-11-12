@@ -434,3 +434,4 @@ Based on README documentation:
 - Performance tests for large datasets
 - Accessibility tests (screen reader compliance)
 - Target: 80%+ code coverage
+- always bump up version number when you push to github
