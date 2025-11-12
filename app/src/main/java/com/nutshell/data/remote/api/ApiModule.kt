@@ -20,26 +20,26 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object ApiModule {
 
-private const val BASE_URL = "https://colin730-summarizerapp.hf.space/"
+    private const val BASE_URL = "https://colin730-summarizerapp.hf.space/"
 
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
-    
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
+
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
-        
+
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
-            .connectTimeout(60, TimeUnit.SECONDS)  // Increased for AI processing
-            .readTimeout(120, TimeUnit.SECONDS)    // Increased for large text processing
-            .writeTimeout(60, TimeUnit.SECONDS)    // Increased for large requests
-            .retryOnConnectionFailure(true)        // Enable automatic retry
+            .connectTimeout(60, TimeUnit.SECONDS) // Increased for AI processing
+            .readTimeout(120, TimeUnit.SECONDS) // Increased for large text processing
+            .writeTimeout(60, TimeUnit.SECONDS) // Increased for large requests
+            .retryOnConnectionFailure(true) // Enable automatic retry
             .build()
     }
-    
+
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
@@ -49,23 +49,23 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
-    
+
     @Provides
     @Singleton
     fun provideSummarizerApi(retrofit: Retrofit): SummarizerApi {
         return retrofit.create(SummarizerApi::class.java)
     }
-    
+
     @Provides
     @Singleton
     fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
         return context.dataStore
     }
-    
+
     @Provides
     @Singleton
     fun provideWebContentRepository(
-        webContentRepositoryImpl: com.nutshell.data.remote.repository.WebContentRepositoryImpl
+        webContentRepositoryImpl: com.nutshell.data.remote.repository.WebContentRepositoryImpl,
     ): com.nutshell.domain.repository.WebContentRepository {
         return webContentRepositoryImpl
     }

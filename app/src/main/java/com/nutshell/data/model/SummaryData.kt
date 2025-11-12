@@ -9,20 +9,20 @@ data class SummaryData(
     val mediumSummary: String,
     val detailedSummary: String,
     val createdAt: Date = Date(),
-    val isSaved: Boolean = false
+    val isSaved: Boolean = false,
 )
 
 data class SummaryRequest(
     val text: String,
     val maxTokens: Int = 256,
-    val prompt: String = "Summarize the following text concisely:"
+    val prompt: String = "Summarize the following text concisely:",
 )
 
 data class SummaryResponse(
     val summary: String,
     val model: String,
     val tokensUsed: Int?,
-    val latencyMs: Double?
+    val latencyMs: Double?,
 )
 
 sealed class ApiResult<out T> {

@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nutshell.data.local.preferences.SummaryLanguage
@@ -39,12 +38,12 @@ fun SettingsScreen(
     onSetStreamingEnabled: (Boolean) -> Unit,
     onSetThemeMode: (ThemeMode) -> Unit,
     onSetSummaryLanguage: (SummaryLanguage) -> Unit,
-    onSetSummaryLength: (SummaryLength) -> Unit
+    onSetSummaryLength: (SummaryLength) -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.background),
     ) {
         // Content - Flat Minimalist Design
         Column(
@@ -52,7 +51,7 @@ fun SettingsScreen(
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
                 .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             // Theme Mode Card
             SettingsCard(
@@ -60,13 +59,13 @@ fun SettingsScreen(
                 iconBackground = Purple50,
                 iconTint = Purple600,
                 title = "Theme",
-                description = "Choose your app theme preference"
+                description = "Choose your app theme preference",
             ) {
                 var themeExpanded by remember { mutableStateOf(false) }
 
                 ExposedDropdownMenuBox(
                     expanded = themeExpanded,
-                    onExpandedChange = { themeExpanded = it }
+                    onExpandedChange = { themeExpanded = it },
                 ) {
                     OutlinedTextField(
                         value = when (themeMode) {
@@ -86,59 +85,59 @@ fun SettingsScreen(
                             focusedBorderColor = MaterialTheme.colorScheme.primary,
                             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                             focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
                     )
 
                     ExposedDropdownMenu(
                         expanded = themeExpanded,
-                        onDismissRequest = { themeExpanded = false }
+                        onDismissRequest = { themeExpanded = false },
                     ) {
                         DropdownMenuItem(
                             text = { Text("System") },
                             onClick = {
                                 onSetThemeMode(ThemeMode.SYSTEM)
                                 themeExpanded = false
-                            }
+                            },
                         )
                         DropdownMenuItem(
                             text = { Text("Light") },
                             onClick = {
                                 onSetThemeMode(ThemeMode.LIGHT)
                                 themeExpanded = false
-                            }
+                            },
                         )
                         DropdownMenuItem(
                             text = { Text("Dark") },
                             onClick = {
                                 onSetThemeMode(ThemeMode.DARK)
                                 themeExpanded = false
-                            }
+                            },
                         )
                     }
                 }
             }
-            
+
             // Text Streaming Card
             SettingsCard(
                 icon = Icons.Default.Speed,
                 iconBackground = Green50,
                 iconTint = Green600,
                 title = "Text Streaming",
-                description = "Show summaries as they're being generated"
+                description = "Show summaries as they're being generated",
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column(
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     ) {
                         // Content is handled by the card
                     }
-                    
+
                     Switch(
                         checked = isStreamingEnabled,
                         onCheckedChange = onSetStreamingEnabled,
@@ -146,9 +145,9 @@ fun SettingsScreen(
                             checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
                             checkedTrackColor = MaterialTheme.colorScheme.primary,
                             uncheckedThumbColor = Gray400,
-                            uncheckedTrackColor = Gray300
+                            uncheckedTrackColor = Gray300,
                         ),
-                        modifier = Modifier.testTag("streaming_toggle")
+                        modifier = Modifier.testTag("streaming_toggle"),
                     )
                 }
             }
@@ -159,13 +158,13 @@ fun SettingsScreen(
                 iconBackground = Blue50,
                 iconTint = Blue600,
                 title = "Language",
-                description = "Choose summary output language"
+                description = "Choose summary output language",
             ) {
                 var languageExpanded by remember { mutableStateOf(false) }
 
                 ExposedDropdownMenuBox(
                     expanded = languageExpanded,
-                    onExpandedChange = { languageExpanded = it }
+                    onExpandedChange = { languageExpanded = it },
                 ) {
                     OutlinedTextField(
                         value = summaryLanguage.displayName,
@@ -181,14 +180,14 @@ fun SettingsScreen(
                             focusedBorderColor = MaterialTheme.colorScheme.primary,
                             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                             focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
                     )
 
                     ExposedDropdownMenu(
                         expanded = languageExpanded,
-                        onDismissRequest = { languageExpanded = false }
+                        onDismissRequest = { languageExpanded = false },
                     ) {
                         SummaryLanguage.values().forEach { language ->
                             DropdownMenuItem(
@@ -196,7 +195,7 @@ fun SettingsScreen(
                                 onClick = {
                                     onSetSummaryLanguage(language)
                                     languageExpanded = false
-                                }
+                                },
                             )
                         }
                     }
@@ -209,13 +208,13 @@ fun SettingsScreen(
                 iconBackground = Blue50,
                 iconTint = Blue600,
                 title = "Summary Length",
-                description = "Control the detail level of summaries"
+                description = "Control the detail level of summaries",
             ) {
                 var lengthExpanded by remember { mutableStateOf(false) }
 
                 ExposedDropdownMenuBox(
                     expanded = lengthExpanded,
-                    onExpandedChange = { lengthExpanded = it }
+                    onExpandedChange = { lengthExpanded = it },
                 ) {
                     OutlinedTextField(
                         value = summaryLength.displayName,
@@ -231,14 +230,14 @@ fun SettingsScreen(
                             focusedBorderColor = MaterialTheme.colorScheme.primary,
                             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                             focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
                     )
 
                     ExposedDropdownMenu(
                         expanded = lengthExpanded,
-                        onDismissRequest = { lengthExpanded = false }
+                        onDismissRequest = { lengthExpanded = false },
                     ) {
                         SummaryLength.values().forEach { length ->
                             DropdownMenuItem(
@@ -246,7 +245,7 @@ fun SettingsScreen(
                                 onClick = {
                                     onSetSummaryLength(length)
                                     lengthExpanded = false
-                                }
+                                },
                             )
                         }
                     }
@@ -260,39 +259,39 @@ fun SettingsScreen(
                     .border(
                         width = 2.dp,
                         color = MaterialTheme.colorScheme.primary,
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
                     )
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(24.dp),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
                         text = "NUTSHELL",
                         style = MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp
+                            letterSpacing = 1.sp,
                         ),
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
-                    
+
                     Text(
                         text = "Version $appVersion",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
-                    
+
                     Spacer(modifier = Modifier.height(4.dp))
-                    
+
                     Text(
                         text = "Turn long text into key insights instantly",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                 }
             }
@@ -307,7 +306,7 @@ fun SettingsCard(
     iconTint: androidx.compose.ui.graphics.Color,
     title: String,
     description: String,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     // Flat Card with Border
     Row(
@@ -316,11 +315,11 @@ fun SettingsCard(
             .border(
                 width = 2.dp,
                 color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
             )
             .background(MaterialTheme.colorScheme.surface)
             .padding(20.dp),
-        verticalAlignment = Alignment.Top
+        verticalAlignment = Alignment.Top,
     ) {
         // Icon Container
         Box(
@@ -328,40 +327,40 @@ fun SettingsCard(
                 .size(48.dp)
                 .background(
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
                 ),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = title,
                 tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(24.dp),
             )
         }
-        
+
         Spacer(modifier = Modifier.width(16.dp))
-        
+
         // Content Area
         Column(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 ),
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
-            
+
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             content()
         }
     }
@@ -372,23 +371,23 @@ fun ThemeModeOption(
     text: String,
     isSelected: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Button(
         onClick = onClick,
         modifier = modifier.height(48.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-            contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+            contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
         ),
         shape = RoundedCornerShape(12.dp),
-        border = if (!isSelected) BorderStroke(2.dp, MaterialTheme.colorScheme.outline) else null
+        border = if (!isSelected) BorderStroke(2.dp, MaterialTheme.colorScheme.outline) else null,
     ) {
         Text(
             text = text,
             style = MaterialTheme.typography.bodyMedium.copy(
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-            )
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+            ),
         )
     }
 }

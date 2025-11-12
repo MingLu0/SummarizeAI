@@ -54,7 +54,7 @@ fun AppScaffold(
     streamingOutputViewModel: StreamingOutputViewModel,
     historyViewModel: HistoryViewModel,
     savedViewModel: SavedViewModel,
-    webContentViewModel: WebContentViewModel
+    webContentViewModel: WebContentViewModel,
 ) {
     // Use bottom nav route when main route is "main", otherwise use the main route
     val effectiveRoute = if (currentRoute == "main") bottomNavRoute else currentRoute
@@ -66,7 +66,7 @@ fun AppScaffold(
                     title = {
                         Text(
                             text = getScreenTitle(effectiveRoute),
-                            modifier = Modifier.padding(start = 8.dp)
+                            modifier = Modifier.padding(start = 8.dp),
                         )
                     },
                     navigationIcon = {
@@ -79,11 +79,11 @@ fun AppScaffold(
                                     } else {
                                         onNavigateBack()
                                     }
-                                }
+                                },
                             ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "Back"
+                                    contentDescription = "Back",
                                 )
                             }
                         }
@@ -98,7 +98,7 @@ fun AppScaffold(
                             IconButton(onClick = onCopyToClipboard) {
                                 Icon(
                                     imageVector = Icons.Default.ContentCopy,
-                                    contentDescription = "Copy"
+                                    contentDescription = "Copy",
                                 )
                             }
 
@@ -114,7 +114,7 @@ fun AppScaffold(
                                         "Unsave"
                                     } else {
                                         "Save"
-                                    }
+                                    },
                                 )
                             }
 
@@ -122,14 +122,14 @@ fun AppScaffold(
                             IconButton(onClick = onShareSummary) {
                                 Icon(
                                     imageVector = Icons.Default.Share,
-                                    contentDescription = "Share"
+                                    contentDescription = "Share",
                                 )
                             }
                         }
-                    }
+                    },
                 )
             }
-        }
+        },
     ) { innerPadding ->
         NutshellNavHost(
             navController = navController,
@@ -154,7 +154,7 @@ fun AppScaffold(
             historyViewModel = historyViewModel,
             savedViewModel = savedViewModel,
             webContentViewModel = webContentViewModel,
-            onBottomNavRouteChange = onBottomNavRouteChange
+            onBottomNavRouteChange = onBottomNavRouteChange,
         )
     }
 }
@@ -195,4 +195,3 @@ private fun shouldShowBackButton(route: String?): Boolean {
         else -> false
     }
 }
-

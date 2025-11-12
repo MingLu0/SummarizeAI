@@ -21,40 +21,40 @@ import com.nutshell.data.local.preferences.ThemeMode
 
 // Spacing System
 object Spacing {
-    val xs = 4.dp      // 4dp
-    val sm = 8.dp      // 8dp
-    val md = 12.dp     // 12dp
-    val lg = 16.dp     // 16dp
-    val xl = 24.dp     // 24dp
-    val xxl = 32.dp    // 32dp
-    val xxxl = 48.dp   // 48dp
+    val xs = 4.dp // 4dp
+    val sm = 8.dp // 8dp
+    val md = 12.dp // 12dp
+    val lg = 16.dp // 16dp
+    val xl = 24.dp // 24dp
+    val xxl = 32.dp // 32dp
+    val xxxl = 48.dp // 48dp
 }
 
 // Border Radius
 object CornerRadius {
-    val sm = 8.dp      // Small elements
-    val md = 12.dp     // Medium elements
-    val lg = 16.dp     // Cards
-    val xl = 20.dp     // Large cards
-    val xxl = 24.dp    // Buttons, major elements
+    val sm = 8.dp // Small elements
+    val md = 12.dp // Medium elements
+    val lg = 16.dp // Cards
+    val xl = 20.dp // Large cards
+    val xxl = 24.dp // Buttons, major elements
     val full = 9999.dp // Circular/pill shapes
 }
 
 // Elevation/Shadows
 object Elevation {
     val none = 0.dp
-    val sm = 2.dp      // Subtle shadow
-    val md = 4.dp      // Card shadow
-    val lg = 8.dp      // Elevated elements
-    val xl = 16.dp     // Modal/dialog shadow
+    val sm = 2.dp // Subtle shadow
+    val md = 4.dp // Card shadow
+    val lg = 8.dp // Elevated elements
+    val xl = 16.dp // Modal/dialog shadow
 }
 
 // Animation Durations (in milliseconds)
 object AnimationDurations {
-    const val fast = 150        // Quick transitions (hover states, ripples)
-    const val medium = 300      // Standard transitions (tab changes, colors)
-    const val slow = 500        // Deliberate animations (modals, screens)
-    const val extraSlow = 800   // Emphasis animations (success states)
+    const val fast = 150 // Quick transitions (hover states, ripples)
+    const val medium = 300 // Standard transitions (tab changes, colors)
+    const val slow = 500 // Deliberate animations (modals, screens)
+    const val extraSlow = 800 // Emphasis animations (success states)
 }
 
 // Animation Specifications
@@ -70,17 +70,17 @@ object AnimationSpecs {
     // Spring animations for bouncy effects
     val bouncySpring = spring<Float>(
         dampingRatio = Spring.DampingRatioMediumBouncy,
-        stiffness = Spring.StiffnessMedium
+        stiffness = Spring.StiffnessMedium,
     )
 
     val gentleSpring = spring<Float>(
         dampingRatio = Spring.DampingRatioLowBouncy,
-        stiffness = Spring.StiffnessLow
+        stiffness = Spring.StiffnessLow,
     )
 
     val stiffSpring = spring<Float>(
         dampingRatio = Spring.DampingRatioMediumBouncy,
-        stiffness = Spring.StiffnessHigh
+        stiffness = Spring.StiffnessHigh,
     )
 
     // Fade animations
@@ -115,7 +115,7 @@ private val DarkColorScheme = darkColorScheme(
     surfaceVariant = DarkSurfaceVariant,
     onSurfaceVariant = DarkOnSurfaceVariant,
     outline = DarkOutline,
-    outlineVariant = DarkOutlineVariant
+    outlineVariant = DarkOutlineVariant,
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -142,7 +142,7 @@ private val LightColorScheme = lightColorScheme(
     surfaceVariant = LightSurfaceVariant,
     onSurfaceVariant = LightOnSurfaceVariant,
     outline = LightOutline,
-    outlineVariant = LightOutlineVariant
+    outlineVariant = LightOutlineVariant,
 )
 
 @Composable
@@ -150,16 +150,16 @@ fun NutshellTheme(
     themeMode: ThemeMode = ThemeMode.SYSTEM,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false, // Disabled for consistent branding
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val systemInDarkTheme = isSystemInDarkTheme()
-    
+
     val shouldUseDarkTheme = when (themeMode) {
         ThemeMode.SYSTEM -> systemInDarkTheme
         ThemeMode.LIGHT -> false
         ThemeMode.DARK -> true
     }
-    
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
@@ -169,7 +169,7 @@ fun NutshellTheme(
         shouldUseDarkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
-    
+
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -177,7 +177,7 @@ fun NutshellTheme(
             // Use transparent status bar for edge-to-edge design
             window.statusBarColor = Color.Transparent.toArgb()
             window.navigationBarColor = Color.Transparent.toArgb()
-            
+
             val windowInsetsController = WindowCompat.getInsetsController(window, view)
             // Light icons for dark theme, dark icons for light theme
             windowInsetsController.isAppearanceLightStatusBars = !shouldUseDarkTheme
@@ -188,6 +188,6 @@ fun NutshellTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = NutshellTypography,
-        content = content
+        content = content,
     )
 }

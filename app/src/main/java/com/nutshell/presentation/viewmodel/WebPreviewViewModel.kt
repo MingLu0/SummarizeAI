@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WebPreviewViewModel @Inject constructor(
-    private val webContentRepository: WebContentRepository
+    private val webContentRepository: WebContentRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WebPreviewUiState())
@@ -31,7 +31,7 @@ class WebPreviewViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(
                 isLoading = true,
                 error = null,
-                content = null
+                content = null,
             )
 
             webContentRepository.extractWebContent(currentUrl)
@@ -39,14 +39,14 @@ class WebPreviewViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         content = content,
-                        error = null
+                        error = null,
                     )
                 }
                 .onFailure { throwable ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         error = getErrorMessage(throwable),
-                        content = null
+                        content = null,
                     )
                 }
         }
@@ -55,11 +55,11 @@ class WebPreviewViewModel @Inject constructor(
     private fun getErrorMessage(throwable: Throwable): String {
         return when {
             throwable is IllegalArgumentException -> throwable.message ?: "Invalid URL"
-            throwable.message?.contains("timeout", ignoreCase = true) == true -> 
+            throwable.message?.contains("timeout", ignoreCase = true) == true ->
                 "Request timed out. Please check your internet connection and try again."
-            throwable.message?.contains("network", ignoreCase = true) == true -> 
+            throwable.message?.contains("network", ignoreCase = true) == true ->
                 "Network error. Please check your internet connection."
-            throwable.message?.contains("no content", ignoreCase = true) == true -> 
+            throwable.message?.contains("no content", ignoreCase = true) == true ->
                 "No readable content found on this page."
             else -> "Failed to extract content. Please try again."
         }
@@ -70,6 +70,5 @@ data class WebPreviewUiState(
     val url: String = "",
     val isLoading: Boolean = false,
     val content: WebContent? = null,
-    val error: String? = null
+    val error: String? = null,
 )
-

@@ -17,12 +17,13 @@ import javax.inject.Singleton
 enum class ThemeMode {
     SYSTEM,
     LIGHT,
-    DARK
+    DARK,
 }
 
 enum class SummaryLanguage(val code: String, val displayName: String) {
     ENGLISH("en", "English"),
-    CHINESE("zh-CN", "中文");
+    CHINESE("zh-CN", "中文"),
+    ;
 
     companion object {
         fun fromCode(code: String): SummaryLanguage {
@@ -42,19 +43,19 @@ enum class SummaryLanguage(val code: String, val displayName: String) {
 enum class SummaryLength(val displayName: String) {
     SHORT("Short"),
     MEDIUM("Medium"),
-    LONG("Long")
+    LONG("Long"),
 }
 
 @Singleton
 class UserPreferences @Inject constructor(
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
 ) {
 
     private val streamingEnabledKey = booleanPreferencesKey("streaming_enabled")
     private val themeModeKey = stringPreferencesKey("theme_mode")
     private val summaryLanguageKey = stringPreferencesKey("summary_language")
     private val summaryLengthKey = stringPreferencesKey("summary_length")
-    
+
     val isStreamingEnabled: Flow<Boolean> = dataStore.data
         .catch { exception ->
             if (exception is IOException) {
@@ -66,7 +67,7 @@ class UserPreferences @Inject constructor(
         .map { preferences ->
             preferences[streamingEnabledKey] ?: true // Default to true
         }
-    
+
     val themeMode: Flow<ThemeMode> = dataStore.data
         .catch { exception ->
             if (exception is IOException) {
@@ -120,7 +121,7 @@ class UserPreferences @Inject constructor(
             preferences[streamingEnabledKey] = enabled
         }
     }
-    
+
     suspend fun setThemeMode(mode: ThemeMode) {
         dataStore.edit { preferences ->
             preferences[themeModeKey] = mode.name

@@ -21,31 +21,31 @@ class StreamingOutputViewModel @Inject constructor(
     private val repository: SummaryRepository,
     private val clipboardUtils: ClipboardUtils,
     private val shareUtils: ShareUtils,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    
+
     companion object {
         private const val TAG = "StreamingOutputVM"
     }
-    
+
     private val _uiState = MutableStateFlow(StreamingOutputUiState())
     val uiState: StateFlow<StreamingOutputUiState> = _uiState.asStateFlow()
-    
+
     fun startStreaming(inputText: String) {
         if (inputText.isBlank()) {
             _uiState.value = _uiState.value.copy(
-                error = "Input text is empty"
+                error = "Input text is empty",
             )
             return
         }
-        
+
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 isStreaming = true,
                 streamingText = "",
-                error = null
+                error = null,
             )
-            
+
             // Collect from repository and display chunks as they arrive
             var chunkCount = 0
             repository.summarizeTextStreaming(inputText).collect { result ->
@@ -63,33 +63,33 @@ class StreamingOutputViewModel @Inject constructor(
                         _uiState.value = _uiState.value.copy(
                             isStreaming = false,
                             summaryData = result.summaryData,
-                            streamingText = ""
+                            streamingText = "",
                         )
                     }
                     is StreamingResult.Error -> {
                         Log.e(TAG, "Streaming error: ${result.message}")
                         _uiState.value = _uiState.value.copy(
                             isStreaming = false,
-                            error = result.message
+                            error = result.message,
                         )
                     }
                 }
             }
         }
     }
-    
+
     fun selectTab(index: Int) {
         _uiState.value = _uiState.value.copy(selectedTabIndex = index)
     }
-    
+
     fun getCurrentSummaryText(): String {
         val state = _uiState.value
-        
+
         // If streaming, return streaming text
         if (state.isStreaming) {
             return state.streamingText
         }
-        
+
         // If completed, return appropriate summary based on tab
         val summaryData = state.summaryData ?: return ""
         return when (state.selectedTabIndex) {
@@ -99,34 +99,34 @@ class StreamingOutputViewModel @Inject constructor(
             else -> summaryData.mediumSummary
         }
     }
-    
+
     fun copyToClipboard() {
         val text = getCurrentSummaryText()
         if (text.isNotBlank()) {
             clipboardUtils.copyToClipboard(text, "Summary")
         }
     }
-    
+
     fun shareSummary() {
         val text = getCurrentSummaryText()
         if (text.isNotBlank()) {
             shareUtils.shareText(text, "Share Summary")
         }
     }
-    
+
     fun toggleSaveStatus() {
         val summaryData = _uiState.value.summaryData ?: return
-        
+
         viewModelScope.launch {
             repository.toggleSaveStatus(summaryData.id)
-            
+
             // Update local state
             _uiState.value = _uiState.value.copy(
-                summaryData = summaryData.copy(isSaved = !summaryData.isSaved)
+                summaryData = summaryData.copy(isSaved = !summaryData.isSaved),
             )
         }
     }
-    
+
     fun resetState() {
         _uiState.value = StreamingOutputUiState()
     }
@@ -137,6 +137,5 @@ data class StreamingOutputUiState(
     val isStreaming: Boolean = false,
     val summaryData: SummaryData? = null,
     val selectedTabIndex: Int = 1, // Default to Medium
-    val error: String? = null
+    val error: String? = null,
 )
-

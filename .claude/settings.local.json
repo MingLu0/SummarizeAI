@@ -11,7 +11,9 @@
       "Bash(git revert:*)",
       "Bash(./gradlew assembleDebug:*)",
       "WebSearch",
-      "WebFetch(domain:stackoverflow.com)"
+      "WebFetch(domain:stackoverflow.com)",
+      "Bash(./gradlew help:*)",
+      "Bash(./gradlew ktlintCheck:*)"
     ],
     "deny": [],
     "ask": []

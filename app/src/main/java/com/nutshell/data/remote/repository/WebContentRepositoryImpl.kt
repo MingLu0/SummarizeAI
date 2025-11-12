@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Singleton
 class WebContentRepositoryImpl @Inject constructor(
-    private val webContentExtractor: WebContentExtractor
+    private val webContentExtractor: WebContentExtractor,
 ) : WebContentRepository {
 
     override suspend fun extractWebContent(url: String): Result<WebContent> = withContext(Dispatchers.IO) {
@@ -21,4 +21,3 @@ class WebContentRepositoryImpl @Inject constructor(
         }
     }
 }
-

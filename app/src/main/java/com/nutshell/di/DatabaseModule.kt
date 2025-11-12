@@ -15,22 +15,22 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
-    
+
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): SummarizeDatabase {
         return Room.databaseBuilder(
             context,
             SummarizeDatabase::class.java,
-            SummarizeDatabase.DATABASE_NAME
+            SummarizeDatabase.DATABASE_NAME,
         ).build()
     }
-    
+
     @Provides
     fun provideSummaryDao(database: SummarizeDatabase): SummaryDao {
         return database.summaryDao()
     }
-    
+
     @Provides
     @Singleton
     fun provideSummaryLocalDataSource(summaryDao: SummaryDao): SummaryLocalDataSource {

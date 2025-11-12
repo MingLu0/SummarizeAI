@@ -13,12 +13,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WebContentViewModel @Inject constructor(
-    private val webContentExtractor: WebContentExtractor
+    private val webContentExtractor: WebContentExtractor,
 ) : ViewModel() {
-    
+
     private val _uiState = MutableStateFlow(WebContentUiState())
     val uiState: StateFlow<WebContentUiState> = _uiState.asStateFlow()
-    
+
     fun handleIntent(intent: Intent?) {
         try {
             when (intent?.action) {
@@ -31,7 +31,7 @@ class WebContentViewModel @Inject constructor(
                             _uiState.value = _uiState.value.copy(
                                 extractedContent = url,
                                 isExtracting = false,
-                                shouldNavigateToMain = true
+                                shouldNavigateToMain = true,
                             )
                         }
                     }
@@ -39,19 +39,19 @@ class WebContentViewModel @Inject constructor(
             }
         } catch (e: Exception) {
             _uiState.value = _uiState.value.copy(
-                error = e.message ?: "Failed to handle intent"
+                error = e.message ?: "Failed to handle intent",
             )
         }
     }
-    
+
     fun handleSharedUrl(url: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 sharedUrl = url,
                 isExtracting = true,
-                error = null
+                error = null,
             )
-            
+
             try {
                 println("WebContentViewModel: Starting content extraction for URL: $url")
                 webContentExtractor.extractContent(url)
@@ -60,7 +60,7 @@ class WebContentViewModel @Inject constructor(
                         _uiState.value = _uiState.value.copy(
                             extractedContent = webContent.content,
                             isExtracting = false,
-                            shouldNavigateToMain = true
+                            shouldNavigateToMain = true,
                         )
                     }
                     .onFailure { error ->
@@ -69,7 +69,7 @@ class WebContentViewModel @Inject constructor(
                             extractedContent = "",
                             isExtracting = false,
                             shouldNavigateToMain = true,
-                            error = error.message
+                            error = error.message,
                         )
                     }
             } catch (e: Exception) {
@@ -77,26 +77,26 @@ class WebContentViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     extractedContent = "",
                     isExtracting = false,
-                    error = e.message
+                    error = e.message,
                 )
             }
         }
     }
-    
+
     fun clearExtractedContent() {
         _uiState.value = _uiState.value.copy(
             extractedContent = null,
             sharedUrl = null,
-            shouldNavigateToMain = false
+            shouldNavigateToMain = false,
         )
     }
-    
+
     fun clearNavigationFlag() {
         _uiState.value = _uiState.value.copy(
-            shouldNavigateToMain = false
+            shouldNavigateToMain = false,
         )
     }
-    
+
     private fun extractUrlFromText(text: String): String? {
         val urlPattern = Regex("https?://[\\w\\-._~:/?#\\[\\]@!$&'()*+,;=%]+")
         return urlPattern.find(text)?.value
@@ -108,6 +108,5 @@ data class WebContentUiState(
     val extractedContent: String? = null,
     val isExtracting: Boolean = false,
     val error: String? = null,
-    val shouldNavigateToMain: Boolean = false
+    val shouldNavigateToMain: Boolean = false,
 )
-

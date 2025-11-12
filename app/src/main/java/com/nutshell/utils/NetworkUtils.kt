@@ -16,11 +16,11 @@ import javax.inject.Singleton
 
 @Singleton
 class NetworkUtils @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) {
-    
+
     private val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    
+
     /**
      * Check if device has an active network connection
      */
@@ -28,7 +28,7 @@ class NetworkUtils @Inject constructor(
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val network = connectivityManager.activeNetwork ?: return false
             val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
-            
+
             when {
                 networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
                 networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
@@ -41,7 +41,7 @@ class NetworkUtils @Inject constructor(
             networkInfo?.isConnected == true
         }
     }
-    
+
     /**
      * Check if device has internet connectivity (not just network connection)
      * This is a basic check - for production, you might want to ping a reliable server
@@ -49,7 +49,7 @@ class NetworkUtils @Inject constructor(
     fun hasInternetConnectivity(): Boolean {
         return isNetworkAvailable()
     }
-    
+
     /**
      * Flow that emits network connectivity status changes
      */
@@ -58,18 +58,18 @@ class NetworkUtils @Inject constructor(
             override fun onAvailable(network: Network) {
                 trySend(true)
             }
-            
+
             override fun onLost(network: Network) {
                 trySend(false)
             }
-            
+
             override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
                 val hasInternet = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
-                        networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+                    networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
                 trySend(hasInternet)
             }
         }
-        
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             connectivityManager.registerDefaultNetworkCallback(callback)
         } else {
@@ -79,7 +79,7 @@ class NetworkUtils @Inject constructor(
                 .build()
             connectivityManager.registerNetworkCallback(networkRequest, callback)
         }
-        
+
         awaitClose {
             connectivityManager.unregisterNetworkCallback(callback)
         }

@@ -13,7 +13,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -24,17 +23,17 @@ import com.nutshell.ui.theme.*
 fun LoadingScreen(
     onNavigateToOutput: () -> Unit = {},
     onNavigateBack: () -> Unit,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    
+
     // Handle navigation based on API call result
     LaunchedEffect(uiState) {
         println("LoadingScreen: LaunchedEffect triggered")
         println("LoadingScreen: summaryData = ${uiState.summaryData}")
         println("LoadingScreen: isLoading = ${uiState.isLoading}")
         println("LoadingScreen: error = ${uiState.error}")
-        
+
         when {
             uiState.summaryData != null && !uiState.isLoading -> {
                 println("LoadingScreen: Navigating to output screen")
@@ -46,7 +45,7 @@ fun LoadingScreen(
             }
         }
     }
-    
+
     // Add timeout mechanism to prevent infinite loading
     LaunchedEffect(Unit) {
         kotlinx.coroutines.delay(60000) // 60 seconds timeout
@@ -56,62 +55,62 @@ fun LoadingScreen(
     }
     // Animation for dots
     val infiniteTransition = rememberInfiniteTransition(label = "loading")
-    
+
     val dot1Scale by infiniteTransition.animateFloat(
         initialValue = 0.8f,
         targetValue = 1.2f,
         animationSpec = infiniteRepeatable(
             animation = tween(1000, easing = EaseInOut),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "dot1"
+        label = "dot1",
     )
-    
+
     val dot2Scale by infiniteTransition.animateFloat(
         initialValue = 0.8f,
         targetValue = 1.2f,
         animationSpec = infiniteRepeatable(
             animation = tween(1000, delayMillis = 200, easing = EaseInOut),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "dot2"
+        label = "dot2",
     )
-    
+
     val dot3Scale by infiniteTransition.animateFloat(
         initialValue = 0.8f,
         targetValue = 1.2f,
         animationSpec = infiniteRepeatable(
             animation = tween(1000, delayMillis = 400, easing = EaseInOut),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "dot3"
+        label = "dot3",
     )
-    
+
     // Progress bar animation
     val progress by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(2000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
+            repeatMode = RepeatMode.Restart,
         ),
-        label = "progress"
+        label = "progress",
     )
-    
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Gray50),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+            verticalArrangement = Arrangement.spacedBy(Spacing.xl),
         ) {
             // Animated Dots
             Row(
                 horizontalArrangement = Arrangement.spacedBy(Spacing.md),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 // Dot 1
                 Box(
@@ -119,43 +118,43 @@ fun LoadingScreen(
                         .size(16.dp)
                         .scale(dot1Scale)
                         .clip(CircleShape)
-                        .background(Cyan600)
+                        .background(Cyan600),
                 )
-                
+
                 // Dot 2
                 Box(
                     modifier = Modifier
                         .size(16.dp)
                         .scale(dot2Scale)
                         .clip(CircleShape)
-                        .background(Cyan600)
+                        .background(Cyan600),
                 )
-                
+
                 // Dot 3
                 Box(
                     modifier = Modifier
                         .size(16.dp)
                         .scale(dot3Scale)
                         .clip(CircleShape)
-                        .background(Cyan600)
+                        .background(Cyan600),
                 )
             }
-            
+
             // Status Text
             Text(
                 text = "Analyzing text...",
                 style = MaterialTheme.typography.headlineSmall,
                 color = Gray900,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
             )
-            
+
             // Progress Bar
             Box(
                 modifier = Modifier
                     .width(240.dp)
                     .height(4.dp)
                     .clip(RoundedCornerShape(CornerRadius.sm))
-                    .background(Gray200)
+                    .background(Gray200),
             ) {
                 Box(
                     modifier = Modifier
@@ -163,20 +162,19 @@ fun LoadingScreen(
                         .width(240.dp * progress)
                         .background(
                             brush = Brush.horizontalGradient(
-                                colors = listOf(Cyan600, Blue600)
-                            )
-                        )
+                                colors = listOf(Cyan600, Blue600),
+                            ),
+                        ),
                 )
             }
-            
+
             // Helper Text
             Text(
                 text = "Please wait while we summarize your content",
                 style = MaterialTheme.typography.bodyMedium,
                 color = Gray600,
-                modifier = Modifier.widthIn(max = 280.dp)
+                modifier = Modifier.widthIn(max = 280.dp),
             )
-            
         }
     }
 }

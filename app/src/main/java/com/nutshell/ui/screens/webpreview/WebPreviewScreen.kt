@@ -16,7 +16,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,43 +29,43 @@ fun WebPreviewScreen(
     initialUrl: String,
     onNavigateBack: () -> Unit,
     onProceedToSummarize: (String, String) -> Unit, // title, content
-    viewModel: WebPreviewViewModel = hiltViewModel()
+    viewModel: WebPreviewViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    
+
     LaunchedEffect(initialUrl) {
         if (initialUrl.isNotBlank()) {
             viewModel.setUrl(initialUrl)
             viewModel.extractContent()
         }
     }
-    
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(PureWhite)
+            .background(PureWhite),
     ) {
         // Content - Flat Minimalist Design
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             // Custom Header with Back Button
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(
                     onClick = onNavigateBack,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(40.dp),
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
                         tint = PureBlack,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
@@ -75,12 +74,12 @@ fun WebPreviewScreen(
                     style = MaterialTheme.typography.displayMedium.copy(
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.sp
+                        letterSpacing = 0.sp,
                     ),
-                    color = PureBlack
+                    color = PureBlack,
                 )
             }
-            
+
             // URL Box - Flat
             Row(
                 modifier = Modifier
@@ -88,27 +87,27 @@ fun WebPreviewScreen(
                     .border(
                         width = 2.dp,
                         color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
                     )
                     .background(PureWhite)
                     .padding(20.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     imageVector = Icons.Default.Link,
                     contentDescription = "URL",
                     tint = PureBlack,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
                     text = uiState.url,
                     style = MaterialTheme.typography.bodyMedium,
                     color = Gray800,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
             }
-            
+
             // Content Box - Flat
             Column(
                 modifier = Modifier
@@ -117,113 +116,113 @@ fun WebPreviewScreen(
                     .border(
                         width = 2.dp,
                         color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
                     )
                     .background(PureWhite)
-                    .padding(20.dp)
+                    .padding(20.dp),
             ) {
                 Text(
                     text = "CONTENT PREVIEW",
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     ),
-                    color = PureBlack
+                    color = PureBlack,
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 when {
                     uiState.isLoading -> {
                         Box(
                             modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
                             ) {
                                 CircularProgressIndicator(
                                     color = ElectricLime,
-                                    strokeWidth = 3.dp
+                                    strokeWidth = 3.dp,
                                 )
                                 Text(
                                     text = "Extracting content...",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = Gray700
+                                    color = Gray700,
                                 )
                             }
                         }
                     }
-                    
+
                     uiState.error != null -> {
                         val errorMessage = uiState.error
                         Box(
                             modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
                             ) {
                                 Text(
                                     text = "⚠️",
-                                    style = MaterialTheme.typography.headlineLarge
+                                    style = MaterialTheme.typography.headlineLarge,
                                 )
                                 Text(
                                     text = errorMessage ?: "Unknown error",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = Gray700
+                                    color = Gray700,
                                 )
                                 Box(
                                     modifier = Modifier
                                         .background(
                                             color = ElectricLime,
-                                            shape = RoundedCornerShape(12.dp)
+                                            shape = RoundedCornerShape(12.dp),
                                         )
                                         .clickable { viewModel.extractContent() }
-                                        .padding(horizontal = 24.dp, vertical = 12.dp)
+                                        .padding(horizontal = 24.dp, vertical = 12.dp),
                                 ) {
                                     Text(
                                         text = "RETRY",
                                         style = MaterialTheme.typography.labelMedium.copy(
-                                            fontWeight = FontWeight.Bold
+                                            fontWeight = FontWeight.Bold,
                                         ),
-                                        color = PureBlack
+                                        color = PureBlack,
                                     )
                                 }
                             }
                         }
                     }
-                    
+
                     uiState.content != null -> {
                         val content = uiState.content
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .verticalScroll(rememberScrollState())
+                                .verticalScroll(rememberScrollState()),
                         ) {
                             Text(
                                 text = content?.title ?: "Untitled",
                                 style = MaterialTheme.typography.titleLarge.copy(
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
                                 ),
-                                color = PureBlack
+                                color = PureBlack,
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 text = content?.content ?: "",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = Gray800,
-                                lineHeight = 22.sp
+                                lineHeight = 22.sp,
                             )
                         }
                     }
                 }
             }
-            
+
             // Action Buttons - Flat
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 // Cancel Button
                 Box(
@@ -233,21 +232,21 @@ fun WebPreviewScreen(
                         .border(
                             width = 2.dp,
                             color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12.dp),
                         )
                         .background(PureWhite)
                         .clickable(onClick = onNavigateBack),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = "CANCEL",
                         style = MaterialTheme.typography.labelMedium.copy(
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         ),
-                        color = PureBlack
+                        color = PureBlack,
                     )
                 }
-                
+
                 // Summarize Button
                 Box(
                     modifier = Modifier
@@ -255,22 +254,22 @@ fun WebPreviewScreen(
                         .height(56.dp)
                         .background(
                             color = if (uiState.content != null && !uiState.isLoading) ElectricLime else ElectricLimeLight,
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12.dp),
                         )
                         .clickable(enabled = uiState.content != null && !uiState.isLoading) {
                             uiState.content?.let { content ->
                                 onProceedToSummarize(content.title, content.content)
                             }
                         },
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = "SUMMARIZE →",
                         style = MaterialTheme.typography.labelMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp
+                            letterSpacing = 1.sp,
                         ),
-                        color = PureBlack
+                        color = PureBlack,
                     )
                 }
             }

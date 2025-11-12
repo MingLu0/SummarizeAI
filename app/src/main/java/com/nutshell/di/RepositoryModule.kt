@@ -13,16 +13,16 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
-    
+
     @Binds
     @Singleton
     abstract fun bindSummaryRepository(
-        summaryRepositoryImpl: SummaryRepositoryImpl
+        summaryRepositoryImpl: SummaryRepositoryImpl,
     ): SummaryRepository
-    
+
     @Binds
     @Singleton
     abstract fun bindSummaryRemoteDataSource(
-        summaryRemoteDataSourceImpl: SummaryRemoteDataSourceImpl
+        summaryRemoteDataSourceImpl: SummaryRemoteDataSourceImpl,
     ): SummaryRemoteDataSource
 }

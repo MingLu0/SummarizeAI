@@ -1,0 +1,37 @@
+# EditorConfig for Kotlin code style
+# https://editorconfig.org
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{kt,kts}]
+indent_style = space
+indent_size = 4
+continuation_indent_size = 4
+max_line_length = 140
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+
+# ktlint rules (0.50.0 format)
+ktlint_disabled_rules = filename,no-wildcard-imports
+
+# Import ordering
+ij_kotlin_imports_layout = *,java.**,javax.**,kotlin.**,^
+
+# Wrapping
+ij_kotlin_parameter_annotation_wrap = on_every_item
+ij_kotlin_enum_constants_wrap = on_every_item
+
+[*.xml]
+indent_size = 4
+
+[*.gradle.kts]
+indent_size = 4
+
+[*.md]
+trim_trailing_whitespace = false

@@ -5,7 +5,7 @@ import com.nutshell.data.model.SummaryData
 import java.util.*
 
 object SummaryMapper {
-    
+
     fun SummaryEntity.toSummaryData(): SummaryData {
         return SummaryData(
             id = this.id,
@@ -14,10 +14,10 @@ object SummaryMapper {
             mediumSummary = this.mediumSummary,
             detailedSummary = this.detailedSummary,
             createdAt = Date(this.createdAt),
-            isSaved = this.isSaved
+            isSaved = this.isSaved,
         )
     }
-    
+
     fun SummaryData.toSummaryEntity(): SummaryEntity {
         return SummaryEntity(
             id = this.id,
@@ -26,10 +26,10 @@ object SummaryMapper {
             mediumSummary = this.mediumSummary,
             detailedSummary = this.detailedSummary,
             createdAt = this.createdAt.time,
-            isSaved = this.isSaved
+            isSaved = this.isSaved,
         )
     }
-    
+
     fun List<SummaryEntity>.toSummaryDataList(): List<SummaryData> {
         return this.map { it.toSummaryData() }
     }

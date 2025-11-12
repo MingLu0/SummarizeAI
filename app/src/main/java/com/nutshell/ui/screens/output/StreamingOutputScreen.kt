@@ -8,14 +8,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.clickable
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,7 +32,7 @@ fun StreamingOutputScreen(
     onCopyToClipboard: () -> Unit,
     onShareSummary: () -> Unit,
     onToggleSaveStatus: () -> Unit,
-    onResetState: () -> Unit = {}
+    onResetState: () -> Unit = {},
 ) {
     // Compute current summary text locally
     val currentSummaryText by remember(uiState) {
@@ -54,7 +50,7 @@ fun StreamingOutputScreen(
             }
         }
     }
-    
+
     // Start streaming when screen loads
     LaunchedEffect(inputText) {
         if (inputText.isNotBlank()) {
@@ -62,11 +58,11 @@ fun StreamingOutputScreen(
             onStartStreaming(inputText)
         }
     }
-    
+
     // Auto-scroll to bottom when new text arrives
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-    
+
     LaunchedEffect(currentSummaryText) {
         if (currentSummaryText.isNotEmpty()) {
             coroutineScope.launch {
@@ -74,18 +70,18 @@ fun StreamingOutputScreen(
             }
         }
     }
-    
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.background),
     ) {
         // Content - Flat Minimalist Design
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // Status Indicator - Flat
             if (uiState.isStreaming) {
@@ -95,11 +91,11 @@ fun StreamingOutputScreen(
                         .border(
                             width = 2.dp,
                             color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12.dp),
                         )
                         .background(MaterialTheme.colorScheme.surface)
                         .padding(20.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     // Animated typing indicator
                     TypingIndicator()
@@ -109,9 +105,9 @@ fun StreamingOutputScreen(
                     Text(
                         text = "Nutshell is generating your summary...",
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
                         ),
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
@@ -166,27 +162,27 @@ fun StreamingOutputScreen(
                     .border(
                         width = 2.dp,
                         color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
                     )
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(MaterialTheme.colorScheme.surface),
             ) {
                 LazyColumn(
                     state = listState,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     item {
                         Text(
                             text = currentSummaryText.ifEmpty { "Starting to generate summary..." },
                             style = MaterialTheme.typography.bodyLarge.copy(
-                                lineHeight = 28.sp
+                                lineHeight = 28.sp,
                             ),
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
-                    
+
                     // Add typing cursor at the end
 //                    if (currentSummaryText.isNotEmpty()) {
 //                        item {
@@ -207,14 +203,14 @@ fun TypingIndicator() {
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(1000, easing = EaseInOut),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "typing_alpha"
+        label = "typing_alpha",
     )
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         repeat(3) { index ->
             val delay = index * 200
@@ -223,9 +219,9 @@ fun TypingIndicator() {
                 targetValue = 1f,
                 animationSpec = infiniteRepeatable(
                     animation = tween(600, delayMillis = delay, easing = EaseInOut),
-                    repeatMode = RepeatMode.Reverse
+                    repeatMode = RepeatMode.Reverse,
                 ),
-                label = "dot_alpha_$index"
+                label = "dot_alpha_$index",
             )
 
             Box(
@@ -233,8 +229,8 @@ fun TypingIndicator() {
                     .size(8.dp)
                     .background(
                         color = MaterialTheme.colorScheme.primary.copy(alpha = dotAlpha),
-                        shape = RoundedCornerShape(4.dp)
-                    )
+                        shape = RoundedCornerShape(4.dp),
+                    ),
             )
         }
     }
@@ -248,16 +244,16 @@ fun TypingCursor() {
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(500, easing = EaseInOut),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "cursor_alpha"
+        label = "cursor_alpha",
     )
 
     Text(
         text = "|",
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.primary,
-        fontWeight = FontWeight.Bold
+        fontWeight = FontWeight.Bold,
     )
 }
 
@@ -274,7 +270,7 @@ fun StreamingOutputScreenPreview() {
             onSelectTab = {},
             onCopyToClipboard = {},
             onShareSummary = {},
-            onToggleSaveStatus = {}
+            onToggleSaveStatus = {},
         )
     }
 }

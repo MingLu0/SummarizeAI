@@ -10,14 +10,14 @@ import javax.inject.Singleton
 
 @Singleton
 class ClipboardUtils @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) {
-    
+
     fun copyToClipboard(text: String, label: String = "Summary") {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText(label, text)
         clipboard.setPrimaryClip(clip)
-        
+
         Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
     }
 }

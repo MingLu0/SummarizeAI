@@ -1,8 +1,8 @@
 package com.nutshell.domain.repository
 
 import com.nutshell.data.model.ApiResult
-import com.nutshell.data.model.SummaryData
 import com.nutshell.data.model.StreamingResult
+import com.nutshell.data.model.SummaryData
 import kotlinx.coroutines.flow.Flow
 
 interface SummaryRepository {

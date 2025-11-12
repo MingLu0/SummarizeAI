@@ -13,20 +13,20 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val userPreferences: UserPreferences
+    private val userPreferences: UserPreferences,
 ) : ViewModel() {
 
     val isStreamingEnabled: Flow<Boolean> = userPreferences.isStreamingEnabled
     val themeMode: Flow<ThemeMode> = userPreferences.themeMode
     val summaryLanguage: Flow<SummaryLanguage> = userPreferences.summaryLanguage
     val summaryLength: Flow<SummaryLength> = userPreferences.summaryLength
-    
+
     fun setStreamingEnabled(enabled: Boolean) {
         viewModelScope.launch {
             userPreferences.setStreamingEnabled(enabled)
         }
     }
-    
+
     fun setThemeMode(mode: ThemeMode) {
         viewModelScope.launch {
             userPreferences.setThemeMode(mode)

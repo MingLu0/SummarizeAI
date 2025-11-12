@@ -13,5 +13,5 @@ data class SummaryEntity(
     val mediumSummary: String,
     val detailedSummary: String,
     val createdAt: Long,
-    val isSaved: Boolean = false
+    val isSaved: Boolean = false,
 )

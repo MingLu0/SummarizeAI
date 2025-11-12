@@ -11,24 +11,20 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.nutshell.R
 import com.nutshell.ui.theme.*
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
-    onNavigateToMain: () -> Unit
+    onNavigateToMain: () -> Unit,
 ) {
     var isVisible by remember { mutableStateOf(false) }
-    
+
     // Animation for logo scaling
     val infiniteTransition = rememberInfiniteTransition(label = "splash")
     val scale by infiniteTransition.animateFloat(
@@ -36,25 +32,26 @@ fun SplashScreen(
         targetValue = 1.1f,
         animationSpec = infiniteRepeatable(
             animation = tween(2000, easing = EaseInOut),
-            repeatMode = RepeatMode.Reverse
-        ), label = "scale"
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "scale",
     )
-    
+
     LaunchedEffect(Unit) {
         isVisible = true
         delay(2000) // Show splash for 2 seconds
         onNavigateToMain()
     }
-    
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Spacing.lg)
+            verticalArrangement = Arrangement.spacedBy(Spacing.lg),
         ) {
             // App Icon with animation - matching app's flat minimalist style
             Box(
@@ -64,20 +61,20 @@ fun SplashScreen(
                     .border(
                         width = 2.dp,
                         color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
                     )
                     .background(
                         color = MaterialTheme.colorScheme.surface,
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
                     )
                     .padding(Spacing.lg),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 // App icon
                 Image(
                     painter = painterResource(id = R.drawable.ic_launcher_foreground),
                     contentDescription = "App Icon",
-                    modifier = Modifier.size(80.dp)
+                    modifier = Modifier.size(80.dp),
                 )
             }
 
@@ -86,14 +83,14 @@ fun SplashScreen(
                 text = "Nutshell",
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
 
             // Tagline
             Text(
                 text = "Turn long text into key insights using Nutshell powered by AI",
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
             )
 
             // Loading indicator
@@ -102,9 +99,8 @@ fun SplashScreen(
             CircularProgressIndicator(
                 modifier = Modifier.size(32.dp),
                 color = MaterialTheme.colorScheme.primary,
-                strokeWidth = 3.dp
+                strokeWidth = 3.dp,
             )
         }
     }
 }
-

@@ -1,8 +1,6 @@
 package com.nutshell.ui.navigation
 
 import android.net.Uri
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -14,8 +12,8 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -40,43 +37,37 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.nutshell.ui.screens.splash.SplashScreen
-import com.nutshell.ui.screens.welcome.WelcomeScreen
-import com.nutshell.ui.screens.home.HomeScreen
-import com.nutshell.ui.screens.history.HistoryScreen
-import com.nutshell.ui.screens.saved.SavedScreen
-import com.nutshell.ui.screens.settings.SettingsScreen
-import com.nutshell.ui.screens.loading.LoadingScreen
-import com.nutshell.ui.screens.output.OutputScreen
-import com.nutshell.ui.screens.output.StreamingOutputScreen
-import com.nutshell.presentation.viewmodel.*
 import com.nutshell.data.local.preferences.SummaryLanguage
 import com.nutshell.data.local.preferences.SummaryLength
 import com.nutshell.data.local.preferences.ThemeMode
-import com.nutshell.ui.theme.Cyan600
-import com.nutshell.ui.theme.Gray400
-import com.nutshell.ui.theme.Gray600
-import com.nutshell.ui.theme.NutshellTheme
-import com.nutshell.ui.theme.White
+import com.nutshell.presentation.viewmodel.*
+import com.nutshell.ui.screens.history.HistoryScreen
+import com.nutshell.ui.screens.home.HomeScreen
+import com.nutshell.ui.screens.loading.LoadingScreen
+import com.nutshell.ui.screens.output.OutputScreen
+import com.nutshell.ui.screens.output.StreamingOutputScreen
+import com.nutshell.ui.screens.saved.SavedScreen
+import com.nutshell.ui.screens.settings.SettingsScreen
+import com.nutshell.ui.screens.splash.SplashScreen
 
 // Animation specs for screen transitions
 private val fadeInTransition = fadeIn(animationSpec = tween(300))
 private val fadeOutTransition = fadeOut(animationSpec = tween(300))
 private val slideInTransition = slideInHorizontally(
     initialOffsetX = { it },
-    animationSpec = tween(300)
+    animationSpec = tween(300),
 )
 private val slideOutTransition = slideOutHorizontally(
     targetOffsetX = { -it },
-    animationSpec = tween(300)
+    animationSpec = tween(300),
 )
 private val popEnterTransition = slideInHorizontally(
     initialOffsetX = { -it },
-    animationSpec = tween(300)
+    animationSpec = tween(300),
 ) + fadeIn(animationSpec = tween(300))
 private val popExitTransition = slideOutHorizontally(
     targetOffsetX = { it },
-    animationSpec = tween(300)
+    animationSpec = tween(300),
 ) + fadeOut(animationSpec = tween(300))
 
 // Fast animations for bottom nav tab switches
@@ -107,24 +98,24 @@ fun NutshellNavHost(
     historyViewModel: com.nutshell.presentation.viewmodel.HistoryViewModel,
     savedViewModel: com.nutshell.presentation.viewmodel.SavedViewModel,
     webContentViewModel: com.nutshell.presentation.viewmodel.WebContentViewModel,
-    onBottomNavRouteChange: (String?) -> Unit = {}
+    onBottomNavRouteChange: (String?) -> Unit = {},
 ) {
     NavHost(
         navController = navController,
         startDestination = Screen.Main.route,
-        modifier = modifier.padding(innerPadding)
+        modifier = modifier.padding(innerPadding),
     ) {
         composable(
             route = Screen.Splash.route,
             enterTransition = { fadeInTransition },
-        exitTransition = { fadeOutTransition }
+            exitTransition = { fadeOutTransition },
         ) {
             SplashScreen(
                 onNavigateToMain = {
                     navController.navigate(Screen.Main.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
-                }
+                },
             )
         }
 
@@ -140,12 +131,12 @@ fun NutshellNavHost(
                 }
             )
         }
-        */
+         */
 
         composable(
             route = Screen.Main.route,
             enterTransition = { fadeInTransition + slideInTransition },
-            exitTransition = { fadeOutTransition + slideOutTransition }
+            exitTransition = { fadeOutTransition + slideOutTransition },
         ) {
             MainScreenWithBottomNavigation(
                 navController = navController,
@@ -168,10 +159,9 @@ fun NutshellNavHost(
                 summaryLanguage = summaryLanguage,
                 summaryLength = summaryLength,
                 appVersion = appVersion,
-                onBottomNavRouteChange = onBottomNavRouteChange
+                onBottomNavRouteChange = onBottomNavRouteChange,
             )
         }
-        
     }
 }
 
@@ -197,7 +187,7 @@ fun MainScreenWithBottomNavigation(
     summaryLanguage: SummaryLanguage,
     summaryLength: SummaryLength,
     appVersion: String,
-    onBottomNavRouteChange: (String?) -> Unit = {}
+    onBottomNavRouteChange: (String?) -> Unit = {},
 ) {
     val bottomNavController = rememberNavController()
 
@@ -208,28 +198,28 @@ fun MainScreenWithBottomNavigation(
     LaunchedEffect(bottomNavRoute) {
         onBottomNavRouteChange(bottomNavRoute)
     }
-    
+
     val bottomNavItems = listOf(
         BottomNavItem(
             route = Screen.Home.route,
             icon = Icons.Default.Home,
-            label = "Home"
+            label = "Home",
         ),
         BottomNavItem(
             route = Screen.History.route,
             icon = Icons.Default.History,
-            label = "History"
+            label = "History",
         ),
         BottomNavItem(
             route = Screen.Saved.route,
             icon = Icons.Default.Bookmark,
-            label = "Saved"
+            label = "Saved",
         ),
         BottomNavItem(
             route = Screen.Settings.route,
             icon = Icons.Default.Settings,
-            label = "Settings"
-        )
+            label = "Settings",
+        ),
     )
 
     Scaffold(
@@ -244,40 +234,42 @@ fun MainScreenWithBottomNavigation(
                     MaterialTheme.colorScheme.surfaceColorAtElevation(0.dp).copy(alpha = 0.95f)
                 },
                 contentColor = MaterialTheme.colorScheme.onSurface,
-                tonalElevation = 0.dp
+                tonalElevation = 0.dp,
             ) {
                 val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
-                
+
                 bottomNavItems.forEach { item ->
                     NavigationBarItem(
                         icon = {
                             Icon(
                                 imageVector = item.icon,
                                 contentDescription = item.label,
-                                tint = if (currentDestination?.hierarchy?.any { it.route == item.route } == true) 
-                                    MaterialTheme.colorScheme.primary 
-                                else 
+                                tint = if (currentDestination?.hierarchy?.any { it.route == item.route } == true) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
                                     MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                },
                             )
                         },
-                        label = { 
+                        label = {
                             Text(
                                 text = item.label,
-                                color = if (currentDestination?.hierarchy?.any { it.route == item.route } == true) 
-                                    MaterialTheme.colorScheme.primary 
-                                else 
+                                color = if (currentDestination?.hierarchy?.any { it.route == item.route } == true) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
                                     MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                            ) 
+                                },
+                            )
                         },
                         selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                         onClick = {
                             println("Bottom nav clicked: ${item.route}, current: ${currentDestination?.route}")
-                            
+
                             // Check if we're on Output or StreamingOutput screen
                             val isOnOutputScreen = currentDestination?.route == Screen.Output.route
                             val isOnStreamingOutputScreen = currentDestination?.route?.startsWith("streaming_output/") == true
-                            
+
                             if (isOnOutputScreen || isOnStreamingOutputScreen) {
                                 println("Navigating from Output/StreamingOutput screen to ${item.route}")
                                 // If on Output or StreamingOutput screen, navigate directly to the selected tab
@@ -297,22 +289,22 @@ fun MainScreenWithBottomNavigation(
                                     launchSingleTop = true
                                 }
                             }
-                        }
+                        },
                     )
                 }
             }
-        }
+        },
     ) { innerPadding ->
         NavHost(
             navController = bottomNavController,
             startDestination = Screen.Home.route,
             modifier = Modifier
-                .padding(bottom = innerPadding.calculateBottomPadding())
+                .padding(bottom = innerPadding.calculateBottomPadding()),
         ) {
             composable(
                 route = Screen.Home.route,
                 enterTransition = { fastFadeIn },
-                exitTransition = { fastFadeOut }
+                exitTransition = { fastFadeOut },
             ) {
                 // Collect webContentUiState to get error state
                 val webContentUiState by webContentViewModel.uiState.collectAsStateWithLifecycle()
@@ -332,40 +324,40 @@ fun MainScreenWithBottomNavigation(
                         bottomNavController.navigate(Screen.Output.route)
                     },
                     onClearNavigationFlags = homeViewModel::clearNavigationFlags,
-                    onClearExtractedContent = webContentViewModel::clearExtractedContent
+                    onClearExtractedContent = webContentViewModel::clearExtractedContent,
                 )
             }
-            
+
             composable(
                 route = Screen.History.route,
                 enterTransition = { fastFadeIn },
-                exitTransition = { fastFadeOut }
+                exitTransition = { fastFadeOut },
             ) {
                 HistoryScreen(
                     uiState = historyUiState,
                     searchQuery = historySearchQuery,
                     onUpdateSearchQuery = historyViewModel::updateSearchQuery,
-                    onDeleteSummary = historyViewModel::deleteSummary
+                    onDeleteSummary = historyViewModel::deleteSummary,
                 )
             }
 
             composable(
                 route = Screen.Saved.route,
                 enterTransition = { fastFadeIn },
-                exitTransition = { fastFadeOut }
+                exitTransition = { fastFadeOut },
             ) {
                 SavedScreen(
                     uiState = savedUiState,
                     searchQuery = savedSearchQuery,
                     onUpdateSearchQuery = savedViewModel::updateSearchQuery,
-                    onUnsaveSummary = savedViewModel::unsaveSummary
+                    onUnsaveSummary = savedViewModel::unsaveSummary,
                 )
             }
 
             composable(
                 route = Screen.Settings.route,
                 enterTransition = { fastFadeIn },
-                exitTransition = { fastFadeOut }
+                exitTransition = { fastFadeOut },
             ) {
                 SettingsScreen(
                     isStreamingEnabled = isStreamingEnabled,
@@ -376,16 +368,16 @@ fun MainScreenWithBottomNavigation(
                     onSetStreamingEnabled = settingsViewModel::setStreamingEnabled,
                     onSetThemeMode = settingsViewModel::setThemeMode,
                     onSetSummaryLanguage = settingsViewModel::setSummaryLanguage,
-                    onSetSummaryLength = settingsViewModel::setSummaryLength
+                    onSetSummaryLength = settingsViewModel::setSummaryLength,
                 )
             }
-            
+
             composable(
                 route = Screen.Loading.route,
                 enterTransition = { fadeInTransition + slideInTransition },
                 exitTransition = { fadeOutTransition + slideOutTransition },
                 popEnterTransition = { popEnterTransition },
-                popExitTransition = { popExitTransition }
+                popExitTransition = { popExitTransition },
             ) {
                 LoadingScreen(
                     onNavigateToOutput = {
@@ -393,7 +385,7 @@ fun MainScreenWithBottomNavigation(
                     },
                     onNavigateBack = {
                         bottomNavController.popBackStack()
-                    }
+                    },
                 )
             }
 
@@ -402,7 +394,7 @@ fun MainScreenWithBottomNavigation(
                 enterTransition = { fadeInTransition + slideInTransition },
                 exitTransition = { fadeOutTransition + slideOutTransition },
                 popEnterTransition = { popEnterTransition },
-                popExitTransition = { popExitTransition }
+                popExitTransition = { popExitTransition },
             ) {
                 OutputScreen(
                     uiState = outputUiState,
@@ -429,27 +421,27 @@ fun MainScreenWithBottomNavigation(
                     onSelectTab = outputViewModel::selectTab,
                     onCopyToClipboard = outputViewModel::copyToClipboard,
                     onShareSummary = outputViewModel::shareSummary,
-                    onToggleSaveStatus = outputViewModel::toggleSaveStatus
+                    onToggleSaveStatus = outputViewModel::toggleSaveStatus,
                 )
             }
-            
+
             composable(
                 route = Screen.StreamingOutput.route,
                 arguments = listOf(
-                    navArgument("inputText") { type = NavType.StringType }
+                    navArgument("inputText") { type = NavType.StringType },
                 ),
                 enterTransition = { fadeInTransition + slideInTransition },
                 exitTransition = { fadeOutTransition + slideOutTransition },
                 popEnterTransition = { popEnterTransition },
-                popExitTransition = { popExitTransition }
+                popExitTransition = { popExitTransition },
             ) { backStackEntry ->
-                val inputText = backStackEntry.arguments?.getString("inputText")?.let { 
-                    Uri.decode(it) 
+                val inputText = backStackEntry.arguments?.getString("inputText")?.let {
+                    Uri.decode(it)
                 } ?: ""
-                
+
                 // Collect state INSIDE the composable lambda (maintains Single Source of Truth)
                 val streamingOutputUiState by streamingOutputViewModel.uiState.collectAsStateWithLifecycle()
-                
+
                 StreamingOutputScreen(
                     uiState = streamingOutputUiState,
                     inputText = inputText,
@@ -473,10 +465,9 @@ fun MainScreenWithBottomNavigation(
                     onCopyToClipboard = streamingOutputViewModel::copyToClipboard,
                     onShareSummary = streamingOutputViewModel::shareSummary,
                     onToggleSaveStatus = streamingOutputViewModel::toggleSaveStatus,
-                    onResetState = streamingOutputViewModel::resetState
+                    onResetState = streamingOutputViewModel::resetState,
                 )
             }
-            
         }
     }
 }
@@ -484,6 +475,5 @@ fun MainScreenWithBottomNavigation(
 data class BottomNavItem(
     val route: String,
     val icon: androidx.compose.ui.graphics.vector.ImageVector,
-    val label: String
+    val label: String,
 )
-

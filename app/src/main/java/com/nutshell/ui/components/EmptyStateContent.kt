@@ -43,7 +43,7 @@ fun EmptyStateContent(
     description: String,
     modifier: Modifier = Modifier,
     iconTint: Color = Gray400,
-    iconBackground: Color = Gray100
+    iconBackground: Color = Gray100,
 ) {
     // Entrance animations
     val scale = remember { Animatable(0.8f) }
@@ -55,14 +55,14 @@ fun EmptyStateContent(
                 targetValue = 1f,
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessMedium
-                )
+                    stiffness = Spring.StiffnessMedium,
+                ),
             )
         }
         launch {
             alpha.animateTo(
                 targetValue = 1f,
-                animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing)
+                animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
             )
         }
     }
@@ -71,7 +71,7 @@ fun EmptyStateContent(
         modifier = modifier
             .scale(scale.value),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         // Icon Container
         Box(
@@ -79,15 +79,15 @@ fun EmptyStateContent(
                 .size(96.dp)
                 .background(
                     color = iconBackground.copy(alpha = alpha.value),
-                    shape = CircleShape
+                    shape = CircleShape,
                 ),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 tint = iconTint.copy(alpha = alpha.value),
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(48.dp),
             )
         }
 
@@ -98,7 +98,7 @@ fun EmptyStateContent(
             text = title,
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = alpha.value),
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -108,7 +108,7 @@ fun EmptyStateContent(
             text = description,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha.value),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
     }
 }

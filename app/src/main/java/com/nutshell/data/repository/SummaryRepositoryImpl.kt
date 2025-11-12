@@ -8,8 +8,8 @@ import com.nutshell.data.local.mapper.SummaryMapper.toSummaryEntity
 import com.nutshell.data.model.ApiResult
 import com.nutshell.data.model.StreamingResult
 import com.nutshell.data.model.SummaryData
-import com.nutshell.data.remote.api.SummarizeRequest
 import com.nutshell.data.remote.api.StreamingSummarizerService
+import com.nutshell.data.remote.api.SummarizeRequest
 import com.nutshell.data.remote.datasource.SummaryRemoteDataSource
 import com.nutshell.domain.repository.SummaryRepository
 import kotlinx.coroutines.flow.Flow
@@ -22,17 +22,17 @@ import javax.inject.Singleton
 class SummaryRepositoryImpl @Inject constructor(
     private val remoteDataSource: SummaryRemoteDataSource,
     private val localDataSource: SummaryLocalDataSource,
-    private val streamingService: StreamingSummarizerService
+    private val streamingService: StreamingSummarizerService,
 ) : SummaryRepository {
-    
+
     companion object {
         private const val TAG = "SummaryRepositoryImpl"
     }
-    
+
     override suspend fun summarizeText(text: String): ApiResult<SummaryData> {
         val request = SummarizeRequest(text = text)
         val result = remoteDataSource.summarizeText(request)
-        
+
         return when (result) {
             is ApiResult.Success -> {
                 val response = result.data
@@ -40,12 +40,12 @@ class SummaryRepositoryImpl @Inject constructor(
                     originalText = text,
                     shortSummary = generateShortSummary(response.summary),
                     mediumSummary = response.summary,
-                    detailedSummary = generateDetailedSummary(response.summary)
+                    detailedSummary = generateDetailedSummary(response.summary),
                 )
-                
+
                 // Save to local database
                 localDataSource.insertSummary(summaryData.toSummaryEntity())
-                
+
                 ApiResult.Success(summaryData)
             }
             is ApiResult.Error -> {
@@ -56,7 +56,7 @@ class SummaryRepositoryImpl @Inject constructor(
             }
         }
     }
-    
+
     override fun summarizeTextStreaming(text: String): Flow<StreamingResult> = flow {
         try {
             Log.d(TAG, "summarizeTextStreaming: Starting streaming summary generation")
@@ -76,7 +76,7 @@ class SummaryRepositoryImpl @Inject constructor(
                         originalText = text,
                         shortSummary = generateShortSummary(fullSummary),
                         mediumSummary = fullSummary,
-                        detailedSummary = generateDetailedSummary(fullSummary)
+                        detailedSummary = generateDetailedSummary(fullSummary),
                     )
                     Log.d(TAG, "summarizeTextStreaming: Created SummaryData with ID: ${summaryData.id}")
                     Log.d(TAG, "summarizeTextStreaming: Saving to local database...")
@@ -93,41 +93,41 @@ class SummaryRepositoryImpl @Inject constructor(
             emit(StreamingResult.Error(e.message ?: "Unknown error occurred"))
         }
     }
-    
-    override fun getAllSummaries(): Flow<List<SummaryData>> = 
+
+    override fun getAllSummaries(): Flow<List<SummaryData>> =
         localDataSource.getAllSummaries().map { entities ->
             entities.toSummaryDataList()
         }
-    
-    override fun getSavedSummaries(): Flow<List<SummaryData>> = 
+
+    override fun getSavedSummaries(): Flow<List<SummaryData>> =
         localDataSource.getSavedSummaries().map { entities ->
             entities.toSummaryDataList()
         }
-    
+
     override suspend fun getLatestSummary(): SummaryData? {
         return localDataSource.getLatestSummary()?.toSummaryData()
     }
-    
+
     override suspend fun saveSummary(summaryData: SummaryData) {
         localDataSource.updateSaveStatus(summaryData.id, true)
     }
-    
+
     override suspend fun deleteSummary(id: String) {
         localDataSource.deleteSummaryById(id)
     }
-    
+
     override suspend fun toggleSaveStatus(id: String) {
         val entity = localDataSource.getSummaryById(id)
         entity?.let {
             localDataSource.updateSaveStatus(id, !it.isSaved)
         }
     }
-    
-    override fun searchSummaries(query: String): Flow<List<SummaryData>> = 
+
+    override fun searchSummaries(query: String): Flow<List<SummaryData>> =
         localDataSource.searchSummaries(query).map { entities ->
             entities.toSummaryDataList()
         }
-    
+
     private fun generateShortSummary(summary: String): String {
         // Generate a shorter version (first 2 sentences or 100 chars)
         val sentences = summary.split(". ")
@@ -137,7 +137,7 @@ class SummaryRepositoryImpl @Inject constructor(
             summary.take(100) + if (summary.length > 100) "..." else ""
         }
     }
-    
+
     private fun generateDetailedSummary(summary: String): String {
         // Generate a more detailed version by expanding the summary
         return summary + " This summary provides comprehensive insights into the original content, covering all major points and supporting details."

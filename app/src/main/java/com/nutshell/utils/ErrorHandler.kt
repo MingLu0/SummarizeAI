@@ -8,9 +8,9 @@ import javax.inject.Singleton
 
 @Singleton
 class ErrorHandler @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) {
-    
+
     fun handleError(error: Throwable, userMessage: String? = null) {
         val message = when (error) {
             is java.net.UnknownHostException -> "Network not available. Please check your internet connection."
@@ -21,22 +21,22 @@ class ErrorHandler @Inject constructor(
             is UnsupportedOperationException -> "This operation is not supported."
             else -> userMessage ?: "An unexpected error occurred. Please try again."
         }
-        
+
         showErrorToast(message)
     }
-    
+
     fun showErrorToast(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
-    
+
     fun showSuccessToast(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
-    
+
     fun showInfoToast(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
-    
+
     fun getErrorMessage(error: Throwable): String {
         return when (error) {
             is java.net.UnknownHostException -> "Network not available"

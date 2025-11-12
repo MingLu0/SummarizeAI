@@ -17,16 +17,16 @@ import javax.inject.Inject
 class OutputViewModel @Inject constructor(
     private val repository: SummaryRepository,
     private val clipboardUtils: ClipboardUtils,
-    private val shareUtils: ShareUtils
+    private val shareUtils: ShareUtils,
 ) : ViewModel() {
-    
+
     private val _uiState = MutableStateFlow(OutputUiState())
     val uiState: StateFlow<OutputUiState> = _uiState.asStateFlow()
-    
+
     init {
         loadLatestSummary()
     }
-    
+
     private fun loadLatestSummary() {
         viewModelScope.launch {
             val latestSummary = repository.getLatestSummary()
@@ -35,15 +35,15 @@ class OutputViewModel @Inject constructor(
             }
         }
     }
-    
+
     fun setSummaryData(summaryData: SummaryData) {
         _uiState.value = _uiState.value.copy(summaryData = summaryData)
     }
-    
+
     fun selectTab(index: Int) {
         _uiState.value = _uiState.value.copy(selectedTabIndex = index)
     }
-    
+
     fun getCurrentSummaryText(): String {
         val summaryData = _uiState.value.summaryData ?: return ""
         return when (_uiState.value.selectedTabIndex) {
@@ -53,30 +53,30 @@ class OutputViewModel @Inject constructor(
             else -> summaryData.mediumSummary
         }
     }
-    
+
     fun copyToClipboard() {
         val text = getCurrentSummaryText()
         if (text.isNotBlank()) {
             clipboardUtils.copyToClipboard(text, "Summary")
         }
     }
-    
+
     fun shareSummary() {
         val text = getCurrentSummaryText()
         if (text.isNotBlank()) {
             shareUtils.shareText(text, "Share Summary")
         }
     }
-    
+
     fun toggleSaveStatus() {
         val summaryData = _uiState.value.summaryData ?: return
-        
+
         viewModelScope.launch {
             repository.toggleSaveStatus(summaryData.id)
-            
+
             // Update local state
             _uiState.value = _uiState.value.copy(
-                summaryData = summaryData.copy(isSaved = !summaryData.isSaved)
+                summaryData = summaryData.copy(isSaved = !summaryData.isSaved),
             )
         }
     }
@@ -85,5 +85,5 @@ class OutputViewModel @Inject constructor(
 data class OutputUiState(
     val summaryData: SummaryData? = null,
     val selectedTabIndex: Int = 1, // Default to Medium
-    val isSaved: Boolean = false
+    val isSaved: Boolean = false,
 )
