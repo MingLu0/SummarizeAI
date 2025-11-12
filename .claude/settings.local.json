@@ -7,7 +7,10 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(gh run:*)"
+      "Bash(gh run:*)",
+      "Bash(git revert:*)",
+      "Bash(./gradlew assembleDebug:*)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

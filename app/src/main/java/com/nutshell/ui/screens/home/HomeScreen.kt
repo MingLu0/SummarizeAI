@@ -1,5 +1,6 @@
 package com.nutshell.ui.screens.home
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -9,7 +10,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.*
@@ -72,7 +75,7 @@ fun HomeScreen(
             println("HomeScreen: No extracted content received")
         }
     }
-    
+
     // Handle navigation based on UI state
     LaunchedEffect(uiState.shouldNavigateToStreaming, uiState.shouldNavigateToOutput) {
         if (uiState.shouldNavigateToStreaming) {
@@ -90,32 +93,18 @@ fun HomeScreen(
     val filePicker = filePickerUtils.rememberFilePicker { uri ->
         onUploadFile(uri)
     }
-    
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .statusBarsPadding()  // Add padding for transparent status bar
     ) {
-        // Content - Flat Minimalist Design
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // Custom Header - Large Bold Title
-            Text(
-                text = "SUMMARIZE AI",
-                style = MaterialTheme.typography.displayLarge.copy(
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.sp
-                ),
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(top = 8.dp, bottom = 12.dp)
-            )
-
             // Text Input Area - Flat with Border and Animated Focus
             var isTextFieldFocused by remember { mutableStateOf(false) }
 
@@ -156,7 +145,7 @@ fun HomeScreen(
                     ),
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
                         .padding(20.dp)
                         .onFocusChanged { focusState ->
                             isTextFieldFocused = focusState.isFocused

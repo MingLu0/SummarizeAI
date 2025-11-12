@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.nutshell.BuildConfig
@@ -38,7 +39,14 @@ class MainActivity : ComponentActivity() {
         
         setContent {
                 val navController = rememberNavController()
-                
+
+                // Track current route for TopAppBar
+                val currentBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = currentBackStackEntry?.destination?.route
+
+                // Track bottom nav route for TopAppBar
+                var bottomNavRoute by remember { mutableStateOf<String?>(null) }
+
                 // OBSERVE ALL VIEWMODELS AT TOP LEVEL
                 val homeViewModel: HomeViewModel = hiltViewModel()
                 val settingsViewModel: SettingsViewModel = hiltViewModel()
@@ -47,7 +55,7 @@ class MainActivity : ComponentActivity() {
                 val historyViewModel: HistoryViewModel = hiltViewModel()
                 val savedViewModel: SavedViewModel = hiltViewModel()
                 val webContentViewModel: WebContentViewModel = hiltViewModel()
-                
+
                 // COLLECT ALL STATE FLOWS
                 val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
                 val isStreamingEnabled by settingsViewModel.isStreamingEnabled.collectAsStateWithLifecycle(initialValue = true)
@@ -86,6 +94,10 @@ class MainActivity : ComponentActivity() {
                 NutshellTheme(themeMode = themeMode) {
                 AppScaffold(
                     navController = navController,
+                    currentRoute = currentRoute,
+                    bottomNavRoute = bottomNavRoute,
+                    onNavigateBack = { navController.navigateUp() },
+                    onBottomNavRouteChange = { route -> bottomNavRoute = route },
                     homeUiState = homeUiState,
                     isStreamingEnabled = isStreamingEnabled,
                     themeMode = themeMode,

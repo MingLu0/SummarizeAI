@@ -46,26 +46,14 @@ fun HistoryScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .statusBarsPadding()
     ) {
         // Content - Flat Minimalist Design
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // Title
-            Text(
-                text = "HISTORY",
-                style = MaterialTheme.typography.displayLarge.copy(
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.sp
-                ),
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            
             // Search Input - Flat with Border
             Box(
                 modifier = Modifier

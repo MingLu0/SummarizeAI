@@ -45,13 +45,12 @@ fun WebPreviewScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(PureWhite)
-            .statusBarsPadding()
     ) {
         // Content - Flat Minimalist Design
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             // Custom Header with Back Button
