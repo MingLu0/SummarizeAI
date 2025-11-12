@@ -237,6 +237,7 @@ fun MainScreenWithBottomNavigation(
         bottomBar = {
             val isDarkTheme = isSystemInDarkTheme()
             NavigationBar(
+                windowInsets = WindowInsets(0, 0, 0, 0),
                 containerColor = if (isDarkTheme) {
                     MaterialTheme.colorScheme.surface
                 } else {
