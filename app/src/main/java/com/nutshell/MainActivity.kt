@@ -63,6 +63,7 @@ class MainActivity : ComponentActivity() {
                 val summaryLanguage by settingsViewModel.summaryLanguage.collectAsStateWithLifecycle(initialValue = SummaryLanguage.ENGLISH)
                 val summaryLength by settingsViewModel.summaryLength.collectAsStateWithLifecycle(initialValue = SummaryLength.SHORT)
                 val outputUiState by outputViewModel.uiState.collectAsStateWithLifecycle()
+                val streamingOutputUiState by streamingOutputViewModel.uiState.collectAsStateWithLifecycle()
                 val historyUiState by historyViewModel.uiState.collectAsStateWithLifecycle()
                 val historySearchQuery by historyViewModel.searchQuery.collectAsStateWithLifecycle()
                 val savedUiState by savedViewModel.uiState.collectAsStateWithLifecycle()
@@ -97,6 +98,12 @@ class MainActivity : ComponentActivity() {
                     currentRoute = currentRoute,
                     bottomNavRoute = bottomNavRoute,
                     onNavigateBack = { navController.navigateUp() },
+                    onNavigateToHome = {
+                        homeViewModel.resetState()
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Main.route) { inclusive = false }
+                        }
+                    },
                     onBottomNavRouteChange = { route -> bottomNavRoute = route },
                     homeUiState = homeUiState,
                     isStreamingEnabled = isStreamingEnabled,
@@ -105,11 +112,15 @@ class MainActivity : ComponentActivity() {
                     summaryLength = summaryLength,
                     appVersion = BuildConfig.VERSION_NAME,
                     outputUiState = outputUiState,
+                    streamingOutputUiState = streamingOutputUiState,
                     historyUiState = historyUiState,
                     historySearchQuery = historySearchQuery,
                     savedUiState = savedUiState,
                     savedSearchQuery = savedSearchQuery,
                     webContentUiState = webContentUiState,
+                    onCopyToClipboard = streamingOutputViewModel::copyToClipboard,
+                    onShareSummary = streamingOutputViewModel::shareSummary,
+                    onToggleSaveStatus = streamingOutputViewModel::toggleSaveStatus,
                     homeViewModel = homeViewModel,
                     settingsViewModel = settingsViewModel,
                     outputViewModel = outputViewModel,

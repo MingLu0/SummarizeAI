@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SummarizeAI"
+rootProject.name = "Nutshell"
 include(":app")

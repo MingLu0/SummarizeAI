@@ -59,16 +59,6 @@
 -keep class com.tom_roush.pdfbox.resources.** { *; }
 -keep class com.tom_roush.pdfbox.pdmodel.font.encoding.** { *; }
 
-# Keep data classes
--keep class com.summarizeai.data.model.** { *; }
--keep class com.summarizeai.data.local.database.** { *; }
-
-# Keep API classes
--keep class com.summarizeai.data.remote.api.** { *; }
-
-# Keep utility classes
--keep class com.summarizeai.utils.** { *; }
-
 # SLF4J - Ignore missing implementation (optional logging dependency)
 -dontwarn org.slf4j.**
 -dontwarn org.slf4j.impl.**

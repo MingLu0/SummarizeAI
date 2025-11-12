@@ -205,7 +205,7 @@ fun SavedItemCard(
             Icon(
                 imageVector = Icons.Default.BookmarkRemove,
                 contentDescription = "Unsave",
-                tint = HotPink,
+                tint = MaterialTheme.colorScheme.outline,
                 modifier = Modifier.size(20.dp)
             )
         }

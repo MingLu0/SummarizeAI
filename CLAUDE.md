@@ -435,3 +435,4 @@ Based on README documentation:
 - Accessibility tests (screen reader compliance)
 - Target: 80%+ code coverage
 - always bump up version number when you push to github
+- don't bump up version number if there's no actual code change

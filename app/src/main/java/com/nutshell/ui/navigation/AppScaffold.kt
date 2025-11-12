@@ -4,6 +4,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +30,7 @@ fun AppScaffold(
     currentRoute: String?,
     bottomNavRoute: String?,
     onNavigateBack: () -> Unit,
+    onNavigateToHome: () -> Unit,
     onBottomNavRouteChange: (String?) -> Unit,
     homeUiState: HomeUiState,
     isStreamingEnabled: Boolean,
@@ -34,11 +39,15 @@ fun AppScaffold(
     summaryLength: SummaryLength,
     appVersion: String,
     outputUiState: OutputUiState,
+    streamingOutputUiState: StreamingOutputUiState,
     historyUiState: HistoryUiState,
     historySearchQuery: String,
     savedUiState: SavedUiState,
     savedSearchQuery: String,
     webContentUiState: WebContentUiState,
+    onCopyToClipboard: () -> Unit,
+    onShareSummary: () -> Unit,
+    onToggleSaveStatus: () -> Unit,
     homeViewModel: HomeViewModel,
     settingsViewModel: SettingsViewModel,
     outputViewModel: OutputViewModel,
@@ -62,10 +71,58 @@ fun AppScaffold(
                     },
                     navigationIcon = {
                         if (shouldShowBackButton(effectiveRoute)) {
-                            IconButton(onClick = onNavigateBack) {
+                            IconButton(
+                                onClick = {
+                                    // For streaming output, back button navigates to home
+                                    if (effectiveRoute?.startsWith("streaming_output") == true) {
+                                        onNavigateToHome()
+                                    } else {
+                                        onNavigateBack()
+                                    }
+                                }
+                            ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                     contentDescription = "Back"
+                                )
+                            }
+                        }
+                    },
+                    actions = {
+                        // Show action icons only for streaming output screen when streaming is complete
+                        if (effectiveRoute?.startsWith("streaming_output") == true &&
+                            !streamingOutputUiState.isStreaming &&
+                            streamingOutputUiState.summaryData != null
+                        ) {
+                            // Copy button
+                            IconButton(onClick = onCopyToClipboard) {
+                                Icon(
+                                    imageVector = Icons.Default.ContentCopy,
+                                    contentDescription = "Copy"
+                                )
+                            }
+
+                            // Save button (filled bookmark when saved, outline when not)
+                            IconButton(onClick = onToggleSaveStatus) {
+                                Icon(
+                                    imageVector = if (streamingOutputUiState.summaryData?.isSaved == true) {
+                                        Icons.Default.Bookmark
+                                    } else {
+                                        Icons.Default.BookmarkBorder
+                                    },
+                                    contentDescription = if (streamingOutputUiState.summaryData?.isSaved == true) {
+                                        "Unsave"
+                                    } else {
+                                        "Save"
+                                    }
+                                )
+                            }
+
+                            // Share button
+                            IconButton(onClick = onShareSummary) {
+                                Icon(
+                                    imageVector = Icons.Default.Share,
+                                    contentDescription = "Share"
                                 )
                             }
                         }
