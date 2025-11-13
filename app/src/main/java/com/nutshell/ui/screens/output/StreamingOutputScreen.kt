@@ -1,6 +1,12 @@
 package com.nutshell.ui.screens.output
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.ui.draw.scale
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -83,8 +89,10 @@ fun StreamingOutputScreen(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            // Status Indicator - Flat
-            if (uiState.isStreaming) {
+            // Status Indicator - Flat with Fade-Out Animation
+            AnimatedVisibility(
+                visible = uiState.isStreaming,
+            ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -111,61 +119,48 @@ fun StreamingOutputScreen(
                     )
                 }
             }
-//                // Success state with bounce animation
-//                val scale = remember { Animatable(0.8f) }
-//                val alpha = remember { Animatable(0f) }
-//
-//                LaunchedEffect(Unit) {
-//                    launch {
-//                        scale.animateTo(
-//                            targetValue = 1f,
-//                            animationSpec = spring(
-//                                dampingRatio = Spring.DampingRatioMediumBouncy,
-//                                stiffness = Spring.StiffnessMedium
-//                            )
-//                        )
-//                    }
-//                    launch {
-//                        alpha.animateTo(
-//                            targetValue = 1f,
-//                            animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing)
-//                        )
-//                    }
-//                }
-//
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .scale(scale.value)
-//                        .border(
-//                            width = 2.dp,
-//                            color = SuccessGreen.copy(alpha = alpha.value),
-//                            shape = RoundedCornerShape(12.dp)
-//                        )
-//                        .background(MaterialTheme.colorScheme.surface.copy(alpha = alpha.value))
-//                        .padding(20.dp)
-//                ) {
-//                    Text(
-//                        text = "✓ Summary completed!",
-//                        style = MaterialTheme.typography.bodyMedium.copy(
-//                            fontWeight = FontWeight.Bold
-//                        ),
-//                        color = SuccessGreen.copy(alpha = alpha.value)
-//                    )
-//                }
 
             // Streaming Summary Content - Flat with Border
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .border(
-                        width = 2.dp,
-                        color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
-                        shape = RoundedCornerShape(12.dp),
+            // Scale animation for completion effect
+            val contentScale = remember { Animatable(1f) }
+
+            // Trigger subtle scale-up when streaming completes
+            LaunchedEffect(uiState.isStreaming) {
+                if (!uiState.isStreaming && currentSummaryText.isNotEmpty()) {
+                    // Single smooth scale animation: 1.0 → 1.02 → 1.0
+                    contentScale.animateTo(
+                        targetValue = 1f,
+                        animationSpec = keyframes {
+                            durationMillis = 600
+                            1.0f at 0 using EaseInOutCubic
+                            1.02f at 300 using EaseInOutCubic
+                            1.0f at 600 using EaseInOutCubic
+                        }
                     )
-                    .background(MaterialTheme.colorScheme.surface),
+                }
+            }
+
+            AnimatedVisibility(
+                visible = currentSummaryText.isNotEmpty() || uiState.isStreaming,
+                enter = fadeIn(
+                    animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing)
+                ) + slideInVertically(
+                    animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
+                    initialOffsetY = { it / 4 } // Slide in from below
+                )
             ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .scale(contentScale.value)
+                        .border(
+                            width = 2.dp,
+                            color = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.outline else PureBlack,
+                            shape = RoundedCornerShape(12.dp),
+                        )
+                        .background(MaterialTheme.colorScheme.surface),
+                ) {
                 LazyColumn(
                     state = listState,
                     modifier = Modifier
@@ -190,6 +185,7 @@ fun StreamingOutputScreen(
 //                        }
 //                    }
                 }
+            }
             }
         }
     }

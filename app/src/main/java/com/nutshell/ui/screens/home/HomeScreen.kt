@@ -292,7 +292,7 @@ fun HomeScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "TEST API CONNECTION",
+                        text = "Test API connection",
                         style = MaterialTheme.typography.labelMedium.copy(
                             fontWeight = FontWeight.Bold,
                         ),
@@ -350,7 +350,7 @@ fun HomeScreen(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = "SUMMARIZING...",
+                            text = "Summarizing...",
                             style = MaterialTheme.typography.labelLarge.copy(
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 1.sp,
@@ -360,7 +360,7 @@ fun HomeScreen(
                     }
                 } else {
                     Text(
-                        text = "SUMMARIZE →",
+                        text = "Summarize →",
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp,

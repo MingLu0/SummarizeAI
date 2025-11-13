@@ -171,16 +171,16 @@ private fun shouldShowTopAppBar(route: String?): Boolean {
 private fun getScreenTitle(route: String?): String {
     return when {
         route == null -> ""
-        route == "splash" -> "NUTSHELL"
+        route == "splash" -> "Nutshell"
         route == "main" -> ""
-        route == "home" -> "HOME"
-        route == "history" -> "HISTORY"
-        route == "saved" -> "SAVED"
-        route == "settings" -> "SETTINGS"
-        route == "output" -> "SUMMARY"
-        route.startsWith("streaming_output") -> "SUMMARY"
-        route == "webpreview" -> "WEB PREVIEW"
-        route == "loading" -> "LOADING"
+        route == "home" -> "Home"
+        route == "history" -> "History"
+        route == "saved" -> "Saved"
+        route == "settings" -> "Settings"
+        route == "output" -> "Summary"
+        route.startsWith("streaming_output") -> "Summary"
+        route == "webpreview" -> "Web preview"
+        route == "loading" -> "Loading"
         else -> ""
     }
 }

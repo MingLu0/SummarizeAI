@@ -103,7 +103,7 @@ fun OutputScreen(
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = tab.uppercase(),
+                            text = tab,
                             style = MaterialTheme.typography.labelMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 0.5.sp,
@@ -185,7 +185,7 @@ fun OutputScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "COPY",
+                                text = "Copy",
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = 0.5.sp,
@@ -241,7 +241,7 @@ fun OutputScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "SAVE",
+                                text = "Save",
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = 0.5.sp,
@@ -281,7 +281,7 @@ fun OutputScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "HOME",
+                                text = "Home",
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = 0.5.sp,
@@ -316,7 +316,7 @@ fun OutputScreen(
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "SHARE SUMMARY",
+                            text = "Share summary",
                             style = MaterialTheme.typography.labelLarge.copy(
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 0.5.sp,

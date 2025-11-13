@@ -70,7 +70,7 @@ fun WebPreviewScreen(
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
-                    text = "WEB PREVIEW",
+                    text = "Web preview",
                     style = MaterialTheme.typography.displayMedium.copy(
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
@@ -122,7 +122,7 @@ fun WebPreviewScreen(
                     .padding(20.dp),
             ) {
                 Text(
-                    text = "CONTENT PREVIEW",
+                    text = "Content preview",
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
                     ),
@@ -182,7 +182,7 @@ fun WebPreviewScreen(
                                         .padding(horizontal = 24.dp, vertical = 12.dp),
                                 ) {
                                     Text(
-                                        text = "RETRY",
+                                        text = "Retry",
                                         style = MaterialTheme.typography.labelMedium.copy(
                                             fontWeight = FontWeight.Bold,
                                         ),
@@ -239,7 +239,7 @@ fun WebPreviewScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "CANCEL",
+                        text = "Cancel",
                         style = MaterialTheme.typography.labelMedium.copy(
                             fontWeight = FontWeight.Bold,
                         ),
@@ -264,7 +264,7 @@ fun WebPreviewScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "SUMMARIZE →",
+                        text = "Summarize →",
                         style = MaterialTheme.typography.labelMedium.copy(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.sp,
