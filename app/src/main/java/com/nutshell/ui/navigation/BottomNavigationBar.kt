@@ -1,7 +1,6 @@
 package com.nutshell.ui.navigation
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.History
@@ -61,7 +60,6 @@ fun BottomNavigationBar(
     val isDarkTheme = isSystemInDarkTheme()
     
     NavigationBar(
-        windowInsets = WindowInsets(0, 0, 0, 0),
         containerColor = if (isDarkTheme) {
             MaterialTheme.colorScheme.surface
         } else {

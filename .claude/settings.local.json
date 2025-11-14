@@ -13,7 +13,8 @@
       "WebSearch",
       "WebFetch(domain:stackoverflow.com)",
       "Bash(./gradlew help:*)",
-      "Bash(./gradlew ktlintCheck:*)"
+      "Bash(./gradlew ktlintCheck:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

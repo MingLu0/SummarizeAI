@@ -24,19 +24,21 @@ This is a modern Android application that uses AI to summarize text content. It 
 # Development
 ./gradlew clean                 # Clean build artifacts
 ./gradlew lint                  # Run lint checks
+./gradlew ktlintCheck           # Run ktlint code style checks
+./gradlew help                  # Show available Gradle tasks
 ```
 
 ## Architecture: Clean Architecture with Scaffold Pattern
 
 ### Core Principle: Centralized State Management
 
-**CRITICAL**: All 7 ViewModels are instantiated and observed at the MainActivity level. Screen composables are pure functions that receive state and callbacks as parameters. This is not standard Compose architecture - do not inject ViewModels into screen composables.
+**CRITICAL**: All 8 ViewModels are instantiated and observed at the MainActivity level. Screen composables are pure functions that receive state and callbacks as parameters. This is not standard Compose architecture - do not inject ViewModels into screen composables.
 
 ### Architecture Flow
 
 ```
 MainActivity (Entry Point)
-├── Instantiate ALL 7 ViewModels with hiltViewModel()
+├── Instantiate ALL 8 ViewModels with hiltViewModel()
 ├── Collect ALL StateFlows with collectAsStateWithLifecycle()
 ├── Handle ALL navigation logic in LaunchedEffect blocks
 └── AppScaffold
@@ -45,7 +47,7 @@ MainActivity (Entry Point)
             └── Screen Composables (pure functions, no ViewModels)
 ```
 
-### The 7 ViewModels
+### The 8 ViewModels
 
 All instantiated in MainActivity, never in screen composables:
 
@@ -56,6 +58,7 @@ All instantiated in MainActivity, never in screen composables:
 5. **SavedViewModel** - Bookmarked summaries
 6. **SettingsViewModel** - App preferences (streaming toggle, etc.)
 7. **WebContentViewModel** - Web content extraction from shared URLs
+8. **WebPreviewViewModel** - Web content preview and display
 
 ### Data Flow Pattern
 
@@ -96,18 +99,21 @@ app/src/main/java/com/nutshell/
 │   │   ├── NutshellNavHost.kt        # Top-level navigation
 │   │   └── Screen.kt                 # Route definitions
 │   └── screens/                      # PURE COMPOSABLES - no hiltViewModel() calls
+│       ├── splash/SplashScreen.kt
+│       ├── welcome/WelcomeScreen.kt
 │       ├── home/HomeScreen.kt
 │       ├── output/OutputScreen.kt & StreamingOutputScreen.kt
+│       ├── loading/LoadingScreen.kt
 │       ├── history/HistoryScreen.kt
 │       ├── saved/SavedScreen.kt
 │       ├── settings/SettingsScreen.kt
 │       └── webpreview/WebPreviewScreen.kt
-├── presentation/viewmodel/           # State management (7 ViewModels)
+├── presentation/viewmodel/           # State management (8 ViewModels)
 ├── domain/repository/                # Repository interfaces
 ├── data/
 │   ├── repository/                   # Repository implementations
 │   ├── local/                        # Room database, DataStore
-│   │   ├── database/NutshellDatabase.kt, SummaryDao.kt, SummaryEntity.kt
+│   │   ├── database/SummarizeDatabase.kt, SummaryDao.kt, SummaryEntity.kt
 │   │   └── preferences/UserPreferences.kt
 │   ├── remote/                       # Retrofit + Ktor
 │   │   ├── api/SummarizerApi.kt, StreamingSummarizerService.kt
@@ -147,7 +153,7 @@ class MainActivity : ComponentActivity() {
             // ✅ INSTANTIATE ALL VIEWMODELS HERE
             val homeViewModel: HomeViewModel = hiltViewModel()
             val settingsViewModel: SettingsViewModel = hiltViewModel()
-            // ... all 7 ViewModels
+            // ... all 8 ViewModels
 
             // ✅ COLLECT ALL STATE FLOWS HERE
             val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
@@ -335,6 +341,10 @@ From `.cursor/rules/android.mdc`:
 
 ## Configuration
 
+### App Version
+- **Current Version**: 1.2.8 (versionCode 24)
+- **Version Policy**: Always bump version number when pushing to GitHub; don't bump if no actual code changes
+
 ### Build Configuration
 - **Gradle Plugin**: 8.2.2
 - **Kotlin**: 1.9.22
@@ -343,6 +353,7 @@ From `.cursor/rules/android.mdc`:
 - **Target SDK**: 34
 - **Java Version**: 17
 - **Compose Compiler**: 1.5.8
+- **ktlint**: 0.50.0 - Code formatting and linting
 
 ### Build Variants
 - **Debug** - Debuggable, `.debug` applicationIdSuffix, `-debug` versionNameSuffix
@@ -387,7 +398,7 @@ The app handles URL sharing via:
 
 1. Create entity in `data/local/database/SummaryEntity.kt`
 2. Add DAO methods to `data/local/database/SummaryDao.kt`
-3. Update Room database version in `NutshellDatabase.kt`
+3. Update Room database version in `SummarizeDatabase.kt`
 4. Add migration if needed
 5. Create mapper in `data/local/mapper/` for Entity ↔ Model conversion
 6. Use in repository implementation
@@ -429,10 +440,8 @@ The app handles URL sharing via:
 
 Based on README documentation:
 - Repository tests with Room database testing
-- ViewModel tests for all 7 ViewModels (currently partial coverage)
+- ViewModel tests for all 8 ViewModels (currently partial coverage)
 - AI Service integration tests
 - Performance tests for large datasets
 - Accessibility tests (screen reader compliance)
 - Target: 80%+ code coverage
-- always bump up version number when you push to github
-- don't bump up version number if there's no actual code change
