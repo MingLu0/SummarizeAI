@@ -36,42 +36,15 @@ import com.nutshell.utils.FilePickerUtils
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
-    extractedContent: String? = null,
     webContentError: String? = null,
     onUpdateTextInput: (String) -> Unit,
     onSummarizeText: () -> Unit,
-    onClearError: () -> Unit,
     onUploadFile: (Uri) -> Unit,
     onNavigateToStreaming: (String) -> Unit = {},
     onNavigateToOutput: () -> Unit = {},
     onClearNavigationFlags: () -> Unit = {},
-    onClearExtractedContent: () -> Unit = {},
 ) {
     val context = LocalContext.current
-
-    // Handle extracted content from shared URL
-    LaunchedEffect(extractedContent) {
-        println("HomeScreen: LaunchedEffect triggered, extractedContent: ${extractedContent?.let { "length ${it.length}" } ?: "null"}")
-        extractedContent?.let { content ->
-            if (content.isNotBlank()) {
-                println("HomeScreen: Received extracted content, length: ${content.length}")
-                println("HomeScreen: Navigating directly to StreamingOutputScreen with content")
-                // Set the text input for record keeping
-                onUpdateTextInput(content)
-                // Navigate directly to streaming screen with the extracted content
-                onNavigateToStreaming(content)
-                println("HomeScreen: Navigation to StreamingOutputScreen triggered")
-                // Clear extracted content so the effect can trigger again for new shares
-                onClearExtractedContent()
-            } else {
-                println("HomeScreen: Content is blank, not starting summarization")
-                // Clear even if blank to reset state
-                onClearExtractedContent()
-            }
-        } ?: run {
-            println("HomeScreen: No extracted content received")
-        }
-    }
 
     // Handle navigation based on UI state
     LaunchedEffect(uiState.shouldNavigateToStreaming, uiState.shouldNavigateToOutput) {
@@ -389,16 +362,13 @@ fun HomeScreenFlatMinimalistPreview() {
                 shouldNavigateToOutput = false,
                 shouldNavigateToStreaming = false,
             ),
-            extractedContent = null,
             webContentError = null,
             onUpdateTextInput = {},
             onSummarizeText = {},
-            onClearError = {},
             onUploadFile = {},
             onNavigateToStreaming = {},
             onNavigateToOutput = {},
             onClearNavigationFlags = {},
-            onClearExtractedContent = {},
         )
     }
 }
@@ -416,16 +386,13 @@ fun HomeScreenWithContentPreview() {
                 shouldNavigateToOutput = false,
                 shouldNavigateToStreaming = false,
             ),
-            extractedContent = null,
             webContentError = null,
             onUpdateTextInput = {},
             onSummarizeText = {},
-            onClearError = {},
             onUploadFile = {},
             onNavigateToStreaming = {},
             onNavigateToOutput = {},
             onClearNavigationFlags = {},
-            onClearExtractedContent = {},
         )
     }
 }
@@ -443,16 +410,13 @@ fun HomeScreenLoadingPreview() {
                 shouldNavigateToOutput = false,
                 shouldNavigateToStreaming = false,
             ),
-            extractedContent = null,
             webContentError = null,
             onUpdateTextInput = {},
             onSummarizeText = {},
-            onClearError = {},
             onUploadFile = {},
             onNavigateToStreaming = {},
             onNavigateToOutput = {},
             onClearNavigationFlags = {},
-            onClearExtractedContent = {},
         )
     }
 }

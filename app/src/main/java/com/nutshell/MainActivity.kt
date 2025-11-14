@@ -5,7 +5,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -14,7 +25,8 @@ import com.nutshell.data.local.preferences.SummaryLanguage
 import com.nutshell.data.local.preferences.SummaryLength
 import com.nutshell.data.local.preferences.ThemeMode
 import com.nutshell.presentation.viewmodel.*
-import com.nutshell.ui.navigation.AppScaffold
+import com.nutshell.ui.navigation.BottomNavigationBar
+import com.nutshell.ui.navigation.NutshellNavHost
 import com.nutshell.ui.navigation.Screen
 import com.nutshell.ui.theme.NutshellTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,14 +47,13 @@ class MainActivity : ComponentActivity() {
         _intentFlow.value = intent
 
         setContent {
+            // Single NavController for entire app
             val navController = rememberNavController()
 
-            // Track current route for TopAppBar
+            // Track current destination
             val currentBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentRoute = currentBackStackEntry?.destination?.route
-
-            // Track bottom nav route for TopAppBar
-            var bottomNavRoute by remember { mutableStateOf<String?>(null) }
+            val currentDestination = currentBackStackEntry?.destination
+            val currentRoute = currentDestination?.route
 
             // OBSERVE ALL VIEWMODELS AT TOP LEVEL
             val homeViewModel: HomeViewModel = hiltViewModel()
@@ -76,55 +87,89 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            // HANDLE ALL NAVIGATION LOGIC HERE
-            // Web content navigation
-            LaunchedEffect(webContentUiState.shouldNavigateToMain) {
-                if (webContentUiState.shouldNavigateToMain) {
-                    navController.navigate(Screen.Main.route) {
-                        popUpTo(Screen.Splash.route) { inclusive = true }
+            // Unified intent navigation handler
+            // Handles both extractedContent and shouldNavigateToMain in priority order
+            LaunchedEffect(webContentUiState.extractedContent, webContentUiState.shouldNavigateToMain) {
+                when {
+                    // Priority 1: If we have extracted content, navigate directly to streaming
+                    webContentUiState.extractedContent?.isNotBlank() == true -> {
+                        val content = webContentUiState.extractedContent!!
+                        println("MainActivity: Intent with content detected, navigating DIRECTLY to StreamingOutput")
+                        
+                        // Navigate directly to the nested streaming route
+                        // This will automatically activate Home tab in bottom bar
+                        navController.navigate(Screen.StreamingOutput.createRoute(content)) {
+                            // Don't create multiple instances
+                            launchSingleTop = true
+                        }
+                        
+                        // Clear after navigation to allow subsequent shares
+                        kotlinx.coroutines.delay(500)
+                        webContentViewModel.clearExtractedContent()
+                        if (webContentUiState.shouldNavigateToMain) {
+                            webContentViewModel.clearNavigationFlag()
+                        }
                     }
-                    webContentViewModel.clearNavigationFlag()
+                    // Priority 2: If shouldNavigateToMain but no content, navigate to Home
+                    webContentUiState.shouldNavigateToMain -> {
+                        println("MainActivity: Navigating to Home tab")
+                        navController.navigate(Screen.Home.route) {
+                            launchSingleTop = true
+                        }
+                        webContentViewModel.clearNavigationFlag()
+                    }
                 }
             }
 
-            // PASS ALL STATE AND CALLBACKS DOWN
             NutshellTheme(themeMode = themeMode) {
-                AppScaffold(
-                    navController = navController,
-                    currentRoute = currentRoute,
-                    bottomNavRoute = bottomNavRoute,
-                    onNavigateBack = { navController.navigateUp() },
-                    onNavigateToHome = {
-                        homeViewModel.resetState()
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Main.route) { inclusive = false }
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    topBar = {
+                        if (shouldShowTopAppBar(currentRoute)) {
+                            TopAppBar(
+                                currentRoute = currentRoute,
+                                streamingOutputUiState = streamingOutputUiState,
+                                onNavigateBack = { navController.navigateUp() },
+                                onCopyToClipboard = streamingOutputViewModel::copyToClipboard,
+                                onToggleSaveStatus = streamingOutputViewModel::toggleSaveStatus,
+                                onShareSummary = streamingOutputViewModel::shareSummary,
+                            )
                         }
                     },
-                    onBottomNavRouteChange = { route -> bottomNavRoute = route },
-                    homeUiState = homeUiState,
-                    isStreamingEnabled = isStreamingEnabled,
-                    themeMode = themeMode,
-                    summaryLanguage = summaryLanguage,
-                    summaryLength = summaryLength,
-                    appVersion = BuildConfig.VERSION_NAME,
-                    outputUiState = outputUiState,
-                    streamingOutputUiState = streamingOutputUiState,
-                    historyUiState = historyUiState,
-                    historySearchQuery = historySearchQuery,
-                    savedUiState = savedUiState,
-                    savedSearchQuery = savedSearchQuery,
-                    webContentUiState = webContentUiState,
-                    onCopyToClipboard = streamingOutputViewModel::copyToClipboard,
-                    onShareSummary = streamingOutputViewModel::shareSummary,
-                    onToggleSaveStatus = streamingOutputViewModel::toggleSaveStatus,
-                    homeViewModel = homeViewModel,
-                    settingsViewModel = settingsViewModel,
-                    outputViewModel = outputViewModel,
-                    streamingOutputViewModel = streamingOutputViewModel,
-                    historyViewModel = historyViewModel,
-                    savedViewModel = savedViewModel,
-                    webContentViewModel = webContentViewModel,
-                )
+                    bottomBar = {
+                        if (shouldShowBottomBar(currentRoute)) {
+                            BottomNavigationBar(
+                                navController = navController,
+                                currentDestination = currentDestination,
+                            )
+                        }
+                    },
+                ) { innerPadding ->
+                    NutshellNavHost(
+                        navController = navController,
+                        modifier = Modifier.fillMaxSize(),
+                        innerPadding = innerPadding,
+                        homeUiState = homeUiState,
+                        isStreamingEnabled = isStreamingEnabled,
+                        themeMode = themeMode,
+                        summaryLanguage = summaryLanguage,
+                        summaryLength = summaryLength,
+                        appVersion = BuildConfig.VERSION_NAME,
+                        outputUiState = outputUiState,
+                        historyUiState = historyUiState,
+                        historySearchQuery = historySearchQuery,
+                        savedUiState = savedUiState,
+                        savedSearchQuery = savedSearchQuery,
+                        extractedContent = webContentUiState.extractedContent,
+                        homeViewModel = homeViewModel,
+                        settingsViewModel = settingsViewModel,
+                        outputViewModel = outputViewModel,
+                        streamingOutputViewModel = streamingOutputViewModel,
+                        historyViewModel = historyViewModel,
+                        savedViewModel = savedViewModel,
+                        webContentViewModel = webContentViewModel,
+                    )
+                }
             }
         }
     }
@@ -132,8 +177,118 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         setIntent(intent)
-        // Emit new intent to flow so LaunchedEffect reacts to it
         println("MainActivity: onNewIntent called - action: ${intent?.action}")
         _intentFlow.value = intent
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopAppBar(
+    currentRoute: String?,
+    streamingOutputUiState: StreamingOutputUiState,
+    onNavigateBack: () -> Unit,
+    onCopyToClipboard: () -> Unit,
+    onToggleSaveStatus: () -> Unit,
+    onShareSummary: () -> Unit,
+) {
+    androidx.compose.material3.TopAppBar(
+        title = {
+            Text(
+                text = getScreenTitle(currentRoute),
+                modifier = Modifier.padding(start = 8.dp),
+            )
+        },
+        navigationIcon = {
+            if (shouldShowBackButton(currentRoute)) {
+                IconButton(onClick = onNavigateBack) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                    )
+                }
+            }
+        },
+        actions = {
+            // Show action icons only for streaming output screen when streaming is complete
+            if (currentRoute?.startsWith("home/streaming") == true &&
+                !streamingOutputUiState.isStreaming &&
+                streamingOutputUiState.summaryData != null
+            ) {
+                IconButton(onClick = onCopyToClipboard) {
+                    Icon(
+                        imageVector = Icons.Default.ContentCopy,
+                        contentDescription = "Copy",
+                    )
+                }
+
+                IconButton(onClick = onToggleSaveStatus) {
+                    Icon(
+                        imageVector = if (streamingOutputUiState.summaryData?.isSaved == true) {
+                            Icons.Default.Bookmark
+                        } else {
+                            Icons.Default.BookmarkBorder
+                        },
+                        contentDescription = if (streamingOutputUiState.summaryData?.isSaved == true) {
+                            "Unsave"
+                        } else {
+                            "Save"
+                        },
+                    )
+                }
+
+                IconButton(onClick = onShareSummary) {
+                    Icon(
+                        imageVector = Icons.Default.Share,
+                        contentDescription = "Share",
+                    )
+                }
+            }
+        },
+    )
+}
+
+private fun shouldShowTopAppBar(route: String?): Boolean {
+    return when (route) {
+        null, "splash" -> false
+        else -> true
+    }
+}
+
+private fun shouldShowBottomBar(route: String?): Boolean {
+    return when {
+        route == null -> false
+        route == "splash" -> false
+        // Show for all tab routes and their nested screens
+        route.startsWith("home") -> true
+        route.startsWith("history") -> true
+        route.startsWith("saved") -> true
+        route.startsWith("settings") -> true
+        else -> false
+    }
+}
+
+private fun getScreenTitle(route: String?): String {
+    return when {
+        route == null -> ""
+        route == "splash" -> ""
+        route == "home_screen" -> "Home"
+        route == "history_screen" -> "History"
+        route == "saved_screen" -> "Saved"
+        route == "settings_screen" -> "Settings"
+        route == "home/output" -> "Summary"
+        route.startsWith("home/streaming") -> "Summary"
+        route == "home/loading" -> "Loading"
+        else -> ""
+    }
+}
+
+private fun shouldShowBackButton(route: String?): Boolean {
+    return when {
+        route == null -> false
+        route == "home/output" -> true
+        route.startsWith("home/streaming") -> true
+        route == "home/loading" -> true
+        else -> false
     }
 }

@@ -59,9 +59,13 @@ fun StreamingOutputScreen(
 
     // Start streaming when screen loads
     LaunchedEffect(inputText) {
+        println("StreamingOutputScreen: LaunchedEffect triggered with inputText length: ${inputText.length}")
         if (inputText.isNotBlank()) {
+            println("StreamingOutputScreen: Calling onStartStreaming with inputText")
             onResetState() // Reset state for fresh streaming session
             onStartStreaming(inputText)
+        } else {
+            println("StreamingOutputScreen: inputText is blank, not starting streaming")
         }
     }
 
