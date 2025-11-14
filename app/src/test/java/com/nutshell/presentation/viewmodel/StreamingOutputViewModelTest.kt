@@ -1,5 +1,6 @@
 package com.nutshell.presentation.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.nutshell.data.model.StreamingResult
 import com.nutshell.data.model.SummaryData
@@ -7,7 +8,10 @@ import com.nutshell.domain.repository.SummaryRepository
 import com.nutshell.utils.ClipboardUtils
 import com.nutshell.utils.ShareUtils
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
@@ -42,6 +46,15 @@ class StreamingOutputViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
+        
+        // Mock Android Log class
+        mockkStatic(Log::class)
+        every { Log.d(any(), any()) } returns 0
+        every { Log.e(any(), any()) } returns 0
+        every { Log.i(any(), any()) } returns 0
+        every { Log.w(any(), any<String>()) } returns 0
+        every { Log.v(any(), any()) } returns 0
+        
         repository = mockk(relaxed = true)
         clipboardUtils = mockk(relaxed = true)
         shareUtils = mockk(relaxed = true)
@@ -52,6 +65,7 @@ class StreamingOutputViewModelTest {
     @After
     fun tearDown() {
         Dispatchers.resetMain()
+        unmockkStatic(Log::class)
     }
 
     @Test
