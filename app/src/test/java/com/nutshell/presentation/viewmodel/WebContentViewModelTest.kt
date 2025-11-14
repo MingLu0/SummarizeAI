@@ -1,6 +1,8 @@
 package com.nutshell.presentation.viewmodel
 
 import android.content.Intent
+import com.nutshell.data.remote.extractor.WebContentExtractor
+import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -19,10 +21,12 @@ import org.robolectric.RobolectricTestRunner
 class WebContentViewModelTest {
 
     private lateinit var viewModel: WebContentViewModel
+    private lateinit var mockWebContentExtractor: WebContentExtractor
 
     @Before
     fun setup() {
-        viewModel = WebContentViewModel()
+        mockWebContentExtractor = mockk(relaxed = true)
+        viewModel = WebContentViewModel(mockWebContentExtractor)
     }
 
     @Test
@@ -39,7 +43,6 @@ class WebContentViewModelTest {
         // Assert
         val state = viewModel.uiState.value
         assertEquals("Should extract URL from shared text", expectedUrl, state.extractedContent)
-        assertEquals("Should set sharedUrl", expectedUrl, state.sharedUrl)
         assertFalse("Should not be extracting", state.isExtracting)
     }
 
@@ -188,7 +191,7 @@ class WebContentViewModelTest {
     }
 
     @Test
-    fun `handleIntent updates both extractedContent and sharedUrl in state`() {
+    fun `handleIntent updates extractedContent in state`() {
         // Arrange
         val expectedUrl = "https://example.com"
         val intent = Intent(Intent.ACTION_SEND).apply {
@@ -201,7 +204,6 @@ class WebContentViewModelTest {
         // Assert
         val state = viewModel.uiState.value
         assertEquals("Should update extractedContent in state", expectedUrl, state.extractedContent)
-        assertEquals("Should update sharedUrl in state", expectedUrl, state.sharedUrl)
     }
 
     @Test
@@ -219,6 +221,5 @@ class WebContentViewModelTest {
         // Assert
         val state = viewModel.uiState.value
         assertNull("Should clear extractedContent", state.extractedContent)
-        assertNull("Should clear sharedUrl", state.sharedUrl)
     }
 }
