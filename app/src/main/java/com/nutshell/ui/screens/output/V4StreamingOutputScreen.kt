@@ -19,11 +19,14 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nutshell.data.model.V4SummaryData
 import com.nutshell.presentation.viewmodel.V4StreamingOutputUiState
 import com.nutshell.ui.theme.*
 import kotlinx.coroutines.launch
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,10 +70,16 @@ fun V4StreamingOutputScreen(
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(currentSummaryText) {
-        if (currentSummaryText.isNotEmpty()) {
+    LaunchedEffect(currentSummaryText, uiState.isStreaming) {
+        if (currentSummaryText.isNotEmpty() && uiState.isStreaming) {
             coroutineScope.launch {
                 listState.animateScrollToItem(listState.layoutInfo.totalItemsCount)
+            }
+        }
+
+        if (!uiState.isStreaming) {
+            coroutineScope.launch {
+                listState.animateScrollToItem(0)
             }
         }
     }
@@ -170,7 +179,7 @@ fun V4StreamingOutputScreen(
                         state = listState,
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(20.dp),
+                            .padding(10.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         item {
@@ -272,3 +281,110 @@ fun V4StreamingOutputScreen(
  * Format double to specified decimal places
  */
 private fun Double.format(decimals: Int): String = "%.${decimals}f".format(this)
+
+@Preview(
+    name = "V4 Streaming - Completed",
+    showBackground = true,
+)
+@Composable
+private fun V4StreamingOutputScreenPreview() {
+    val mockSummaryData = V4SummaryData(
+        id = "preview-id",
+        originalText = "This is the original text that was summarized...",
+        title = "The Future of Artificial Intelligence in Healthcare",
+        mainSummary = "AI is revolutionizing healthcare by enabling faster diagnoses, personalized treatments, and improved patient outcomes through advanced data analysis.",
+        keyPoints = listOf(
+            "AI algorithms can analyze medical images with accuracy comparable to human experts",
+            "Machine learning models predict disease progression and treatment responses",
+            "Natural language processing helps extract insights from clinical notes"
+        ),
+        category = "Technology",
+        sentiment = "positive",
+        readTimeMin = 3,
+        shortSummary = "AI is transforming healthcare delivery",
+        mediumSummary = "AI revolutionizes healthcare with faster diagnoses and personalized treatments",
+        detailedSummary = "Full detailed summary...",
+        createdAt = Date(),
+        isSaved = false
+    )
+
+    val mockDisplayText = """
+        |The Future of Artificial Intelligence in Healthcare
+        |
+        |AI is revolutionizing healthcare by enabling faster diagnoses, personalized treatments, and improved patient outcomes through advanced data analysis.
+        |
+        |Key Points:
+        |• AI algorithms can analyze medical images with accuracy comparable to human experts
+        |• Machine learning models predict disease progression and treatment responses
+        |• Natural language processing helps extract insights from clinical notes
+        |
+        |Category: Technology | Sentiment: positive | Read time: 3 min
+    """.trimMargin()
+
+    val mockUiState = V4StreamingOutputUiState(
+        streamingText = "",
+        displayText = mockDisplayText,
+        isStreaming = false,
+        summaryData = mockSummaryData,
+        metadata = null,
+        tokensUsed = 1234,
+        latencyMs = 2500.0,
+        error = null
+    )
+
+    NutshellTheme {
+        V4StreamingOutputScreen(
+            uiState = mockUiState,
+            inputText = "Sample input text",
+            inputUrl = null,
+            style = "executive",
+            onNavigateBack = {},
+            onNavigateToHome = {},
+            onStartStreaming = { _, _, _ -> },
+            onCopyToClipboard = {},
+            onShareSummary = {},
+            onToggleSaveStatus = {},
+            onResetState = {}
+        )
+    }
+}
+
+@Preview(
+    name = "V4 Streaming - In Progress",
+    showBackground = true,
+)
+@Composable
+private fun V4StreamingOutputScreenStreamingPreview() {
+    val mockStreamingText = """
+        |The Future of Artificial Intelligence in Healthcare
+        |
+        |AI is revolutionizing healthcare by enabling faster diagnoses, personalized treatments...
+    """.trimMargin()
+
+    val mockUiState = V4StreamingOutputUiState(
+        streamingText = mockStreamingText,
+        displayText = "",
+        isStreaming = true,
+        summaryData = null,
+        metadata = null,
+        tokensUsed = 567,
+        latencyMs = null,
+        error = null
+    )
+
+    NutshellTheme {
+        V4StreamingOutputScreen(
+            uiState = mockUiState,
+            inputText = "Sample input text",
+            inputUrl = null,
+            style = "executive",
+            onNavigateBack = {},
+            onNavigateToHome = {},
+            onStartStreaming = { _, _, _ -> },
+            onCopyToClipboard = {},
+            onShareSummary = {},
+            onToggleSaveStatus = {},
+            onResetState = {}
+        )
+    }
+}

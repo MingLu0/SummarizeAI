@@ -95,20 +95,25 @@ class MainActivity : ComponentActivity() {
 
             // Unified intent navigation handler
             // Handles both extractedContent and shouldNavigateToMain in priority order
-            LaunchedEffect(webContentUiState.extractedContent, webContentUiState.shouldNavigateToMain) {
+            LaunchedEffect(webContentUiState.extractedContent, webContentUiState.shouldNavigateToMain, apiVersion) {
                 when {
                     // Priority 1: If we have extracted content, navigate directly to streaming
                     webContentUiState.extractedContent?.isNotBlank() == true -> {
                         val content = webContentUiState.extractedContent!!
-                        println("MainActivity: Intent with content detected, navigating DIRECTLY to StreamingOutput")
-                        
-                        // Navigate directly to the nested streaming route
-                        // This will automatically activate Home tab in bottom bar
-                        navController.navigate(Screen.StreamingOutput.createRoute(content)) {
-                            // Don't create multiple instances
-                            launchSingleTop = true
+
+                        // Check API version preference to determine which screen to navigate to
+                        if (apiVersion == ApiVersion.V4) {
+                            println("MainActivity: Intent with content detected, navigating to V4StreamingOutput")
+                            navController.navigate(Screen.V4StreamingOutput.createRoute(text = content)) {
+                                launchSingleTop = true
+                            }
+                        } else {
+                            println("MainActivity: Intent with content detected, navigating to V3 StreamingOutput")
+                            navController.navigate(Screen.StreamingOutput.createRoute(content)) {
+                                launchSingleTop = true
+                            }
                         }
-                        
+
                         // Clear after navigation to allow subsequent shares
                         kotlinx.coroutines.delay(500)
                         webContentViewModel.clearExtractedContent()
