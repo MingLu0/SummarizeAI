@@ -19,8 +19,8 @@ android {
         applicationId = "com.nutshell"
         minSdk = 24
         targetSdk = 34
-        versionCode = 26
-        versionName = "1.2.9"
+        versionCode = 27
+        versionName = "1.2.10"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
