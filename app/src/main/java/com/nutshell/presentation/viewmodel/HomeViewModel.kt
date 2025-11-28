@@ -3,6 +3,7 @@ package com.nutshell.presentation.viewmodel
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nutshell.data.local.preferences.ApiVersion
 import com.nutshell.data.local.preferences.UserPreferences
 import com.nutshell.data.model.ApiResult
 import com.nutshell.data.model.SummaryData
@@ -43,16 +44,34 @@ class HomeViewModel @Inject constructor(
             println("HomeViewModel: Starting summarization")
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
-            // Check if streaming is enabled
+            // Check API version and streaming preference
             val isStreamingEnabled = userPreferences.isStreamingEnabled.first()
+            val apiVersion = userPreferences.apiVersion.first()
+            val summaryStyle = userPreferences.summaryStyle.first()
 
-            if (isStreamingEnabled) {
-                // Navigate to streaming output screen
+            // Debug logging to diagnose issues
+            println("HomeViewModel: streaming=$isStreamingEnabled, apiVersion=$apiVersion, style=${summaryStyle.value}")
+
+            // Priority 1: V4 always uses streaming (regardless of streaming toggle)
+            if (apiVersion == ApiVersion.V4) {
+                println("HomeViewModel: Navigating to V4 streaming")
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    shouldNavigateToStreamingV4 = true,
+                    summaryStyle = summaryStyle.value,
+                )
+            }
+            // Priority 2: V3 with streaming enabled
+            else if (isStreamingEnabled) {
+                println("HomeViewModel: Navigating to V3 streaming")
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     shouldNavigateToStreaming = true,
                 )
-            } else {
+            }
+            // Priority 3: V3 traditional (non-streaming)
+            else {
+                println("HomeViewModel: Using V3 traditional API")
                 // Use traditional API
                 repository.summarizeText(currentText)
                     .let { result ->
@@ -97,6 +116,7 @@ class HomeViewModel @Inject constructor(
     fun clearNavigationFlags() {
         _uiState.value = _uiState.value.copy(
             shouldNavigateToStreaming = false,
+            shouldNavigateToStreamingV4 = false,
             shouldNavigateToOutput = false,
         )
     }
@@ -145,5 +165,8 @@ data class HomeUiState(
     val summaryData: SummaryData? = null,
     val error: String? = null,
     val shouldNavigateToStreaming: Boolean = false,
+    val shouldNavigateToStreamingV4: Boolean = false,
     val shouldNavigateToOutput: Boolean = false,
+    val summaryStyle: String = "executive",
+    val inputUrl: String? = null,  // For V4 URL input (future enhancement)
 )

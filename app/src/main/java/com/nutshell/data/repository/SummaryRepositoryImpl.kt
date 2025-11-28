@@ -5,11 +5,16 @@ import com.nutshell.data.local.datasource.SummaryLocalDataSource
 import com.nutshell.data.local.mapper.SummaryMapper.toSummaryData
 import com.nutshell.data.local.mapper.SummaryMapper.toSummaryDataList
 import com.nutshell.data.local.mapper.SummaryMapper.toSummaryEntity
+import com.nutshell.data.local.mapper.toSummaryEntity
 import com.nutshell.data.model.ApiResult
 import com.nutshell.data.model.StreamingResult
 import com.nutshell.data.model.SummaryData
+import com.nutshell.data.model.V4StreamEvent
+import com.nutshell.data.model.V4StreamingResult
+import com.nutshell.data.model.V4SummaryData
 import com.nutshell.data.remote.api.StreamingSummarizerService
 import com.nutshell.data.remote.api.SummarizeRequest
+import com.nutshell.data.remote.api.V4StreamingSummarizerService
 import com.nutshell.data.remote.datasource.SummaryRemoteDataSource
 import com.nutshell.domain.repository.SummaryRepository
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +28,7 @@ class SummaryRepositoryImpl @Inject constructor(
     private val remoteDataSource: SummaryRemoteDataSource,
     private val localDataSource: SummaryLocalDataSource,
     private val streamingService: StreamingSummarizerService,
+    private val v4StreamingService: V4StreamingSummarizerService,
 ) : SummaryRepository {
 
     companion object {
@@ -127,6 +133,82 @@ class SummaryRepositoryImpl @Inject constructor(
         localDataSource.searchSummaries(query).map { entities ->
             entities.toSummaryDataList()
         }
+
+    override fun summarizeTextStreamingV4(
+        text: String?,
+        url: String?,
+        style: String
+    ): Flow<V4StreamingResult> = flow {
+        try {
+            Log.d(TAG, "summarizeTextStreamingV4: Starting V4 streaming")
+            Log.d(TAG, "summarizeTextStreamingV4: Style: $style")
+
+            val originalInput = text ?: url ?: ""
+            var savedSummaryData: V4SummaryData? = null
+
+            v4StreamingService.streamSummaryV4(
+                text = text,
+                url = url,
+                style = style
+            ).collect { event ->
+                when (event) {
+                    is V4StreamEvent.Metadata -> {
+                        Log.d(TAG, "summarizeTextStreamingV4: Received metadata event")
+                        emit(
+                            V4StreamingResult.Metadata(
+                                inputType = event.inputType,
+                                url = event.url,
+                                title = event.title,
+                                style = event.style
+                            )
+                        )
+                    }
+
+                    is V4StreamEvent.Patch -> {
+                        Log.d(TAG, "summarizeTextStreamingV4: Received patch event, done=${event.done}")
+
+                        if (event.done) {
+                            // Final event - create and save summary data
+                            val finalSummaryData = V4SummaryData.fromStructuredSummary(
+                                structuredSummary = event.state,
+                                originalText = originalInput
+                            )
+                            savedSummaryData = finalSummaryData
+
+                            Log.d(TAG, "summarizeTextStreamingV4: Saving V4 summary to database")
+                            localDataSource.insertSummary(finalSummaryData.toSummaryEntity())
+
+                            emit(
+                                V4StreamingResult.Complete(
+                                    summaryData = finalSummaryData,
+                                    tokensUsed = event.tokensUsed,
+                                    latencyMs = event.latencyMs
+                                )
+                            )
+                        } else {
+                            // Progress update
+                            emit(
+                                V4StreamingResult.Progress(
+                                    structuredSummary = event.state,
+                                    tokensUsed = event.tokensUsed
+                                )
+                            )
+                        }
+                    }
+
+                    is V4StreamEvent.Error -> {
+                        Log.e(TAG, "summarizeTextStreamingV4: Error event: ${event.message}")
+                        emit(V4StreamingResult.Error(event.message))
+                    }
+                }
+            }
+
+            Log.d(TAG, "summarizeTextStreamingV4: Stream completed")
+        } catch (e: Exception) {
+            Log.e(TAG, "summarizeTextStreamingV4: Exception occurred", e)
+            emit(V4StreamingResult.Error(e.message ?: "Unknown error occurred"))
+        }
+    }
 
     private fun generateShortSummary(summary: String): String {
         // Generate a shorter version (first 2 sentences or 100 chars)

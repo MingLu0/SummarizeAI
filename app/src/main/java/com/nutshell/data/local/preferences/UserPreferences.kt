@@ -46,6 +46,17 @@ enum class SummaryLength(val displayName: String) {
     LONG("Long"),
 }
 
+enum class ApiVersion(val displayName: String) {
+    V3("V3 - Classic"),
+    V4("V4 - Structured Streaming (Beta)"),
+}
+
+enum class SummaryStyle(val value: String, val displayName: String, val description: String) {
+    SKIMMER("skimmer", "Skimmer", "Quick overview with key points"),
+    EXECUTIVE("executive", "Executive", "Balanced summary for professionals"),
+    ELI5("eli5", "ELI5", "Simple explanation, easy to understand"),
+}
+
 @Singleton
 class UserPreferences @Inject constructor(
     private val dataStore: DataStore<Preferences>,
@@ -55,6 +66,8 @@ class UserPreferences @Inject constructor(
     private val themeModeKey = stringPreferencesKey("theme_mode")
     private val summaryLanguageKey = stringPreferencesKey("summary_language")
     private val summaryLengthKey = stringPreferencesKey("summary_length")
+    private val apiVersionKey = stringPreferencesKey("api_version")
+    private val summaryStyleKey = stringPreferencesKey("summary_style")
 
     val isStreamingEnabled: Flow<Boolean> = dataStore.data
         .catch { exception ->
@@ -116,6 +129,40 @@ class UserPreferences @Inject constructor(
             }
         }
 
+    val apiVersion: Flow<ApiVersion> = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preferences ->
+            val versionString = preferences[apiVersionKey] ?: ApiVersion.V3.name
+            try {
+                ApiVersion.valueOf(versionString)
+            } catch (e: IllegalArgumentException) {
+                ApiVersion.V3
+            }
+        }
+
+    val summaryStyle: Flow<SummaryStyle> = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preferences ->
+            val styleString = preferences[summaryStyleKey] ?: SummaryStyle.EXECUTIVE.name
+            try {
+                SummaryStyle.valueOf(styleString)
+            } catch (e: IllegalArgumentException) {
+                SummaryStyle.EXECUTIVE
+            }
+        }
+
     suspend fun setStreamingEnabled(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[streamingEnabledKey] = enabled
@@ -137,6 +184,18 @@ class UserPreferences @Inject constructor(
     suspend fun setSummaryLength(length: SummaryLength) {
         dataStore.edit { preferences ->
             preferences[summaryLengthKey] = length.name
+        }
+    }
+
+    suspend fun setApiVersion(version: ApiVersion) {
+        dataStore.edit { preferences ->
+            preferences[apiVersionKey] = version.name
+        }
+    }
+
+    suspend fun setSummaryStyle(style: SummaryStyle) {
+        dataStore.edit { preferences ->
+            preferences[summaryStyleKey] = style.name
         }
     }
 }

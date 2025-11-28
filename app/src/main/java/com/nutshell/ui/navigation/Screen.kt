@@ -27,7 +27,15 @@ sealed class Screen(val route: String) {
             return "home/streaming/$encodedText"
         }
     }
-    
+
+    object V4StreamingOutput : Screen("home/v4streaming?text={text}&url={url}&style={style}") {
+        fun createRoute(text: String? = null, url: String? = null, style: String = "executive"): String {
+            val encodedText = text?.let { Uri.encode(it) } ?: ""
+            val encodedUrl = url?.let { Uri.encode(it) } ?: ""
+            return "home/v4streaming?text=$encodedText&url=$encodedUrl&style=$style"
+        }
+    }
+
     // Nested routes within History graph
     object HistoryScreen : Screen("history_screen")
     

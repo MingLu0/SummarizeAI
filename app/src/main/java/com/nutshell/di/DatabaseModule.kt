@@ -23,7 +23,8 @@ object DatabaseModule {
             context,
             SummarizeDatabase::class.java,
             SummarizeDatabase.DATABASE_NAME,
-        ).build()
+        ).addMigrations(SummarizeDatabase.MIGRATION_1_2)
+            .build()
     }
 
     @Provides

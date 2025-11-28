@@ -19,8 +19,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
+import com.nutshell.data.local.preferences.ApiVersion
 import com.nutshell.data.local.preferences.SummaryLanguage
 import com.nutshell.data.local.preferences.SummaryLength
+import com.nutshell.data.local.preferences.SummaryStyle
 import com.nutshell.data.local.preferences.ThemeMode
 import com.nutshell.presentation.viewmodel.*
 import com.nutshell.ui.screens.history.HistoryScreen
@@ -28,6 +30,7 @@ import com.nutshell.ui.screens.home.HomeScreen
 import com.nutshell.ui.screens.loading.LoadingScreen
 import com.nutshell.ui.screens.output.OutputScreen
 import com.nutshell.ui.screens.output.StreamingOutputScreen
+import com.nutshell.ui.screens.output.V4StreamingOutputScreen
 import com.nutshell.ui.screens.saved.SavedScreen
 import com.nutshell.ui.screens.settings.SettingsScreen
 import com.nutshell.ui.screens.splash.SplashScreen
@@ -70,6 +73,8 @@ fun NutshellNavHost(
     themeMode: ThemeMode,
     summaryLanguage: SummaryLanguage,
     summaryLength: SummaryLength,
+    apiVersion: ApiVersion,
+    summaryStyle: SummaryStyle,
     appVersion: String,
     outputUiState: OutputUiState,
     historyUiState: HistoryUiState,
@@ -81,6 +86,7 @@ fun NutshellNavHost(
     settingsViewModel: SettingsViewModel,
     outputViewModel: OutputViewModel,
     streamingOutputViewModel: StreamingOutputViewModel,
+    v4StreamingOutputViewModel: V4StreamingOutputViewModel,
     historyViewModel: HistoryViewModel,
     savedViewModel: SavedViewModel,
     webContentViewModel: WebContentViewModel,
@@ -129,6 +135,9 @@ fun NutshellNavHost(
                     onUploadFile = homeViewModel::uploadFile,
                     onNavigateToStreaming = { inputText ->
                         navController.navigate(Screen.StreamingOutput.createRoute(inputText))
+                    },
+                    onNavigateToStreamingV4 = { text, url, style ->
+                        navController.navigate(Screen.V4StreamingOutput.createRoute(text = text, url = url, style = style))
                     },
                     onNavigateToOutput = {
                         navController.navigate(Screen.Output.route)
@@ -221,6 +230,65 @@ fun NutshellNavHost(
                     onResetState = streamingOutputViewModel::resetState,
                 )
             }
+
+            // V4 Streaming Output Screen (with query parameters)
+            composable(
+                route = Screen.V4StreamingOutput.route,
+                arguments = listOf(
+                    navArgument("text") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    },
+                    navArgument("url") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    },
+                    navArgument("style") {
+                        type = NavType.StringType
+                        defaultValue = "executive"
+                    },
+                ),
+                enterTransition = { fadeInTransition + slideInTransition },
+                exitTransition = { fadeOutTransition + slideOutTransition },
+                popEnterTransition = { popEnterTransition },
+                popExitTransition = { popExitTransition },
+            ) { backStackEntry ->
+                val text = backStackEntry.arguments?.getString("text")?.let {
+                    if (it.isBlank()) null else Uri.decode(it)
+                }
+                val url = backStackEntry.arguments?.getString("url")?.let {
+                    if (it.isBlank()) null else Uri.decode(it)
+                }
+                val style = backStackEntry.arguments?.getString("style") ?: "executive"
+
+                val v4UiState by v4StreamingOutputViewModel.uiState.collectAsStateWithLifecycle()
+
+                V4StreamingOutputScreen(
+                    uiState = v4UiState,
+                    inputText = text,
+                    inputUrl = url,
+                    style = style,
+                    onNavigateBack = {
+                        homeViewModel.resetState()
+                        navController.popBackStack()
+                    },
+                    onNavigateToHome = {
+                        homeViewModel.resetState()
+                        navController.navigate(Screen.HomeScreen.route) {
+                            popUpTo(Screen.HomeScreen.route) {
+                                inclusive = false
+                            }
+                        }
+                    },
+                    onStartStreaming = v4StreamingOutputViewModel::startStreaming,
+                    onCopyToClipboard = v4StreamingOutputViewModel::copyToClipboard,
+                    onShareSummary = v4StreamingOutputViewModel::shareSummary,
+                    onToggleSaveStatus = v4StreamingOutputViewModel::toggleSaveStatus,
+                    onResetState = v4StreamingOutputViewModel::resetState,
+                )
+            }
         }
 
         // ====================
@@ -282,11 +350,15 @@ fun NutshellNavHost(
                     themeMode = themeMode,
                     summaryLanguage = summaryLanguage,
                     summaryLength = summaryLength,
+                    apiVersion = apiVersion,
+                    summaryStyle = summaryStyle,
                     appVersion = appVersion,
                     onSetStreamingEnabled = settingsViewModel::setStreamingEnabled,
                     onSetThemeMode = settingsViewModel::setThemeMode,
                     onSetSummaryLanguage = settingsViewModel::setSummaryLanguage,
                     onSetSummaryLength = settingsViewModel::setSummaryLength,
+                    onSetApiVersion = settingsViewModel::setApiVersion,
+                    onSetSummaryStyle = settingsViewModel::setSummaryStyle,
                 )
             }
         }

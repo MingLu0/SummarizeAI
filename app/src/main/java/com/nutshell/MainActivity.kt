@@ -21,8 +21,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.nutshell.data.local.preferences.ApiVersion
 import com.nutshell.data.local.preferences.SummaryLanguage
 import com.nutshell.data.local.preferences.SummaryLength
+import com.nutshell.data.local.preferences.SummaryStyle
 import com.nutshell.data.local.preferences.ThemeMode
 import com.nutshell.presentation.viewmodel.*
 import com.nutshell.ui.navigation.BottomNavigationBar
@@ -60,6 +62,7 @@ class MainActivity : ComponentActivity() {
             val settingsViewModel: SettingsViewModel = hiltViewModel()
             val outputViewModel: OutputViewModel = hiltViewModel()
             val streamingOutputViewModel: StreamingOutputViewModel = hiltViewModel()
+            val v4StreamingOutputViewModel: V4StreamingOutputViewModel = hiltViewModel()
             val historyViewModel: HistoryViewModel = hiltViewModel()
             val savedViewModel: SavedViewModel = hiltViewModel()
             val webContentViewModel: WebContentViewModel = hiltViewModel()
@@ -70,8 +73,11 @@ class MainActivity : ComponentActivity() {
             val themeMode by settingsViewModel.themeMode.collectAsStateWithLifecycle(initialValue = ThemeMode.SYSTEM)
             val summaryLanguage by settingsViewModel.summaryLanguage.collectAsStateWithLifecycle(initialValue = SummaryLanguage.ENGLISH)
             val summaryLength by settingsViewModel.summaryLength.collectAsStateWithLifecycle(initialValue = SummaryLength.SHORT)
+            val apiVersion by settingsViewModel.apiVersion.collectAsStateWithLifecycle(initialValue = ApiVersion.V3)
+            val summaryStyle by settingsViewModel.summaryStyle.collectAsStateWithLifecycle(initialValue = SummaryStyle.EXECUTIVE)
             val outputUiState by outputViewModel.uiState.collectAsStateWithLifecycle()
             val streamingOutputUiState by streamingOutputViewModel.uiState.collectAsStateWithLifecycle()
+            val v4StreamingOutputUiState by v4StreamingOutputViewModel.uiState.collectAsStateWithLifecycle()
             val historyUiState by historyViewModel.uiState.collectAsStateWithLifecycle()
             val historySearchQuery by historyViewModel.searchQuery.collectAsStateWithLifecycle()
             val savedUiState by savedViewModel.uiState.collectAsStateWithLifecycle()
@@ -129,10 +135,14 @@ class MainActivity : ComponentActivity() {
                             TopAppBar(
                                 currentRoute = currentRoute,
                                 streamingOutputUiState = streamingOutputUiState,
+                                v4StreamingOutputUiState = v4StreamingOutputUiState,
                                 onNavigateBack = { navController.navigateUp() },
                                 onCopyToClipboard = streamingOutputViewModel::copyToClipboard,
                                 onToggleSaveStatus = streamingOutputViewModel::toggleSaveStatus,
                                 onShareSummary = streamingOutputViewModel::shareSummary,
+                                onV4CopyToClipboard = v4StreamingOutputViewModel::copyToClipboard,
+                                onV4ToggleSaveStatus = v4StreamingOutputViewModel::toggleSaveStatus,
+                                onV4ShareSummary = v4StreamingOutputViewModel::shareSummary,
                             )
                         }
                     },
@@ -154,6 +164,8 @@ class MainActivity : ComponentActivity() {
                         themeMode = themeMode,
                         summaryLanguage = summaryLanguage,
                         summaryLength = summaryLength,
+                        apiVersion = apiVersion,
+                        summaryStyle = summaryStyle,
                         appVersion = BuildConfig.VERSION_NAME,
                         outputUiState = outputUiState,
                         historyUiState = historyUiState,
@@ -165,6 +177,7 @@ class MainActivity : ComponentActivity() {
                         settingsViewModel = settingsViewModel,
                         outputViewModel = outputViewModel,
                         streamingOutputViewModel = streamingOutputViewModel,
+                        v4StreamingOutputViewModel = v4StreamingOutputViewModel,
                         historyViewModel = historyViewModel,
                         savedViewModel = savedViewModel,
                         webContentViewModel = webContentViewModel,
@@ -187,10 +200,14 @@ class MainActivity : ComponentActivity() {
 private fun TopAppBar(
     currentRoute: String?,
     streamingOutputUiState: StreamingOutputUiState,
+    v4StreamingOutputUiState: V4StreamingOutputUiState,
     onNavigateBack: () -> Unit,
     onCopyToClipboard: () -> Unit,
     onToggleSaveStatus: () -> Unit,
     onShareSummary: () -> Unit,
+    onV4CopyToClipboard: () -> Unit,
+    onV4ToggleSaveStatus: () -> Unit,
+    onV4ShareSummary: () -> Unit,
 ) {
     androidx.compose.material3.TopAppBar(
         title = {
@@ -210,7 +227,7 @@ private fun TopAppBar(
             }
         },
         actions = {
-            // Show action icons only for streaming output screen when streaming is complete
+            // Show action icons for V3 streaming output when streaming is complete
             if (currentRoute?.startsWith("home/streaming") == true &&
                 !streamingOutputUiState.isStreaming &&
                 streamingOutputUiState.summaryData != null
@@ -238,6 +255,40 @@ private fun TopAppBar(
                 }
 
                 IconButton(onClick = onShareSummary) {
+                    Icon(
+                        imageVector = Icons.Default.Share,
+                        contentDescription = "Share",
+                    )
+                }
+            }
+            // Show action icons for V4 streaming output when streaming is complete
+            else if (currentRoute?.startsWith("home/v4streaming") == true &&
+                !v4StreamingOutputUiState.isStreaming &&
+                v4StreamingOutputUiState.summaryData != null
+            ) {
+                IconButton(onClick = onV4CopyToClipboard) {
+                    Icon(
+                        imageVector = Icons.Default.ContentCopy,
+                        contentDescription = "Copy",
+                    )
+                }
+
+                IconButton(onClick = onV4ToggleSaveStatus) {
+                    Icon(
+                        imageVector = if (v4StreamingOutputUiState.summaryData?.isSaved == true) {
+                            Icons.Default.Bookmark
+                        } else {
+                            Icons.Default.BookmarkBorder
+                        },
+                        contentDescription = if (v4StreamingOutputUiState.summaryData?.isSaved == true) {
+                            "Unsave"
+                        } else {
+                            "Save"
+                        },
+                    )
+                }
+
+                IconButton(onClick = onV4ShareSummary) {
                     Icon(
                         imageVector = Icons.Default.Share,
                         contentDescription = "Share",
@@ -278,6 +329,7 @@ private fun getScreenTitle(route: String?): String {
         route == "settings_screen" -> "Settings"
         route == "home/output" -> "Summary"
         route.startsWith("home/streaming") -> "Summary"
+        route.startsWith("home/v4streaming") -> "Summary"
         route == "home/loading" -> "Loading"
         else -> ""
     }
@@ -288,6 +340,7 @@ private fun shouldShowBackButton(route: String?): Boolean {
         route == null -> false
         route == "home/output" -> true
         route.startsWith("home/streaming") -> true
+        route.startsWith("home/v4streaming") -> true
         route == "home/loading" -> true
         else -> false
     }

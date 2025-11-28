@@ -9,9 +9,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Api
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Nightlight
 import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -22,8 +24,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nutshell.data.local.preferences.ApiVersion
 import com.nutshell.data.local.preferences.SummaryLanguage
 import com.nutshell.data.local.preferences.SummaryLength
+import com.nutshell.data.local.preferences.SummaryStyle
 import com.nutshell.data.local.preferences.ThemeMode
 import com.nutshell.ui.theme.*
 
@@ -34,11 +38,15 @@ fun SettingsScreen(
     themeMode: ThemeMode,
     summaryLanguage: SummaryLanguage,
     summaryLength: SummaryLength,
+    apiVersion: ApiVersion,
+    summaryStyle: SummaryStyle,
     appVersion: String,
     onSetStreamingEnabled: (Boolean) -> Unit,
     onSetThemeMode: (ThemeMode) -> Unit,
     onSetSummaryLanguage: (SummaryLanguage) -> Unit,
     onSetSummaryLength: (SummaryLength) -> Unit,
+    onSetApiVersion: (ApiVersion) -> Unit,
+    onSetSummaryStyle: (SummaryStyle) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -247,6 +255,117 @@ fun SettingsScreen(
                                     lengthExpanded = false
                                 },
                             )
+                        }
+                    }
+                }
+            }
+
+            // API Version Card
+            SettingsCard(
+                icon = Icons.Default.Api,
+                iconBackground = Purple50,
+                iconTint = Purple600,
+                title = "API Version",
+                description = "Choose between V3 (classic) or V4 (structured summaries)",
+            ) {
+                var apiVersionExpanded by remember { mutableStateOf(false) }
+
+                ExposedDropdownMenuBox(
+                    expanded = apiVersionExpanded,
+                    onExpandedChange = { apiVersionExpanded = it },
+                ) {
+                    OutlinedTextField(
+                        value = apiVersion.displayName,
+                        onValueChange = { },
+                        readOnly = true,
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = apiVersionExpanded)
+                        },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = apiVersionExpanded,
+                        onDismissRequest = { apiVersionExpanded = false },
+                    ) {
+                        ApiVersion.values().forEach { version ->
+                            DropdownMenuItem(
+                                text = { Text(version.displayName) },
+                                onClick = {
+                                    onSetApiVersion(version)
+                                    apiVersionExpanded = false
+                                },
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Summary Style Card (only visible when V4 is selected)
+            if (apiVersion == ApiVersion.V4) {
+                SettingsCard(
+                    icon = Icons.Default.Style,
+                    iconBackground = Green50,
+                    iconTint = Green600,
+                    title = "Summary Style",
+                    description = "Choose how summaries are generated (V4 only)",
+                ) {
+                    var styleExpanded by remember { mutableStateOf(false) }
+
+                    ExposedDropdownMenuBox(
+                        expanded = styleExpanded,
+                        onExpandedChange = { styleExpanded = it },
+                    ) {
+                        OutlinedTextField(
+                            value = summaryStyle.displayName,
+                            onValueChange = { },
+                            readOnly = true,
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = styleExpanded)
+                            },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = styleExpanded,
+                            onDismissRequest = { styleExpanded = false },
+                        ) {
+                            SummaryStyle.values().forEach { style ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Column {
+                                            Text(style.displayName)
+                                            Text(
+                                                text = style.description,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        }
+                                    },
+                                    onClick = {
+                                        onSetSummaryStyle(style)
+                                        styleExpanded = false
+                                    },
+                                )
+                            }
                         }
                     }
                 }

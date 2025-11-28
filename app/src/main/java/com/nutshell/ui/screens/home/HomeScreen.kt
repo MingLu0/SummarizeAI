@@ -41,20 +41,25 @@ fun HomeScreen(
     onSummarizeText: () -> Unit,
     onUploadFile: (Uri) -> Unit,
     onNavigateToStreaming: (String) -> Unit = {},
+    onNavigateToStreamingV4: (String, String?, String) -> Unit = { _, _, _ -> },
     onNavigateToOutput: () -> Unit = {},
     onClearNavigationFlags: () -> Unit = {},
 ) {
     val context = LocalContext.current
 
     // Handle navigation based on UI state
-    LaunchedEffect(uiState.shouldNavigateToStreaming, uiState.shouldNavigateToOutput) {
-        if (uiState.shouldNavigateToStreaming) {
+    LaunchedEffect(uiState.shouldNavigateToStreaming, uiState.shouldNavigateToStreamingV4, uiState.shouldNavigateToOutput) {
+        if (uiState.shouldNavigateToStreamingV4) {
+            // Navigate to V4 streaming screen
+            onNavigateToStreamingV4(uiState.textInput, uiState.inputUrl, uiState.summaryStyle)
+            onClearNavigationFlags()
+        } else if (uiState.shouldNavigateToStreaming) {
+            // Navigate to V3 streaming screen
             onNavigateToStreaming(uiState.textInput)
-            // Clear the navigation flag to prevent auto-navigation on return
             onClearNavigationFlags()
         } else if (uiState.shouldNavigateToOutput) {
+            // Navigate to traditional output screen
             onNavigateToOutput()
-            // Clear the navigation flag to prevent auto-navigation on return
             onClearNavigationFlags()
         }
     }
