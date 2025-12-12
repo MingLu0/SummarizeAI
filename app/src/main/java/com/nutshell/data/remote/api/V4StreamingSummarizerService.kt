@@ -28,7 +28,6 @@ class V4StreamingSummarizerService @Inject constructor(
 
     companion object {
         private const val TAG = "V4StreamingSummarizerSvc"
-        private const val BASE_URL = "https://colin730-summarizerapp.hf.space"
         private const val ENDPOINT = "/api/v4/scrape-and-summarize/stream-ndjson"
     }
 
@@ -43,6 +42,7 @@ class V4StreamingSummarizerService @Inject constructor(
 
     /**
      * Streams V4 API summary with structured fields.
+     * @param baseUrl Base URL of the API server (e.g., "http://192.168.88.12:7860")
      * @param text Input text to summarize (optional if url is provided)
      * @param url URL to scrape and summarize (optional if text is provided)
      * @param style Summary style: "skimmer", "executive", or "eli5"
@@ -51,6 +51,7 @@ class V4StreamingSummarizerService @Inject constructor(
      * @return Flow of V4StreamEvent (Metadata, Patch, Error)
      */
     fun streamSummaryV4(
+        baseUrl: String,
         text: String? = null,
         url: String? = null,
         style: String = "executive",
@@ -61,7 +62,7 @@ class V4StreamingSummarizerService @Inject constructor(
         require(text == null || url == null) { "Cannot provide both text and url" }
 
         try {
-            Log.d(TAG, "streamSummaryV4: Starting V4 SSE connection")
+            Log.d(TAG, "streamSummaryV4: Starting V4 SSE connection to $baseUrl")
             Log.d(TAG, "streamSummaryV4: Style: $style, maxTokens: $maxTokens")
 
             if (text != null) {
@@ -79,7 +80,7 @@ class V4StreamingSummarizerService @Inject constructor(
                 put("use_cache", true)
             }
 
-            client.preparePost("$BASE_URL$ENDPOINT") {
+            client.preparePost("$baseUrl$ENDPOINT") {
                 contentType(ContentType.Application.Json)
                 setBody(requestBody)
             }.execute { response ->

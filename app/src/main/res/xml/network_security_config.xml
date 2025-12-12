@@ -10,6 +10,7 @@
         <domain includeSubdomains="true">10.0.2.2</domain>
         
         <!-- Common local network IPs (for development) -->
+        <domain includeSubdomains="true">192.168.88.12</domain>
         <domain includeSubdomains="true">192.168.88.3</domain>
         <domain includeSubdomains="true">192.168.1.1</domain>
         <domain includeSubdomains="true">192.168.0.1</domain>

@@ -6,6 +6,7 @@ import com.nutshell.data.local.mapper.SummaryMapper.toSummaryData
 import com.nutshell.data.local.mapper.SummaryMapper.toSummaryDataList
 import com.nutshell.data.local.mapper.SummaryMapper.toSummaryEntity
 import com.nutshell.data.local.mapper.toSummaryEntity
+import com.nutshell.data.local.preferences.UserPreferences
 import com.nutshell.data.model.ApiResult
 import com.nutshell.data.model.StreamingResult
 import com.nutshell.data.model.SummaryData
@@ -17,7 +18,9 @@ import com.nutshell.data.remote.api.SummarizeRequest
 import com.nutshell.data.remote.api.V4StreamingSummarizerService
 import com.nutshell.data.remote.datasource.SummaryRemoteDataSource
 import com.nutshell.domain.repository.SummaryRepository
+import com.nutshell.utils.ServerAvailabilityChecker
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -29,6 +32,8 @@ class SummaryRepositoryImpl @Inject constructor(
     private val localDataSource: SummaryLocalDataSource,
     private val streamingService: StreamingSummarizerService,
     private val v4StreamingService: V4StreamingSummarizerService,
+    private val userPreferences: UserPreferences,
+    private val serverAvailabilityChecker: ServerAvailabilityChecker,
 ) : SummaryRepository {
 
     companion object {
@@ -143,10 +148,39 @@ class SummaryRepositoryImpl @Inject constructor(
             Log.d(TAG, "summarizeTextStreamingV4: Starting V4 streaming")
             Log.d(TAG, "summarizeTextStreamingV4: Style: $style")
 
+            // Determine which server to use with fallback logic
+            val localServerUrl = userPreferences.localServerUrl.first()
+            val fallbackServerUrl = userPreferences.fallbackServerUrl.first()
+            val preferLocal = userPreferences.preferLocalServer.first()
+
+            val primaryUrl = if (preferLocal) localServerUrl else fallbackServerUrl
+            val secondaryUrl = if (preferLocal) fallbackServerUrl else localServerUrl
+
+            Log.d(TAG, "summarizeTextStreamingV4: Checking server availability")
+            Log.d(TAG, "summarizeTextStreamingV4: Primary URL: $primaryUrl")
+            Log.d(TAG, "summarizeTextStreamingV4: Secondary URL: $secondaryUrl")
+
+            val selectedBaseUrl = when {
+                serverAvailabilityChecker.checkServerAvailability(primaryUrl) -> {
+                    Log.d(TAG, "summarizeTextStreamingV4: Using primary server: $primaryUrl")
+                    primaryUrl
+                }
+                serverAvailabilityChecker.checkServerAvailability(secondaryUrl) -> {
+                    Log.w(TAG, "summarizeTextStreamingV4: Primary server unavailable, using fallback: $secondaryUrl")
+                    secondaryUrl
+                }
+                else -> {
+                    val errorMessage = "No available servers. Both $primaryUrl and $secondaryUrl are unreachable."
+                    Log.e(TAG, "summarizeTextStreamingV4: $errorMessage")
+                    throw Exception(errorMessage)
+                }
+            }
+
             val originalInput = text ?: url ?: ""
             var savedSummaryData: V4SummaryData? = null
 
             v4StreamingService.streamSummaryV4(
+                baseUrl = selectedBaseUrl,
                 text = text,
                 url = url,
                 style = style

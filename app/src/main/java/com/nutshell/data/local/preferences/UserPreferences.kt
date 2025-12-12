@@ -68,6 +68,14 @@ class UserPreferences @Inject constructor(
     private val summaryLengthKey = stringPreferencesKey("summary_length")
     private val apiVersionKey = stringPreferencesKey("api_version")
     private val summaryStyleKey = stringPreferencesKey("summary_style")
+    private val localServerUrlKey = stringPreferencesKey("local_server_url")
+    private val fallbackServerUrlKey = stringPreferencesKey("fallback_server_url")
+    private val preferLocalServerKey = booleanPreferencesKey("prefer_local_server")
+
+    companion object {
+        const val DEFAULT_LOCAL_SERVER_URL = "http://192.168.88.12:7860"
+        const val DEFAULT_FALLBACK_SERVER_URL = "https://colin730-summarizerapp.hf.space"
+    }
 
     val isStreamingEnabled: Flow<Boolean> = dataStore.data
         .catch { exception ->
@@ -163,6 +171,42 @@ class UserPreferences @Inject constructor(
             }
         }
 
+    val localServerUrl: Flow<String> = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preferences ->
+            preferences[localServerUrlKey] ?: DEFAULT_LOCAL_SERVER_URL
+        }
+
+    val fallbackServerUrl: Flow<String> = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preferences ->
+            preferences[fallbackServerUrlKey] ?: DEFAULT_FALLBACK_SERVER_URL
+        }
+
+    val preferLocalServer: Flow<Boolean> = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preferences ->
+            preferences[preferLocalServerKey] ?: true // Default to prefer local server
+        }
+
     suspend fun setStreamingEnabled(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[streamingEnabledKey] = enabled
@@ -196,6 +240,24 @@ class UserPreferences @Inject constructor(
     suspend fun setSummaryStyle(style: SummaryStyle) {
         dataStore.edit { preferences ->
             preferences[summaryStyleKey] = style.name
+        }
+    }
+
+    suspend fun setLocalServerUrl(url: String) {
+        dataStore.edit { preferences ->
+            preferences[localServerUrlKey] = url
+        }
+    }
+
+    suspend fun setFallbackServerUrl(url: String) {
+        dataStore.edit { preferences ->
+            preferences[fallbackServerUrlKey] = url
+        }
+    }
+
+    suspend fun setPreferLocalServer(prefer: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[preferLocalServerKey] = prefer
         }
     }
 }
